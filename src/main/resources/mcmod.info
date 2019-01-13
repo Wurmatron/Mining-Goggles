@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "mininggoggles",
+    "name": "Mining Goggles",
+    "description": "",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "Wurmatron"
+    ],
+    "credits": "Special Thanks to Troykoffeman for the mod ideas",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
