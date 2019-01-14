@@ -78,7 +78,7 @@ public class ModuleRegistry {
     modules.add(new IModule() {
       @Override
       public String getName() {
-        return "movmentSpeed";
+        return "movementSpeed";
       }
 
       @Override

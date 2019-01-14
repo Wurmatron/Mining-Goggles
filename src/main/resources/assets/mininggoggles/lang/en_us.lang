@@ -1,2 +1,14 @@
 # Items
 item.gogglesMining.name=Mining Goggles
+
+# Tooltip
+tooltip.range.name=Range
+tooltip.modules.name=--Modules--
+tooltip.holdshift.name=Hold Shift
+
+# Modules
+module.nightVision.name=Night Vision
+module.autoFeed.name=Auto-Feed
+module.haste.name=Mining Boost
+module.movementSpeed.name=Movement Speed
+module.resistance.name=Damage Resistance

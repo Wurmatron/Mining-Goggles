@@ -6,6 +6,10 @@ import static com.wurmatron.mininggoggles.common.registry.ModuleRegistry.modules
 import com.wurmatron.mininggoggles.api.IModule;
 import com.wurmatron.mininggoggles.api.ModuleData;
 import com.wurmatron.mininggoggles.common.reference.Global;
+import com.wurmatron.mininggoggles.common.registry.ModuleRegistry;
+import java.util.List;
+import javax.annotation.Nullable;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -13,9 +17,12 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 
 public class ItemGogglesMining extends ItemArmor {
 
@@ -74,5 +81,33 @@ public class ItemGogglesMining extends ItemArmor {
     ItemStack stack = new ItemStack(MiningRegistry.gogglesMining, 1);
     stack.setTagCompound(nbt);
     return stack;
+  }
+
+  @Override
+  public void addInformation(ItemStack stack, @Nullable World world, List<String> tip,
+      ITooltipFlag flag) {
+    super.addInformation(stack, world, tip, flag);
+    if (stack.hasTagCompound()) {
+      if (stack.getTagCompound().hasKey(Global.NBT_RANGE)) {
+        tip.add(TextFormatting.GOLD + I18n.translateToLocal("tooltip.range.name") + ": " + stack
+            .getTagCompound().getInteger(Global.NBT_RANGE));
+      }
+      if (stack.getTagCompound().hasKey(Global.NBT_MODULES)) {
+        tip.add(TextFormatting.RED + I18n.translateToLocal("tooltip.modules.name"));
+        NBTTagCompound nbt = stack.getTagCompound().getCompoundTag(Global.NBT_MODULES);
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+          for (IModule module : ModuleRegistry.modules) {
+            if (nbt.hasKey(module.getName())) {
+              tip.add(TextFormatting.LIGHT_PURPLE + I18n
+                  .translateToLocal("module." + module.getName() + ".name") + (
+                  nbt.getString(module.getName()).length() > 0 ? nbt
+                      .getString(module.getName()) : ""));
+            }
+          }
+        } else {
+          tip.add(TextFormatting.GRAY + I18n.translateToLocal("tooltip.holdshift.name"));
+        }
+      }
+    }
   }
 }
