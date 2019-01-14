@@ -3,7 +3,7 @@ package com.wurmatron.mininggoggles.common.network;
 import com.wurmatron.mininggoggles.common.network.packets.OpenGuiMessage;
 import com.wurmatron.mininggoggles.common.network.packets.UpdateHelmetConfig;
 import com.wurmatron.mininggoggles.common.network.utils.CustomMessage;
-import com.wurmatron.mininggoggles.common.refrence.Global;
+import com.wurmatron.mininggoggles.common.reference.Global;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;

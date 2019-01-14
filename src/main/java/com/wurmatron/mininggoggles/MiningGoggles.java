@@ -1,10 +1,13 @@
 package com.wurmatron.mininggoggles;
 
 import com.wurmatron.mininggoggles.common.CommonProxy;
+import com.wurmatron.mininggoggles.common.items.MiningRegistry;
 import com.wurmatron.mininggoggles.common.network.GuiHandler;
 import com.wurmatron.mininggoggles.common.network.NetworkHandler;
-import com.wurmatron.mininggoggles.common.refrence.Global;
+import com.wurmatron.mininggoggles.common.reference.Global;
+import com.wurmatron.mininggoggles.common.registry.ModuleRegistry;
 import com.wurmatron.mininggoggles.common.registry.Registry;
+import java.util.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -29,7 +32,9 @@ public class MiningGoggles {
   @EventHandler
   public void onPreInit(FMLPreInitializationEvent e) {
     logger = e.getModLog();
+    ModuleRegistry.registerModules();
     MinecraftForge.EVENT_BUS.register(new Registry());
+    MiningRegistry.registerItems();
     proxy.preInit();
   }
 
@@ -39,11 +44,9 @@ public class MiningGoggles {
   }
 
   @EventHandler
-  public void onInit(FMLPostInitializationEvent e) {
+  public void onPostInit(FMLPostInitializationEvent e) {
     NetworkHandler.registerPackets();
     NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
     proxy.postInit();
   }
-
-
 }

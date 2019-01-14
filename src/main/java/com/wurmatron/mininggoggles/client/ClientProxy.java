@@ -1,7 +1,7 @@
 package com.wurmatron.mininggoggles.client;
 
 import com.wurmatron.mininggoggles.common.CommonProxy;
-import com.wurmatron.mininggoggles.common.refrence.Global;
+import com.wurmatron.mininggoggles.common.reference.Global;
 import com.wurmatron.mininggoggles.common.registry.Registry;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;

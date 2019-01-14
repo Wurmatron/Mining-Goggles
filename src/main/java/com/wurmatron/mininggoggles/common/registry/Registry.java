@@ -1,6 +1,6 @@
 package com.wurmatron.mininggoggles.common.registry;
 
-import com.wurmatron.mininggoggles.common.refrence.Global;
+import com.wurmatron.mininggoggles.common.reference.Global;
 import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -17,10 +17,11 @@ public class Registry {
   public static List<Block> blocks = new ArrayList<>();
   public static HashMap<Block, Item> blockItems = new HashMap<>();
 
-  public static void registerItem(Item item, String registryName) {
+  public static Item registerItem(Item item, String registryName) {
     item.setRegistryName(registryName);
     item.setUnlocalizedName(registryName);
     items.add(item);
+    return item;
   }
 
   public static Block registerBlock(Block block, String registryName) {
