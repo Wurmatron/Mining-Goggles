@@ -2,6 +2,7 @@ package com.wurmatron.mininggoggles.client;
 
 import com.wurmatron.mininggoggles.client.render.MiningGoggleEffect;
 import com.wurmatron.mininggoggles.common.CommonProxy;
+import com.wurmatron.mininggoggles.common.items.MiningRegistry;
 import com.wurmatron.mininggoggles.common.reference.Global;
 import com.wurmatron.mininggoggles.common.registry.Registry;
 import net.minecraft.block.Block;
@@ -30,6 +31,7 @@ public class ClientProxy extends CommonProxy {
 
   @SubscribeEvent
   public void modelBakeEvent(ModelRegistryEvent e) {
+    createModel(MiningRegistry.gogglesMining,MiningRegistry.gogglesMining.getUnlocalizedName().substring(5));
   }
 
   private static void createModel(Block block, int meta, String name) {
