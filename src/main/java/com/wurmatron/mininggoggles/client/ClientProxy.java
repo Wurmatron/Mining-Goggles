@@ -1,5 +1,6 @@
 package com.wurmatron.mininggoggles.client;
 
+import com.wurmatron.mininggoggles.client.render.MiningGoggleEffect;
 import com.wurmatron.mininggoggles.common.CommonProxy;
 import com.wurmatron.mininggoggles.common.reference.Global;
 import com.wurmatron.mininggoggles.common.registry.Registry;
@@ -20,6 +21,11 @@ public class ClientProxy extends CommonProxy {
   @Override
   public void preInit() {
     MinecraftForge.EVENT_BUS.register(new ClientProxy());
+  }
+
+  @Override
+  public void init() {
+    MinecraftForge.EVENT_BUS.register(new MiningGoggleEffect());
   }
 
   @SubscribeEvent

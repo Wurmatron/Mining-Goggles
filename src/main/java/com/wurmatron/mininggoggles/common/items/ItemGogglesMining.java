@@ -5,12 +5,17 @@ import static com.wurmatron.mininggoggles.common.registry.ModuleRegistry.modules
 
 import com.wurmatron.mininggoggles.api.IModule;
 import com.wurmatron.mininggoggles.api.ModuleData;
+import com.wurmatron.mininggoggles.common.network.GuiHandler;
+import com.wurmatron.mininggoggles.common.network.NetworkHandler;
+import com.wurmatron.mininggoggles.common.network.packets.OpenGuiMessage;
 import com.wurmatron.mininggoggles.common.reference.Global;
 import com.wurmatron.mininggoggles.common.registry.ModuleRegistry;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
@@ -109,5 +114,28 @@ public class ItemGogglesMining extends ItemArmor {
         }
       }
     }
+  }
+
+  @Override
+  public boolean onEntitySwing(EntityLivingBase entity, ItemStack stack) {
+    if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)
+        || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT) && !entity.world.isRemote) {
+      NetworkHandler
+          .sendToServer(new OpenGuiMessage(GuiHandler.GOGGLES_FILTER, entity.getPosition()));
+    }
+    return super.onEntitySwing(entity, stack);
+  }
+
+  // TODO Dynamic Texture Based on Modules and Range / Tier
+  @Nullable
+  @Override
+  public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot,
+      String type) {
+    return super.getArmorTexture(stack, entity, slot, type);
+  }
+
+  public static int getRange(ItemStack stack) {
+    return stack.hasTagCompound() && stack.getTagCompound().hasKey(Global.NBT_RANGE) ? stack
+        .getTagCompound().getInteger(Global.NBT_RANGE) : 0;
   }
 }

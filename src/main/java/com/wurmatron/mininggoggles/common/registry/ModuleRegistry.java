@@ -32,7 +32,7 @@ public class ModuleRegistry {
       @Override
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
-            new PotionEffect(Potion.getPotionFromResourceLocation("night_vision"), 60));
+            new PotionEffect(Potion.getPotionFromResourceLocation("night_vision"), 100));
       }
     });
     modules.add(new IModule() {
@@ -70,7 +70,7 @@ public class ModuleRegistry {
       @Override
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
-            new PotionEffect(Potion.getPotionFromResourceLocation("haste"), 60,
+            new PotionEffect(Potion.getPotionFromResourceLocation("haste"), 100,
                 Integer.parseInt(data) > 0 ? Integer.parseInt(data) : 1));
       }
     });
@@ -84,7 +84,7 @@ public class ModuleRegistry {
       @Override
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
-            new PotionEffect(Potion.getPotionFromResourceLocation("speed"), 60,
+            new PotionEffect(Potion.getPotionFromResourceLocation("speed"), 100,
                 Integer.parseInt(data) > 0 ? Integer.parseInt(data) : 1));
       }
     });
@@ -97,7 +97,7 @@ public class ModuleRegistry {
       @Override
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
-            new PotionEffect(Potion.getPotionFromResourceLocation("resistance"), 60,
+            new PotionEffect(Potion.getPotionFromResourceLocation("resistance"), 100,
                 Integer.parseInt(data) > 0 ? Integer.parseInt(data) : 1));
       }
     });

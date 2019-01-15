@@ -2,6 +2,7 @@ package com.wurmatron.mininggoggles.common.network.packets;
 
 import com.wurmatron.mininggoggles.common.items.ItemGogglesMining;
 import com.wurmatron.mininggoggles.common.network.utils.CustomMessage;
+import com.wurmatron.mininggoggles.common.reference.Global;
 import java.io.IOException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -34,10 +35,15 @@ public class UpdateHelmetConfig extends CustomMessage.CustomtServerMessage<Updat
   public void process(EntityPlayer player, Side side) {
     ItemStack stack = player.getHeldItemMainhand();
     if (stack != ItemStack.EMPTY && stack.getItem() instanceof ItemGogglesMining) {
-      if (stack.hasTagCompound() && stack.getTagCompound().hasKey("range")) {
-        nbt.setInteger("range", stack.getTagCompound().getInteger("range"));
+      NBTTagCompound currentNBT = stack.getTagCompound();
+      // Fix Invalid Stack
+      if (!stack.hasTagCompound()) {
+        currentNBT = new NBTTagCompound();
+        currentNBT.setInteger(Global.NBT_RANGE, 4);
+        currentNBT.setTag(Global.NBT_MODULES, new NBTTagCompound());
       }
-      stack.setTagCompound(nbt);
+      currentNBT.setTag(Global.NBT_FILTERS, nbt);
+      stack.setTagCompound(currentNBT);
     }
   }
 }
