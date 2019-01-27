@@ -15,7 +15,6 @@ public class ModuleRegistry {
   public static HashMap<String, Integer> moduleIDCache = new HashMap<>();
   public static HashMap<Integer, String> moduleNameCache = new HashMap<>();
 
-
   public static IModule getModuleForName(String name) {
     for (IModule module : modules) {
       if (module.getName().equals(name)) {
@@ -63,6 +62,11 @@ public class ModuleRegistry {
         player.addPotionEffect(
             new PotionEffect(Potion.getPotionFromResourceLocation("night_vision"), 240));
       }
+
+      @Override
+      public boolean renderOnModel() {
+        return true;
+      }
     });
     modules.add(new IModule() {
 
@@ -90,6 +94,11 @@ public class ModuleRegistry {
           }
         }
       }
+
+      @Override
+      public boolean renderOnModel() {
+        return true;
+      }
     });
     modules.add(new IModule() {
 
@@ -103,6 +112,11 @@ public class ModuleRegistry {
         player.addPotionEffect(
             new PotionEffect(Potion.getPotionFromResourceLocation("haste"), 240,
                 1));
+      }
+
+      @Override
+      public boolean renderOnModel() {
+        return false;
       }
     });
 
@@ -119,6 +133,11 @@ public class ModuleRegistry {
             new PotionEffect(Potion.getPotionFromResourceLocation("speed"), 240,
                 1));
       }
+
+      @Override
+      public boolean renderOnModel() {
+        return false;
+      }
     });
     modules.add(new IModule() {
 
@@ -131,6 +150,11 @@ public class ModuleRegistry {
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
             new PotionEffect(Potion.getPotionFromResourceLocation("resistance"), 240, 1));
+      }
+
+      @Override
+      public boolean renderOnModel() {
+        return true;
       }
     });
   }

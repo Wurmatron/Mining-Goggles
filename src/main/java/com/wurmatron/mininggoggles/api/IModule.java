@@ -8,4 +8,6 @@ public interface IModule {
 
   void onTick(EntityPlayer player, String data);
 
+  boolean renderOnModel();
+
 }

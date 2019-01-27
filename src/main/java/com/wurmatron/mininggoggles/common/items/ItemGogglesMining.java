@@ -10,7 +10,10 @@ import com.wurmatron.mininggoggles.common.network.container.InventoryGoggles;
 import com.wurmatron.mininggoggles.common.network.packets.OpenGuiMessage;
 import com.wurmatron.mininggoggles.common.reference.Global;
 import com.wurmatron.mininggoggles.common.registry.ModuleRegistry;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.TreeMap;
 import javax.annotation.Nullable;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -35,6 +38,7 @@ public class ItemGogglesMining extends ItemArmor {
 
   @SideOnly(Side.CLIENT)
   public static boolean armorDetection = false;
+
 
   public ItemGogglesMining(ArmorMaterial material) {
     super(material, 0, EntityEquipmentSlot.HEAD);
@@ -166,16 +170,62 @@ public class ItemGogglesMining extends ItemArmor {
     return super.onEntitySwing(entity, stack);
   }
 
-  // TODO Dynamic Texture Based on Modules and Range / Tier
   @Nullable
   @Override
   public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot,
       String type) {
-    return super.getArmorTexture(stack, entity, slot, type);
+    return Global.MODID + ":textures/models/" + getTexture(stack) + ".png";
   }
 
   public static int getRange(ItemStack stack) {
     return stack.hasTagCompound() && stack.getTagCompound().hasKey(Global.NBT_RANGE) ? stack
         .getTagCompound().getInteger(Global.NBT_RANGE) : 0;
   }
+
+  public static IModule[] getModules(ItemStack stack) {
+    List<IModule> modules = new ArrayList<>();
+    if (stack.getTagCompound().hasKey(Global.NBT_MODULES)) {
+      NBTTagList moduleNBT = stack.getTagCompound()
+          .getTagList(Global.NBT_MODULES, NBT.TAG_COMPOUND);
+      ItemStack lastModule = ItemStack.EMPTY;
+      for (int index = 0; index < InventoryGoggles.INV_SIZE; index++) {
+        ItemStack moduleStack = new ItemStack(moduleNBT.getCompoundTagAt(index));
+        if (!moduleStack.isEmpty() && !moduleStack.isItemEqual(lastModule)) {
+          lastModule = moduleStack;
+          IModule module = ModuleRegistry
+              .getModuleForName(
+                  ModuleRegistry.getModuleNameFromID(moduleStack.getItemDamage()));
+          if (module != null) {
+            modules.add(module);
+          }
+        }
+      }
+    }
+    return sortModulesBasedOnID(modules.toArray(new IModule[0]));
+  }
+
+  private static IModule[] sortModulesBasedOnID(IModule[] modules) {
+    TreeMap<Integer, IModule> sortedModules = new TreeMap<>(Collections.reverseOrder());
+    for (IModule module : modules) {
+      sortedModules.put(ModuleRegistry.getModuleIDFromName(module.getName()), module);
+    }
+    return sortedModules.descendingMap().values().toArray(new IModule[0]);
+  }
+
+  public String getTexture(ItemStack stack) {
+    IModule[] modules = getModules(stack);
+    StringBuilder builder = new StringBuilder();
+    builder.append("goggles");
+    if (modules.length > 0) {
+      for (IModule module : modules) {
+        if (module.renderOnModel()) {
+          builder.append("_" + module.getName());
+        }
+      }
+      return builder.toString();
+    }
+    return "goggles_default";
+  }
+
+
 }
