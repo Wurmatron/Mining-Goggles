@@ -80,13 +80,15 @@ public class ItemGogglesMining extends ItemArmor {
 
   @Override
   public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> sub) {
-    try {
-      IModule[] modules = new IModule[]{
-          getModuleForName("nightVision"),
-          getModuleForName("autoFeed")};
-      sub.add(create(8, modules));
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (tab == CreativeTabs.MISC) {
+      try {
+        IModule[] modules = new IModule[]{
+            getModuleForName("nightVision"),
+            getModuleForName("autoFeed")};
+        sub.add(create(8, modules));
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 
