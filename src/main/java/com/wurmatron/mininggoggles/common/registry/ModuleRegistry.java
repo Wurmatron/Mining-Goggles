@@ -102,7 +102,7 @@ public class ModuleRegistry {
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
             new PotionEffect(Potion.getPotionFromResourceLocation("haste"), 240,
-                Integer.parseInt(data) > 0 ? Integer.parseInt(data) : 1));
+                1));
       }
     });
 
@@ -117,7 +117,7 @@ public class ModuleRegistry {
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
             new PotionEffect(Potion.getPotionFromResourceLocation("speed"), 240,
-                Integer.parseInt(data) > 0 ? Integer.parseInt(data) : 1));
+                1));
       }
     });
     modules.add(new IModule() {
