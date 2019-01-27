@@ -1,5 +1,6 @@
 package com.wurmatron.mininggoggles.common.items;
 
+import com.wurmatron.mininggoggles.common.registry.ModuleRegistry;
 import com.wurmatron.mininggoggles.common.registry.Registry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
@@ -13,8 +14,10 @@ public class MiningRegistry {
 
   // Items
   public static Item gogglesMining;
+  public static Item itemModule;
 
   public static void registerItems() {
     gogglesMining = Registry.registerItem(new ItemGogglesMining(gogglesMaterial), "gogglesMining");
+    itemModule = Registry.registerItem(new ItemModule(ModuleRegistry.getNames()), "module");
   }
 }

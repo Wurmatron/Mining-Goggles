@@ -4,9 +4,9 @@ import static com.wurmatron.mininggoggles.common.registry.ModuleRegistry.getModu
 import static com.wurmatron.mininggoggles.common.registry.ModuleRegistry.modules;
 
 import com.wurmatron.mininggoggles.api.IModule;
-import com.wurmatron.mininggoggles.api.ModuleData;
 import com.wurmatron.mininggoggles.common.network.GuiHandler;
 import com.wurmatron.mininggoggles.common.network.NetworkHandler;
+import com.wurmatron.mininggoggles.common.network.container.InventoryGoggles;
 import com.wurmatron.mininggoggles.common.network.packets.OpenGuiMessage;
 import com.wurmatron.mininggoggles.common.reference.Global;
 import com.wurmatron.mininggoggles.common.registry.ModuleRegistry;
@@ -21,10 +21,12 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
@@ -49,11 +51,23 @@ public class ItemGogglesMining extends ItemArmor {
     } else
       // Server Side
       if (stack != ItemStack.EMPTY && stack.hasTagCompound()) {
-        if (stack.getTagCompound().hasKey(Global.NBT_MODULES)) {
-          for (IModule module : modules) {
-            if (stack.getTagCompound().getCompoundTag(Global.NBT_MODULES)
-                .hasKey(module.getName())) {
-              module.onTick(player, stack.getTagCompound().getString(module.getName()));
+        if (stack.getTagCompound().hasKey(Global.NBT_MODULES)
+            && world.getTotalWorldTime() % 20 == 0) {
+          NBTTagList moduleNBT = stack.getTagCompound()
+              .getTagList(Global.NBT_MODULES, NBT.TAG_COMPOUND);
+          ItemStack lastModule = ItemStack.EMPTY;
+          for (int index = 0; index < InventoryGoggles.INV_SIZE; index++) {
+            ItemStack moduleStack = new ItemStack(moduleNBT.getCompoundTagAt(index));
+            if (!moduleStack.isEmpty() && !moduleStack.isItemEqual(lastModule)) {
+              lastModule = moduleStack;
+              IModule module = ModuleRegistry
+                  .getModuleForName(
+                      ModuleRegistry.getModuleNameFromID(moduleStack.getItemDamage()));
+              if (module != null) {
+                module.onTick(player,
+                    moduleStack.getTagCompound() != null ? moduleStack.getTagCompound().toString()
+                        : "");
+              }
             }
           }
         }
@@ -62,19 +76,36 @@ public class ItemGogglesMining extends ItemArmor {
 
   @Override
   public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> sub) {
-    ModuleData[] modules = new ModuleData[]{
-        new ModuleData(getModuleForName("nightVision"), ""),
-        new ModuleData(getModuleForName("autoFeed"), "")};
-    sub.add(create(4, modules));
+    try {
+      IModule[] modules = new IModule[]{
+          getModuleForName("nightVision"),
+          getModuleForName("autoFeed")};
+      sub.add(create(8, modules));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
-  public static ItemStack create(int range, ModuleData[] modules) {
+  public static ItemStack create(int range, IModule[] modules) throws Exception {
     NBTTagCompound nbt = new NBTTagCompound();
     nbt.setInteger(Global.NBT_RANGE, range);
     if (modules != null && modules.length > 0) {
-      NBTTagCompound nbtModules = new NBTTagCompound();
-      for (ModuleData module : modules) {
-        nbtModules.setString(module.module.getName(), module.data);
+      NBTTagList nbtModules = new NBTTagList();
+      if (modules.length > InventoryGoggles.INV_SIZE) {
+        throw new Exception(
+            "Too many modules, max is " + InventoryGoggles.INV_SIZE + " you tried adding "
+                + modules.length);
+      }
+      for (IModule module : modules) {
+        ItemStack stack = new ItemStack(MiningRegistry.itemModule, 1,
+            ModuleRegistry.getModuleIDFromName(module.getName()));
+        nbtModules.appendTag(stack.writeToNBT(new NBTTagCompound()));
+      }
+      if (modules.length < InventoryGoggles.INV_SIZE) {
+        int amountLeft = InventoryGoggles.INV_SIZE - modules.length;
+        for (int index = amountLeft; index < InventoryGoggles.INV_SIZE; index++) {
+          nbtModules.appendTag(ItemStack.EMPTY.writeToNBT(new NBTTagCompound()));
+        }
       }
       nbt.setTag(Global.NBT_MODULES, nbtModules);
     }
@@ -91,6 +122,7 @@ public class ItemGogglesMining extends ItemArmor {
   @Override
   public void addInformation(ItemStack stack, @Nullable World world, List<String> tip,
       ITooltipFlag flag) {
+    tip.clear();
     super.addInformation(stack, world, tip, flag);
     if (stack.hasTagCompound()) {
       if (stack.getTagCompound().hasKey(Global.NBT_RANGE)) {
@@ -101,8 +133,16 @@ public class ItemGogglesMining extends ItemArmor {
         tip.add(TextFormatting.RED + I18n.translateToLocal("tooltip.modules.name"));
         NBTTagCompound nbt = stack.getTagCompound().getCompoundTag(Global.NBT_MODULES);
         if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-          for (IModule module : ModuleRegistry.modules) {
-            if (nbt.hasKey(module.getName())) {
+          NBTTagList moduleNBT = stack.getTagCompound()
+              .getTagList(Global.NBT_MODULES, NBT.TAG_COMPOUND);
+          ItemStack lastModule = ItemStack.EMPTY;
+          for (int index = 0; index < InventoryGoggles.INV_SIZE; index++) {
+            ItemStack moduleStack = new ItemStack(moduleNBT.getCompoundTagAt(index));
+            if (!moduleStack.isEmpty() && !moduleStack.isItemEqual(lastModule)) {
+              lastModule = moduleStack;
+              IModule module = ModuleRegistry
+                  .getModuleForName(
+                      ModuleRegistry.getModuleNameFromID(moduleStack.getItemDamage()));
               tip.add(TextFormatting.LIGHT_PURPLE + I18n
                   .translateToLocal("module." + module.getName() + ".name") + (
                   nbt.getString(module.getName()).length() > 0 ? nbt

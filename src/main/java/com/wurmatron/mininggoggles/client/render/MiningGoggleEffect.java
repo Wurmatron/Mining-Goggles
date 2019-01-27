@@ -120,7 +120,7 @@ public class MiningGoggleEffect {
 
   private static String[] getBlockNames(IBlockState block) {
     ItemStack itemBlock = new ItemStack(Item.getItemFromBlock(block.getBlock()), 1, 0);
-    if (itemBlock != ItemStack.EMPTY) {
+    if (itemBlock != ItemStack.EMPTY && !itemBlock.isEmpty()) {
       return Arrays.stream(OreDictionary.getOreIDs(itemBlock))
           .mapToObj(OreDictionary::getOreName).collect(Collectors.toList()).toArray(new String[0]);
     }

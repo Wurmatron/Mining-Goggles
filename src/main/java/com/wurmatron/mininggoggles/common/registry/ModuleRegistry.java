@@ -12,6 +12,9 @@ import net.minecraft.stats.StatList;
 public class ModuleRegistry {
 
   public static List<IModule> modules = new ArrayList<>();
+  public static HashMap<String, Integer> moduleIDCache = new HashMap<>();
+  public static HashMap<Integer, String> moduleNameCache = new HashMap<>();
+
 
   public static IModule getModuleForName(String name) {
     for (IModule module : modules) {
@@ -22,8 +25,34 @@ public class ModuleRegistry {
     return null;
   }
 
+  public static int getModuleIDFromName(String name) {
+    if (moduleIDCache.size() <= 0) {
+      for (int index = 0; index < modules.size(); index++) {
+        moduleIDCache.put(modules.get(index).getName(), index);
+      }
+    }
+    return moduleIDCache.getOrDefault(name, -1);
+  }
+
+  public static String getModuleNameFromID(int id) {
+    if (moduleNameCache.size() <= 0) {
+      for (int index = 0; index < modules.size(); index++) {
+        moduleNameCache.put(index, modules.get(index).getName());
+      }
+    }
+    return moduleNameCache.get(id);
+  }
+
+  public static String[] getNames() {
+    if (moduleIDCache.size() <= 0) {
+      getModuleIDFromName("");
+    }
+    return moduleIDCache.keySet().toArray(new String[0]);
+  }
+
   public static void registerModules() {
     modules.add(new IModule() {
+
       @Override
       public String getName() {
         return "nightVision";
@@ -32,10 +61,11 @@ public class ModuleRegistry {
       @Override
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
-            new PotionEffect(Potion.getPotionFromResourceLocation("night_vision"), 100));
+            new PotionEffect(Potion.getPotionFromResourceLocation("night_vision"), 240));
       }
     });
     modules.add(new IModule() {
+
       @Override
       public String getName() {
         return "autoFeed";
@@ -62,6 +92,7 @@ public class ModuleRegistry {
       }
     });
     modules.add(new IModule() {
+
       @Override
       public String getName() {
         return "haste";
@@ -70,12 +101,13 @@ public class ModuleRegistry {
       @Override
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
-            new PotionEffect(Potion.getPotionFromResourceLocation("haste"), 100,
+            new PotionEffect(Potion.getPotionFromResourceLocation("haste"), 240,
                 Integer.parseInt(data) > 0 ? Integer.parseInt(data) : 1));
       }
     });
 
     modules.add(new IModule() {
+
       @Override
       public String getName() {
         return "movementSpeed";
@@ -84,11 +116,12 @@ public class ModuleRegistry {
       @Override
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
-            new PotionEffect(Potion.getPotionFromResourceLocation("speed"), 100,
+            new PotionEffect(Potion.getPotionFromResourceLocation("speed"), 240,
                 Integer.parseInt(data) > 0 ? Integer.parseInt(data) : 1));
       }
     });
     modules.add(new IModule() {
+
       @Override
       public String getName() {
         return "resistance";
@@ -97,11 +130,8 @@ public class ModuleRegistry {
       @Override
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
-            new PotionEffect(Potion.getPotionFromResourceLocation("resistance"), 100,
-                Integer.parseInt(data) > 0 ? Integer.parseInt(data) : 1));
+            new PotionEffect(Potion.getPotionFromResourceLocation("resistance"), 240, 1));
       }
     });
   }
-
-
 }

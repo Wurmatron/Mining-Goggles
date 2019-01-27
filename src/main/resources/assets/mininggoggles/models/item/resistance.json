@@ -1,0 +1,6 @@
+{
+  "parent": "mininggoggles:item/basic_item",
+  "textures": {
+    "layer0": "mininggoggles:gui/resistance"
+  }
+}
