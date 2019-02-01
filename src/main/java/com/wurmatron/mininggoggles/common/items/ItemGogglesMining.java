@@ -30,15 +30,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 public class ItemGogglesMining extends ItemArmor {
 
-  @SideOnly(Side.CLIENT)
   public static boolean armorDetection = false;
-
 
   public ItemGogglesMining(ArmorMaterial material) {
     super(material, 0, EntityEquipmentSlot.HEAD);
@@ -85,6 +81,9 @@ public class ItemGogglesMining extends ItemArmor {
         IModule[] modules = new IModule[]{
             getModuleForName("nightVision"),
             getModuleForName("autoFeed")};
+        sub.add(create(3, modules));
+        sub.add(create(4, modules));
+        sub.add(create(6, modules));
         sub.add(create(8, modules));
       } catch (Exception e) {
         e.printStackTrace();
@@ -128,7 +127,6 @@ public class ItemGogglesMining extends ItemArmor {
   @Override
   public void addInformation(ItemStack stack, @Nullable World world, List<String> tip,
       ITooltipFlag flag) {
-    tip.clear();
     super.addInformation(stack, world, tip, flag);
     if (stack.hasTagCompound()) {
       if (stack.getTagCompound().hasKey(Global.NBT_RANGE)) {
