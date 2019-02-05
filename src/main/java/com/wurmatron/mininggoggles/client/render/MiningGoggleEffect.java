@@ -50,7 +50,7 @@ public class MiningGoggleEffect {
           return;
         }
         int range = ItemGogglesMining.getRange(player.
-            inventory.armorItemInSlot(3));
+            inventory.armorInventory.get(3));
         MiningGoggleEffect.oreTargets.clear();
         Iterable<BlockPos> blocksToTest = BlockPos
             .getAllInBox((int) player.posX - range, (int) player.posY - range,
@@ -66,15 +66,15 @@ public class MiningGoggleEffect {
   }
 
   private boolean checkArmor(EntityPlayer player) {
-    return player.inventory.armorItemInSlot(3) != ItemStack.EMPTY && player.inventory
-        .armorItemInSlot(3).getItem() instanceof ItemGogglesMining;
+    return player.inventory.armorInventory.get(3) != ItemStack.EMPTY && player.inventory
+        .armorInventory.get(3).getItem() instanceof ItemGogglesMining;
   }
 
   private void validatePos(World world, BlockPos pos, EntityPlayer player) {
     if (world.getBlockState(pos).getBlock() instanceof Block
         && world.getBlockState(pos).getBlock() != Blocks.AIR) {
       int oreColor = getColorForOre(
-          player.inventory.armorItemInSlot(3).getTagCompound().getCompoundTag(Global.NBT_FILTERS),
+          player.inventory.armorInventory.get(3).getTagCompound().getCompoundTag(Global.NBT_FILTERS),
           world.getBlockState(pos), world.getTileEntity(pos));
       if (oreColor != -1) {
         MiningGoggleEffect.oreTargets
