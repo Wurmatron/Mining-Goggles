@@ -8,6 +8,8 @@ import com.wurmatron.mininggoggles.common.reference.Global;
 import com.wurmatron.mininggoggles.common.registry.ModuleRegistry;
 import com.wurmatron.mininggoggles.common.registry.Registry;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -28,6 +30,8 @@ public class MiningGoggles {
   public static CommonProxy proxy;
 
   public static Logger logger;
+
+  public static ExecutorService EXECUTORS = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
   @EventHandler
   public void onPreInit(FMLPreInitializationEvent e) {

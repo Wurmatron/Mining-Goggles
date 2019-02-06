@@ -2,13 +2,12 @@ package com.wurmatron.mininggoggles.client.render;
 
 import static com.wurmatron.mininggoggles.common.items.ItemGogglesMining.armorDetection;
 
+import com.wurmatron.mininggoggles.MiningGoggles;
 import com.wurmatron.mininggoggles.common.ConfigHandler;
 import com.wurmatron.mininggoggles.common.items.ItemGogglesMining;
 import com.wurmatron.mininggoggles.common.reference.Global;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -26,11 +25,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
+import org.cliffc.high_scale_lib.NonBlockingHashMap;
+import org.cliffc.high_scale_lib.NonBlockingHashSet;
 
 public class MiningGoggleEffect {
 
-  private static List<RenderOre> oreTargets = new ArrayList<>();
-  private static HashMap<String, Integer> filterCache = new HashMap<>();
+  private static NonBlockingHashSet<RenderOre> oreTargets = new NonBlockingHashSet<>();
+  private static NonBlockingHashMap<String, Integer> filterCache = new NonBlockingHashMap<>();
 
   @SubscribeEvent
   public void renderInWorld(RenderWorldLastEvent e) {
@@ -42,27 +43,88 @@ public class MiningGoggleEffect {
   @SubscribeEvent
   public void onClientTick(ClientTickEvent e) {
     if (e.side == Side.CLIENT && armorDetection) {
-      EntityPlayer player = Minecraft.getMinecraft().player;
-      if (player != null && player.world != null
-          && player.world.getWorldTime() % ConfigHandler.gogglesUpdateFrequency == 0) {
-        if (!checkArmor(player)) {
-          armorDetection = false;
-          return;
+      // 1st Half
+      MiningGoggles.EXECUTORS.submit(() -> {
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        if (player != null && player.world != null
+            &&
+            player.world.getWorldTime() % (calcRangeModifier(
+                ItemGogglesMining.getRange(player.
+                    inventory.armorInventory.get(3)))) == 0) {
+          if (!checkArmor(player)) {
+            armorDetection = false;
+            return;
+          }
+          int range = ItemGogglesMining.getRange(player.
+              inventory.armorInventory.get(3));
+          removeOutdatedEntries(player.getPosition(), range);
+          Iterable<BlockPos> blocksToTest = BlockPos
+              .getAllInBox((int) player.posX - range, (int) player.posY - range,
+                  (int) player.posZ - range, (int) player.posX + range, (int) player.posY + range,
+                  (int) player.posZ + range);
+          for (BlockPos pos : blocksToTest) {
+            validatePos(player.world, pos, player);
+          }
         }
-        int range = ItemGogglesMining.getRange(player.
-            inventory.armorInventory.get(3));
-        MiningGoggleEffect.oreTargets.clear();
-        Iterable<BlockPos> blocksToTest = BlockPos
-            .getAllInBox((int) player.posX - range, (int) player.posY - range,
-                (int) player.posZ - range, (int) player.posX + range, (int) player.posY + range,
-                (int) player.posZ + range);
-        for (BlockPos pos : blocksToTest) {
-          validatePos(player.world, pos, player);
+      });
+      // 2nd Half
+      MiningGoggles.EXECUTORS.submit(() -> {
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        if (player != null && player.world != null
+            &&
+            player.world.getWorldTime() % (calcRangeModifier(
+                ItemGogglesMining.getRange(player.
+                    inventory.armorInventory.get(3)))) == 0) {
+          if (!checkArmor(player)) {
+            armorDetection = false;
+            return;
+          }
+          int range = ItemGogglesMining.getRange(player.
+              inventory.armorInventory.get(3));
+          Iterable<BlockPos> blocksToTest = BlockPos
+              .getAllInBox((int) player.posX + range, (int) player.posY + range,
+                  (int) player.posZ + range, (int) player.posX + range * 2,
+                  (int) player.posY + range * 2,
+                  (int) player.posZ + range * 2);
+          for (BlockPos pos : blocksToTest) {
+            validatePos(player.world, pos, player);
+          }
         }
-      }
+      });
     } else if (!MiningGoggleEffect.oreTargets.isEmpty()) {
       MiningGoggleEffect.oreTargets.clear();
     }
+  }
+
+  private void removeOutdatedEntries(BlockPos playerPos, int updateRange) {
+    MiningGoggles.EXECUTORS.submit(() -> {
+      Iterator<RenderOre> iterator = oreTargets.iterator();
+      while (iterator.hasNext()) {
+        RenderOre ore = iterator.next();
+        boolean withinX = ore.pos.getX() + updateRange > playerPos.getX()
+            || ore.pos.getX() - updateRange > playerPos.getX();
+        boolean withinY = ore.pos.getY() + updateRange > playerPos.getY()
+            || ore.pos.getY() - updateRange > playerPos.getY();
+        boolean withinZ = ore.pos.getZ() + updateRange > playerPos.getZ()
+            || ore.pos.getZ() - updateRange > playerPos.getZ();
+        if (!withinX || !withinY || !withinZ) {
+          oreTargets.remove(ore);
+        }
+      }
+    });
+  }
+
+  private double calcRangeModifier(int range) {
+    if (range > 4) {
+      if (range <= 64) {
+        return ConfigHandler.gogglesUpdateFrequency + range/4;
+      } else if (range <= 256) {
+        return ConfigHandler.gogglesUpdateFrequency + ( range);
+      } else {
+        return ConfigHandler.gogglesUpdateFrequency + (2 * range);
+      }
+    }
+    return ConfigHandler.gogglesUpdateFrequency;
   }
 
   private boolean checkArmor(EntityPlayer player) {
@@ -74,7 +136,8 @@ public class MiningGoggleEffect {
     if (world.getBlockState(pos).getBlock() instanceof Block
         && world.getBlockState(pos).getBlock() != Blocks.AIR) {
       int oreColor = getColorForOre(
-          player.inventory.armorInventory.get(3).getTagCompound().getCompoundTag(Global.NBT_FILTERS),
+          player.inventory.armorInventory.get(3).getTagCompound()
+              .getCompoundTag(Global.NBT_FILTERS),
           world.getBlockState(pos), world.getTileEntity(pos));
       if (oreColor != -1) {
         MiningGoggleEffect.oreTargets

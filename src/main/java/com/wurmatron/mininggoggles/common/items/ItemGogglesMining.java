@@ -85,6 +85,9 @@ public class ItemGogglesMining extends ItemArmor {
         sub.add(create(4, modules));
         sub.add(create(6, modules));
         sub.add(create(8, modules));
+        sub.add(create(16, modules));
+        sub.add(create(32, modules));
+        sub.add(create(64, modules));
       } catch (Exception e) {
         e.printStackTrace();
       }

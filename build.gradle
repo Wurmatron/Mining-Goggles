@@ -9,6 +9,7 @@ buildscript {
 }
 plugins {
     id 'com.diffplug.gradle.spotless' version '3.4.0'
+    id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
@@ -28,10 +29,23 @@ minecraft {
     clientRunArgs += "--username=${username}"
 }
 
+shadowJar.archiveName = "${archivesBaseName}-${version}.jar"
+shadowJar {
+    dependencies {
+        exclude('dummy*')
+        include(dependency('com.github.stephenc.high-scale-lib:high-scale-lib:1.1.4'))
+    }
+}
+
+reobf {
+    shadowJar {}
+}
+
 repositories {
 }
 
 dependencies {
+    compile group: 'com.github.stephenc.high-scale-lib', name: 'high-scale-lib', version: '1.1.4'
 }
 
 spotless {
