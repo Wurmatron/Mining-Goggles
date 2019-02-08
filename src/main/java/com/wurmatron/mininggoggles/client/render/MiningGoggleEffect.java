@@ -57,7 +57,7 @@ public class MiningGoggleEffect {
           }
           int range = ItemGogglesMining.getRange(player.
               inventory.armorInventory.get(3));
-          removeOutdatedEntries(player.getPosition(), range);
+          removeOutdatedEntries(player.world,player.getPosition(), range);
           Iterable<BlockPos> blocksToTest = BlockPos
               .getAllInBox((int) player.posX - range, (int) player.posY - range,
                   (int) player.posZ - range, (int) player.posX + range, (int) player.posY + range,
@@ -96,7 +96,7 @@ public class MiningGoggleEffect {
     }
   }
 
-  private void removeOutdatedEntries(BlockPos playerPos, int updateRange) {
+  private void removeOutdatedEntries(World world,BlockPos playerPos, int updateRange) {
     MiningGoggles.EXECUTORS.submit(() -> {
       Iterator<RenderOre> iterator = oreTargets.iterator();
       while (iterator.hasNext()) {
@@ -107,7 +107,8 @@ public class MiningGoggleEffect {
             || ore.pos.getY() - updateRange > playerPos.getY();
         boolean withinZ = ore.pos.getZ() + updateRange > playerPos.getZ()
             || ore.pos.getZ() - updateRange > playerPos.getZ();
-        if (!withinX || !withinY || !withinZ) {
+        boolean exist = world.getBlockState(ore.pos).getBlock() != Blocks.AIR;
+        if (!withinX || !withinY || !withinZ || !exist) {
           oreTargets.remove(ore);
         }
       }

@@ -7,7 +7,6 @@ import com.wurmatron.mininggoggles.common.network.NetworkHandler;
 import com.wurmatron.mininggoggles.common.reference.Global;
 import com.wurmatron.mininggoggles.common.registry.ModuleRegistry;
 import com.wurmatron.mininggoggles.common.registry.Registry;
-import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import net.minecraftforge.common.MinecraftForge;
