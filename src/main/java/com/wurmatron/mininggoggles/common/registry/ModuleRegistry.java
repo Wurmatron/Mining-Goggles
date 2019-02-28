@@ -89,6 +89,7 @@ public class ModuleRegistry {
                 } else {
                   player.inventory.deleteStack(stack);
                 }
+                player.inventory.markDirty();
               }
             }
           }
