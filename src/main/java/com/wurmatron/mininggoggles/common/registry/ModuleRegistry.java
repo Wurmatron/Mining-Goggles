@@ -1,6 +1,7 @@
 package com.wurmatron.mininggoggles.common.registry;
 
 import com.wurmatron.mininggoggles.api.IModule;
+import com.wurmatron.mininggoggles.common.registry.support.AutoFeedSOLModule;
 import java.util.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
@@ -8,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.stats.StatList;
+import net.minecraftforge.fml.common.Loader;
 
 public class ModuleRegistry {
 
@@ -68,39 +70,43 @@ public class ModuleRegistry {
         return true;
       }
     });
-    modules.add(new IModule() {
+    if (Loader.isModLoaded("spiceoflife")) {
+     modules.add(new AutoFeedSOLModule());
+    } else {
+      modules.add(new IModule() {
 
-      @Override
-      public String getName() {
-        return "autoFeed";
-      }
+        @Override
+        public String getName() {
+          return "autoFeed";
+        }
 
-      @Override
-      public void onTick(EntityPlayer player, String data) {
-        if (player.getFoodStats().needFood()) {
-          for (ItemStack stack : player.inventory.mainInventory) {
-            if (stack.getItem() instanceof ItemFood) {
-              ItemFood food = (ItemFood) stack.getItem();
-              if (player.getFoodStats().getFoodLevel() + food.getHealAmount(stack) <= 20) {
-                player.getFoodStats().addStats(food, stack);
-                player.addStat(StatList.getObjectUseStats(food));
-                if (stack.getCount() > 1) {
-                  stack.setCount(stack.getCount() - 1);
-                } else {
-                  player.inventory.deleteStack(stack);
+        @Override
+        public void onTick(EntityPlayer player, String data) {
+          if (player.getFoodStats().needFood()) {
+            for (ItemStack stack : player.inventory.mainInventory) {
+              if (stack.getItem() instanceof ItemFood) {
+                ItemFood food = (ItemFood) stack.getItem();
+                if (player.getFoodStats().getFoodLevel() + food.getHealAmount(stack) <= 20) {
+                  player.getFoodStats().addStats(food, stack);
+                  player.addStat(StatList.getObjectUseStats(food));
+                  if (stack.getCount() > 1) {
+                    stack.setCount(stack.getCount() - 1);
+                  } else {
+                    player.inventory.deleteStack(stack);
+                  }
+                  player.inventory.markDirty();
                 }
-                player.inventory.markDirty();
               }
             }
           }
         }
-      }
 
-      @Override
-      public boolean renderOnModel() {
-        return true;
-      }
-    });
+        @Override
+        public boolean renderOnModel() {
+          return true;
+        }
+      });
+    }
     modules.add(new IModule() {
 
       @Override
