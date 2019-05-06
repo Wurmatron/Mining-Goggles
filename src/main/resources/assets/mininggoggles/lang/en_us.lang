@@ -13,6 +13,7 @@ module.autoFeed.name=Auto-Feed
 module.haste.name=Mining Boost
 module.movementSpeed.name=Movement Speed
 module.resistance.name=Damage Resistance
+module.waterBreathing.name=Water-Breathing
 
 # KeyBindings
 key.mininggoggles.category=Mining Goggles

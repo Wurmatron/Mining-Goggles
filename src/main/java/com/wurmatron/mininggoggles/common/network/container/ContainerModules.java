@@ -106,7 +106,7 @@ public class ContainerModules extends Container {
         return ItemStack.EMPTY;
       }
     } else if (sourceSlotIndex >= 0 && sourceSlotIndex < InventoryGoggles.INV_SIZE) {
-      if (!mergeItemStack(sourceStack, INV_START, INV_START + HOTBAR_END, false)) {
+      if (!mergeItemStack(sourceStack, INV_START, INV_START + HOTBAR_END - 1, false)) {
         return ItemStack.EMPTY;
       }
     } else {

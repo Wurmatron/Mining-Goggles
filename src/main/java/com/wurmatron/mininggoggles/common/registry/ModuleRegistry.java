@@ -2,7 +2,9 @@ package com.wurmatron.mininggoggles.common.registry;
 
 import com.wurmatron.mininggoggles.api.IModule;
 import com.wurmatron.mininggoggles.common.registry.support.AutoFeedSOLModule;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
@@ -71,7 +73,7 @@ public class ModuleRegistry {
       }
     });
     if (Loader.isModLoaded("spiceoflife")) {
-     modules.add(new AutoFeedSOLModule());
+      modules.add(new AutoFeedSOLModule());
     } else {
       modules.add(new IModule() {
 
@@ -157,6 +159,24 @@ public class ModuleRegistry {
       public void onTick(EntityPlayer player, String data) {
         player.addPotionEffect(
             new PotionEffect(Potion.getPotionFromResourceLocation("resistance"), 240, 1));
+      }
+
+      @Override
+      public boolean renderOnModel() {
+        return true;
+      }
+    });
+
+    modules.add(new IModule() {
+      @Override
+      public String getName() {
+        return "waterBreathing";
+      }
+
+      @Override
+      public void onTick(EntityPlayer player, String data) {
+        player.addPotionEffect(
+            new PotionEffect(Potion.getPotionFromResourceLocation("water_breathing"), 240, 1));
       }
 
       @Override
