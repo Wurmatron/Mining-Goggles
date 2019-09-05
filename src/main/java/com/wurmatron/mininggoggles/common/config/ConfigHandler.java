@@ -1,7 +1,6 @@
 package com.wurmatron.mininggoggles.common.config;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 
 public class ConfigHandler {
@@ -12,6 +11,8 @@ public class ConfigHandler {
   // Config Values
   // Client
   public static int gogglesUpdateFrequency;
+  // Server
+  public static String[] disabledModules;
 
   @SubscribeEvent
   public static void onModConfigEvent(ModConfig.ModConfigEvent e) {
@@ -31,5 +32,6 @@ public class ConfigHandler {
 
   public static void bakeServer(ModConfig config) {
     serverConfig = config;
+    disabledModules= ConfigHolder.SERVER.disabledModules.get();
   }
 }
