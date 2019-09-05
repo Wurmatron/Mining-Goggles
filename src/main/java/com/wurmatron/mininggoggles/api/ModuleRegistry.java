@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 import com.wurmatron.mininggoggles.MiningGoggles;
 import com.wurmatron.mininggoggles.common.config.ConfigHandler;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -89,11 +90,6 @@ public class ModuleRegistry {
    * @return The Module is enabled or not
    */
   private static boolean isModuleDisabled(IModule module) {
-    for (String disabledModule : ConfigHandler.disabledModules) {
-      if (disabledModule.equalsIgnoreCase(module.getName())) {
-        return true;
-      }
-    }
-    return false;
+    return Arrays.stream(ConfigHandler.disabledModules).anyMatch(disabledModule -> disabledModule.equalsIgnoreCase(module.getName()));
   }
 }
