@@ -30,25 +30,34 @@ public class GuiHandler implements IGuiHandler {
   @Nullable
   @Override
   public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-    switch (ID) {
-      case (GOGGLES_FILTER):
-        return new GuiGogglesFilter(getActiveGoggles(player));
-      case (GOGGLES_MODULES):
-        return new GuiGoggleModules(
-            new ContainerModules(player, player.inventory,
-                new InventoryGoggles(getActiveGoggles(player))));
-      default:
-        return null;
+    if (getActiveGoggles(player) != ItemStack.EMPTY) {
+      switch (ID) {
+        case (GOGGLES_FILTER):
+          return new GuiGogglesFilter(getActiveGoggles(player));
+        case (GOGGLES_MODULES):
+          return new GuiGoggleModules(
+              new ContainerModules(player, player.inventory,
+                  new InventoryGoggles(getActiveGoggles(player))));
+        default:
+          return null;
+      }
     }
+    return null;
   }
 
-  public static  ItemStack getActiveGoggles(EntityPlayer player) {
+  public static ItemStack getActiveGoggles(EntityPlayer player) {
     if (player.getHeldItemMainhand() != null && player.getHeldItemMainhand()
         .getItem() instanceof ItemGogglesMining) {
       return player.getHeldItemMainhand();
     } else if (player.inventory.armorInventory.get(3) != ItemStack.EMPTY && player.inventory
         .armorInventory.get(3).getItem() instanceof ItemGogglesMining) {
       return player.inventory.armorInventory.get(3);
+    } else {
+      for (ItemStack stack : player.inventory.mainInventory) {
+        if (stack != ItemStack.EMPTY && stack.getItem() instanceof ItemGogglesMining) {
+          return stack;
+        }
+      }
     }
     return ItemStack.EMPTY;
   }
