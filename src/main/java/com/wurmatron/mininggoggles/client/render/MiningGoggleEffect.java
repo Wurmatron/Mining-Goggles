@@ -7,6 +7,7 @@ import com.wurmatron.mininggoggles.common.ConfigHandler;
 import com.wurmatron.mininggoggles.common.items.ItemGogglesMining;
 import com.wurmatron.mininggoggles.common.reference.Global;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 import net.minecraft.block.Block;
@@ -31,11 +32,21 @@ import org.cliffc.high_scale_lib.NonBlockingHashSet;
 public class MiningGoggleEffect {
 
   private static NonBlockingHashSet<RenderOre> oreTargets = new NonBlockingHashSet<>();
+  private static HashSet<RenderOre> renderingOre = new HashSet<>();
   private static NonBlockingHashMap<String, Integer> filterCache = new NonBlockingHashMap<>();
 
   @SubscribeEvent
   public void renderInWorld(RenderWorldLastEvent e) {
-    for (RenderOre target : oreTargets) {
+    if (oreTargets.size() > 0) {
+      RenderOre[] ore = oreTargets.toArray(new RenderOre[0]);
+      for (int index = 0; index < ConfigHandler.renderOverTime; index++) {
+        if (index < ore.length) {
+          renderingOre.add(ore[index]);
+          oreTargets.remove(ore[index]);
+        }
+      }
+    }
+    for (RenderOre target : renderingOre) {
       target.render(e.getPartialTicks());
     }
   }
@@ -57,7 +68,7 @@ public class MiningGoggleEffect {
           }
           int range = ItemGogglesMining.getRange(player.
               inventory.armorInventory.get(3));
-          removeOutdatedEntries(player.world,player.getPosition(), range);
+          removeOutdatedEntries(player.world, player.getPosition(), range);
           Iterable<BlockPos> blocksToTest = BlockPos
               .getAllInBox((int) player.posX - range, (int) player.posY - range,
                   (int) player.posZ - range, (int) player.posX + range, (int) player.posY + range,
@@ -96,7 +107,7 @@ public class MiningGoggleEffect {
     }
   }
 
-  private void removeOutdatedEntries(World world,BlockPos playerPos, int updateRange) {
+  private void removeOutdatedEntries(World world, BlockPos playerPos, int updateRange) {
     MiningGoggles.EXECUTORS.submit(() -> {
       Iterator<RenderOre> iterator = oreTargets.iterator();
       while (iterator.hasNext()) {
@@ -118,9 +129,9 @@ public class MiningGoggleEffect {
   private double calcRangeModifier(int range) {
     if (range > 4) {
       if (range <= 64) {
-        return ConfigHandler.gogglesUpdateFrequency + range/4;
+        return ConfigHandler.gogglesUpdateFrequency + range / 4;
       } else if (range <= 256) {
-        return ConfigHandler.gogglesUpdateFrequency + ( range);
+        return ConfigHandler.gogglesUpdateFrequency + (range);
       } else {
         return ConfigHandler.gogglesUpdateFrequency + (2 * range);
       }

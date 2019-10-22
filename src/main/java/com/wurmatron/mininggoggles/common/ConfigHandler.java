@@ -12,4 +12,7 @@ public class ConfigHandler {
   @Comment("How many ticks between goggle re-scan's")
   public static int gogglesUpdateFrequency = 10;
 
+  @Comment("How many ore's can be rendered per tick")
+  public static int renderOverTime = 2;
+
 }
