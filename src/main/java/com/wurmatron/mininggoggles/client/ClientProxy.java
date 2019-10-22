@@ -15,8 +15,12 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
@@ -88,13 +92,21 @@ public class ClientProxy extends CommonProxy {
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
-  public void onClientTick(TickEvent.ClientTickEvent event) throws Exception {
-    if (keyBindings[0].isKeyDown()) {
-      NetworkHandler.sendToServer(new OpenGuiMessage(GuiHandler.GOGGLES_MODULES,
-          Minecraft.getMinecraft().player.getPosition()));
-    } else if (keyBindings[1].isKeyDown()) {
-      NetworkHandler.sendToServer(new OpenGuiMessage(GuiHandler.GOGGLES_FILTER,
-          Minecraft.getMinecraft().player.getPosition()));
+  public void onClientTick(TickEvent.ClientTickEvent e) throws Exception {
+    if (keyBindings[0].isPressed()) {
+      if (GuiHandler.getActiveGoggles(Minecraft.getMinecraft().player) != ItemStack.EMPTY) {
+        NetworkHandler.sendToServer(new OpenGuiMessage(GuiHandler.GOGGLES_MODULES,
+            Minecraft.getMinecraft().player.getPosition()));
+      } else {
+        Minecraft.getMinecraft().player.sendMessage(new TextComponentString(I18n.translateToLocal("chat.gogglesmissing.name")));
+      }
+    } else if (keyBindings[1].isPressed()) {
+      if (GuiHandler.getActiveGoggles(Minecraft.getMinecraft().player) != ItemStack.EMPTY) {
+        NetworkHandler.sendToServer(new OpenGuiMessage(GuiHandler.GOGGLES_FILTER,
+            Minecraft.getMinecraft().player.getPosition()));
+      } else {
+        Minecraft.getMinecraft().player.sendMessage(new TextComponentTranslation(I18n.translateToLocal("chat.gogglesmissing.name")));
+      }
     }
   }
 }

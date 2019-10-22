@@ -19,3 +19,6 @@ module.waterBreathing.name=Water-Breathing
 key.mininggoggles.category=Mining Goggles
 key.filter.desc=Open Filter GUI
 key.toggle.desc=Open Modules GUI
+
+# Chat
+chat.gogglesmissing.name=§cNo Goggles Found, §b(Must be on head or held)
