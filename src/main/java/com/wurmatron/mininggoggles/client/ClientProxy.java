@@ -4,6 +4,7 @@ import com.wurmatron.mininggoggles.client.render.MiningGoggleEffect;
 import com.wurmatron.mininggoggles.common.CommonProxy;
 import com.wurmatron.mininggoggles.common.items.ItemModule;
 import com.wurmatron.mininggoggles.common.items.MiningRegistry;
+import com.wurmatron.mininggoggles.common.items.baubles.ItemGogglesMiningBaubles;
 import com.wurmatron.mininggoggles.common.network.GuiHandler;
 import com.wurmatron.mininggoggles.common.network.NetworkHandler;
 import com.wurmatron.mininggoggles.common.network.packets.OpenGuiMessage;
@@ -26,6 +27,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -50,6 +52,9 @@ public class ClientProxy extends CommonProxy {
   @Override
   public void init() {
     MinecraftForge.EVENT_BUS.register(new MiningGoggleEffect());
+    if (Loader.isModLoaded("baubles")) {
+      MinecraftForge.EVENT_BUS.register(new ItemGogglesMiningBaubles(MiningRegistry.gogglesMaterial));
+    }
   }
 
   @SubscribeEvent

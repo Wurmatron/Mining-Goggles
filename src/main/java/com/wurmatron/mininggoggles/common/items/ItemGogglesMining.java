@@ -32,7 +32,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import org.lwjgl.input.Keyboard;
 
-public class ItemGogglesMining extends ItemArmor {
+public class ItemGogglesMining extends ItemArmor{
 
   public static boolean armorDetection = false;
 

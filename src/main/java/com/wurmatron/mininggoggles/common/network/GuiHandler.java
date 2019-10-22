@@ -1,5 +1,6 @@
 package com.wurmatron.mininggoggles.common.network;
 
+import baubles.api.BaublesApi;
 import com.wurmatron.mininggoggles.client.gui.GuiGoggleModules;
 import com.wurmatron.mininggoggles.client.gui.GuiGogglesFilter;
 import com.wurmatron.mininggoggles.common.items.ItemGogglesMining;
@@ -10,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 
 public class GuiHandler implements IGuiHandler {
@@ -52,6 +54,8 @@ public class GuiHandler implements IGuiHandler {
     } else if (player.inventory.armorInventory.get(3) != ItemStack.EMPTY && player.inventory
         .armorInventory.get(3).getItem() instanceof ItemGogglesMining) {
       return player.inventory.armorInventory.get(3);
+    } else if(Loader.isModLoaded("baubles")) {
+      return BaublesApi.getBaublesHandler(player).getStackInSlot(4);
     }
     return ItemStack.EMPTY;
   }

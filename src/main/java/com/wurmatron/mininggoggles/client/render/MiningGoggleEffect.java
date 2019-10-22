@@ -2,12 +2,12 @@ package com.wurmatron.mininggoggles.client.render;
 
 import static com.wurmatron.mininggoggles.common.items.ItemGogglesMining.armorDetection;
 
+import baubles.api.BaublesApi;
 import com.wurmatron.mininggoggles.MiningGoggles;
 import com.wurmatron.mininggoggles.common.ConfigHandler;
 import com.wurmatron.mininggoggles.common.items.ItemGogglesMining;
 import com.wurmatron.mininggoggles.common.reference.Global;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 import net.minecraft.block.Block;
@@ -22,6 +22,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -32,7 +33,7 @@ import org.cliffc.high_scale_lib.NonBlockingHashSet;
 public class MiningGoggleEffect {
 
   private static NonBlockingHashSet<RenderOre> oreTargets = new NonBlockingHashSet<>();
-  private static HashSet<RenderOre> renderingOre = new HashSet<>();
+  private static NonBlockingHashSet<RenderOre> renderingOre = new NonBlockingHashSet<>();
   private static NonBlockingHashMap<String, Integer> filterCache = new NonBlockingHashMap<>();
 
   @SubscribeEvent
@@ -66,8 +67,7 @@ public class MiningGoggleEffect {
             armorDetection = false;
             return;
           }
-          int range = ItemGogglesMining.getRange(player.
-              inventory.armorInventory.get(3));
+          int range = ItemGogglesMining.getRange(getGoggles(player));
           removeOutdatedEntries(player.world, player.getPosition(), range);
           Iterable<BlockPos> blocksToTest = BlockPos
               .getAllInBox((int) player.posX - range, (int) player.posY - range,
@@ -84,14 +84,12 @@ public class MiningGoggleEffect {
         if (player != null && player.world != null
             &&
             player.world.getWorldTime() % (calcRangeModifier(
-                ItemGogglesMining.getRange(player.
-                    inventory.armorInventory.get(3)))) == 0) {
+                ItemGogglesMining.getRange(getGoggles(player)))) == 0) {
           if (!checkArmor(player)) {
             armorDetection = false;
             return;
           }
-          int range = ItemGogglesMining.getRange(player.
-              inventory.armorInventory.get(3));
+          int range = ItemGogglesMining.getRange(getGoggles(player));
           Iterable<BlockPos> blocksToTest = BlockPos
               .getAllInBox((int) player.posX + range, (int) player.posY + range,
                   (int) player.posZ + range, (int) player.posX + range * 2,
@@ -102,14 +100,21 @@ public class MiningGoggleEffect {
           }
         }
       });
-    } else if (!MiningGoggleEffect.oreTargets.isEmpty()) {
-      MiningGoggleEffect.oreTargets.clear();
+    } else if (!MiningGoggleEffect.renderingOre.isEmpty()) {
+      MiningGoggleEffect.renderingOre.clear();
     }
+  }
+
+  public ItemStack getGoggles(EntityPlayer player) {
+    if (Loader.isModLoaded("baubles")) {
+      return BaublesApi.getBaublesHandler(player).getStackInSlot(4);
+    }
+    return player.inventory.armorInventory.get(3);
   }
 
   private void removeOutdatedEntries(World world, BlockPos playerPos, int updateRange) {
     MiningGoggles.EXECUTORS.submit(() -> {
-      Iterator<RenderOre> iterator = oreTargets.iterator();
+      Iterator<RenderOre> iterator = renderingOre.iterator();
       while (iterator.hasNext()) {
         RenderOre ore = iterator.next();
         boolean withinX = ore.pos.getX() + updateRange > playerPos.getX()
@@ -120,7 +125,7 @@ public class MiningGoggleEffect {
             || ore.pos.getZ() - updateRange > playerPos.getZ();
         boolean exist = world.getBlockState(ore.pos).getBlock() != Blocks.AIR;
         if (!withinX || !withinY || !withinZ || !exist) {
-          oreTargets.remove(ore);
+          renderingOre.remove(ore);
         }
       }
     });
@@ -140,15 +145,15 @@ public class MiningGoggleEffect {
   }
 
   private boolean checkArmor(EntityPlayer player) {
-    return player.inventory.armorInventory.get(3) != ItemStack.EMPTY && player.inventory
-        .armorInventory.get(3).getItem() instanceof ItemGogglesMining;
+    return getGoggles(player) != ItemStack.EMPTY && getGoggles(player).getItem() instanceof ItemGogglesMining;
   }
 
   private void validatePos(World world, BlockPos pos, EntityPlayer player) {
     if (world.getBlockState(pos).getBlock() instanceof Block
         && world.getBlockState(pos).getBlock() != Blocks.AIR) {
+      IBlockState state = world.getBlockState(pos);
       int oreColor = getColorForOre(
-          player.inventory.armorInventory.get(3).getTagCompound()
+          getGoggles(player).getTagCompound()
               .getCompoundTag(Global.NBT_FILTERS),
           world.getBlockState(pos), world.getTileEntity(pos));
       if (oreColor != -1) {

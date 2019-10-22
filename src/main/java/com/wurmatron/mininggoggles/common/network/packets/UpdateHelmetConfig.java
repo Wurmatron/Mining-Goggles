@@ -1,5 +1,6 @@
 package com.wurmatron.mininggoggles.common.network.packets;
 
+import baubles.api.BaublesApi;
 import com.wurmatron.mininggoggles.common.items.ItemGogglesMining;
 import com.wurmatron.mininggoggles.common.network.GuiHandler;
 import com.wurmatron.mininggoggles.common.network.utils.CustomMessage;
@@ -9,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class UpdateHelmetConfig extends CustomMessage.CustomtServerMessage<UpdateHelmetConfig> {
@@ -45,6 +47,9 @@ public class UpdateHelmetConfig extends CustomMessage.CustomtServerMessage<Updat
       }
       currentNBT.setTag(Global.NBT_FILTERS, nbt);
       stack.setTagCompound(currentNBT);
+    }
+    if(Loader.isModLoaded("baubles")) {
+      BaublesApi.getBaublesHandler(player).setStackInSlot(4,stack);
     }
   }
 }

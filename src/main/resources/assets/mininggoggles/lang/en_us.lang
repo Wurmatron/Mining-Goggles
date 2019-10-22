@@ -6,6 +6,7 @@ item.module.name=Module
 tooltip.range.name=Range
 tooltip.modules.name=--Modules--
 tooltip.holdshift.name=Hold Shift
+tooltip.baubles.name=§cModules are disabled while used as a bauble
 
 # Modules
 module.nightVision.name=Night Vision
