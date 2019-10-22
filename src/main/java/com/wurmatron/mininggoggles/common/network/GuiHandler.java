@@ -53,11 +53,13 @@ public class GuiHandler implements IGuiHandler {
         .armorInventory.get(3).getItem() instanceof ItemGogglesMining) {
       return player.inventory.armorInventory.get(3);
     } else {
-      for (ItemStack stack : player.inventory.mainInventory) {
-        if (stack != ItemStack.EMPTY && stack.getItem() instanceof ItemGogglesMining) {
-          return stack;
-        }
-      }
+      // TODO Redo this without causing inv issues
+//      for (int index = 0; index < player.inventory.getSizeInventory(); index++) {
+//        if (player.inventory.mainInventory.get(index) != ItemStack.EMPTY && player.inventory.mainInventory.get(index)
+//            .getItem() instanceof ItemGogglesMining) {
+//          return player.inventory.mainInventory.get(index);
+//        }
+//      }
     }
     return ItemStack.EMPTY;
   }
