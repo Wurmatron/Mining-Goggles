@@ -2,6 +2,7 @@ package com.wurmatron.mininggoggles.common.registry;
 
 import com.wurmatron.mininggoggles.api.IModule;
 import com.wurmatron.mininggoggles.common.registry.support.AutoFeedSOLModule;
+import com.wurmatron.mininggoggles.common.registry.support.MobRepelModule;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.stats.StatList;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 
 public class ModuleRegistry {
@@ -184,5 +186,9 @@ public class ModuleRegistry {
         return true;
       }
     });
+    if(Loader.isModLoaded("viral")) {
+      modules.add(new MobRepelModule());
+      MinecraftForge.EVENT_BUS.register(new MobRepelModule());
+    }
   }
 }

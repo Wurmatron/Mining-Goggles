@@ -15,6 +15,7 @@ module.haste.name=Mining Boost
 module.movementSpeed.name=Movement Speed
 module.resistance.name=Damage Resistance
 module.waterBreathing.name=Water-Breathing
+module.mobRepel.name=Mob Repeler
 
 # KeyBindings
 key.mininggoggles.category=Mining Goggles
