@@ -23,19 +23,20 @@ import org.lwjgl.opengl.GL11;
 
 public class RenderBlock {
 
-
   @SubscribeEvent
   public void onRenderWorldEvent(RenderWorldLastEvent e) {
     World world = Minecraft.getInstance().level;
     final GameRenderer gameRenderer = Minecraft.getInstance().gameRenderer;
     gameRenderer.resetProjectionMatrix(e.getProjectionMatrix());
     PlayerEntity player = Minecraft.getInstance().player;
-    for (int x = -8; x < 8; x++) {
-      for (int z = -8; z < 8; z++) {
-        for (int y = 0; y < 255; y++) {
-          BlockPos pos = new BlockPos(player.getX() + x, y, player.getZ() + z);
+    for (int x = -32; x < 32; x++) {
+      for (int z = -32; z < 32; z++) {
+        for (int y = -32; y < 32; y++) {
+          BlockPos pos = new BlockPos(player.getX() + x, player.getY() + y,
+              player.getZ() + z);
           BlockState state = world.getBlockState(pos);
-          if (state.is(Blocks.IRON_ORE)) {
+          if (!state.is(Blocks.AIR) && state.getBlock().getRegistryName().getPath()
+              .contains("ore")) {
             drawBoundingBoxAtBlockPos(e.getMatrixStack(),
                 state.getShape(world, pos, ISelectionContext.of(player)).bounds(), 1.0F,
                 0.0F, 0.0F, 1.0F, pos);

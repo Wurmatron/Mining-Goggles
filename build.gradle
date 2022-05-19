@@ -13,7 +13,6 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 
 
-
 version = "${version}"
 group = 'io.wurmatron.mining_goggles'
 archivesBaseName = 'MiningGoggles'
@@ -22,7 +21,9 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+    implementation group: 'com.github.stephenc.high-scale-lib', name: 'high-scale-lib', version: '1.1.4'
 }
+
 minecraft {
     mappings channel: 'official', version: "${mc_version}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
@@ -84,5 +85,16 @@ jar {
     }
 }
 
+shadowJar.archiveName = "${archivesBaseName}-${version}.jar"
+shadowJar {
+    dependencies {
+        exclude('dummy*')
+        include(dependency('com.github.stephenc.high-scale-lib:high-scale-lib:1.1.4'))
+    }
+}
+
+reobf {
+    shadowJar {}
+}
 
 jar.finalizedBy('reobfJar')
