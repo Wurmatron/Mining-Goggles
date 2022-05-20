@@ -4,6 +4,8 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -20,5 +22,11 @@ public class MiningItems {
 
     public static <T extends Item> RegistryObject<T> register(final String name, final Supplier<T> sup) {
         return ITEMS.register(name, sup);
+    }
+
+    @SubscribeEvent
+    public void registerModel(RegistryEvent.Register<Item> e) {
+        e.getRegistry().register(goggles);
+        e.getRegistry().register(crystal);
     }
 }

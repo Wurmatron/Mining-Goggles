@@ -5,14 +5,8 @@ import com.google.gson.GsonBuilder;
 import io.wurmatron.mining_goggles.api.json.MiningGogglesApi;
 import io.wurmatron.mining_goggles.client.render.RenderBlock;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
-import io.wurmatron.mining_goggles.items.ItemCrystal;
-import io.wurmatron.mining_goggles.items.ItemMiningGoggles;
 import io.wurmatron.mining_goggles.items.MiningItems;
 import java.io.IOException;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -38,6 +32,7 @@ public class MiningGoggles {
 
     MiningItems.ITEMS.register(modBus);
     MinecraftForge.EVENT_BUS.register(new RenderBlock());
+    MinecraftForge.EVENT_BUS.register(new MiningItems());
     MiningGogglesApi.oreWavelengths = OreConfigLoader.load();
   }
 
