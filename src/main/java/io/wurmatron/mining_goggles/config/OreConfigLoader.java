@@ -1,6 +1,7 @@
 package io.wurmatron.mining_goggles.config;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
+import io.wurmatron.mining_goggles.api.json.MiningGogglesApi;
 import io.wurmatron.mining_goggles.config.wrapper.OreWavelength;
 import java.io.File;
 import java.io.IOException;
@@ -60,15 +61,19 @@ public class OreConfigLoader {
     return oreConfig;
   }
 
+  public static int get(String name) {
+    return MiningGogglesApi.oreWavelengths.getOrDefault(name, -1);
+  }
+
   public static void generateWavelengthsForOres() {
-    save(new OreWavelength("oreIron", 250));
-    save(new OreWavelength("oreCoal", 350));
-    save(new OreWavelength("oreGold", 500));
-    save(new OreWavelength("oreDebris", 510));
-    save(new OreWavelength("oreRedstone", 550));
-    save(new OreWavelength("oreDiamond", 750));
-    save(new OreWavelength("oreLapis", 800));
-    save(new OreWavelength("oreEmerald", 1000));
-    save(new OreWavelength("oreCopper", 1050));
+    save(new OreWavelength("forge:ores/iron", 250));
+    save(new OreWavelength("forge:ores/coal", 350));
+    save(new OreWavelength("forge:ores/gold", 500));
+    save(new OreWavelength("forge:ores/debris", 510));
+    save(new OreWavelength("forge:ores/redstone", 550));
+    save(new OreWavelength("forge:ores/diamond", 750));
+    save(new OreWavelength("forge:ores/lapis", 800));
+    save(new OreWavelength("forge:ores/emerald", 1000));
+    save(new OreWavelength("forge:ores/copper", 1050));
   }
 }

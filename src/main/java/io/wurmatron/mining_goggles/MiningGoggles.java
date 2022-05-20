@@ -7,6 +7,8 @@ import io.wurmatron.mining_goggles.client.render.RenderBlock;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.MiningItems;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -22,6 +24,7 @@ public class MiningGoggles {
   public static final Logger LOGGER = LogManager.getLogger();
 
   public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+  public static final ExecutorService EXECUTORS = Executors.newFixedThreadPool(4);
 
   public MiningGoggles() throws IOException {
     IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
