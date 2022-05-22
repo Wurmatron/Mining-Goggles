@@ -2,18 +2,21 @@ package io.wurmatron.mining_goggles;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.wurmatron.mining_goggles.api.json.MiningGogglesApi;
+import io.wurmatron.mining_goggles.api.MiningGogglesApi;
 import io.wurmatron.mining_goggles.client.render.RenderBlock;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.MiningItems;
-import java.io.IOException;
+import io.wurmatron.mining_goggles.registry.ContainerRegistry;
+import io.wurmatron.mining_goggles.client.gui.ScreenCrystalBag;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import net.minecraft.client.gui.ScreenManager;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,24 +29,26 @@ public class MiningGoggles {
   public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   public static final ExecutorService EXECUTORS = Executors.newFixedThreadPool(4);
 
-  public MiningGoggles() throws IOException {
+  public MiningGoggles() {
     IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-    FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-    FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
-    MiningItems.register("goggles", () -> MiningItems.goggles);
-    MiningItems.register("crystal", () -> MiningItems.crystal);
-
-    MiningItems.ITEMS.register(modBus);
+    // Registry
+    modBus.addListener(this::doClientStuff);
+    modBus.register(ContainerRegistry.class);
+    ClientOnly clientOnly = new ClientOnly(modBus);
+    DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> clientOnly::registerClientOnlyEvents);
+    // Events
     MinecraftForge.EVENT_BUS.register(new RenderBlock());
     MinecraftForge.EVENT_BUS.register(new MiningItems());
+    // Items
+    MiningItems.register("goggles", () -> MiningItems.goggles);
+    MiningItems.register("crystal", () -> MiningItems.crystal);
+    MiningItems.register("bag_crystal", () -> MiningItems.bag);
+    MiningItems.ITEMS.register(modBus);
+    // Config
     MiningGogglesApi.oreWavelengths = OreConfigLoader.load();
   }
 
-  private void setup(final FMLCommonSetupEvent event) {
-
-  }
-
   private void doClientStuff(final FMLClientSetupEvent event) {
-
+    ScreenManager.register(ContainerRegistry.containerTypeMiningGoggles, ScreenCrystalBag::new);
   }
 }

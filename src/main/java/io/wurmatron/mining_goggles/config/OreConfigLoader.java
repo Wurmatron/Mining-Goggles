@@ -1,7 +1,7 @@
 package io.wurmatron.mining_goggles.config;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
-import io.wurmatron.mining_goggles.api.json.MiningGogglesApi;
+import io.wurmatron.mining_goggles.api.MiningGogglesApi;
 import io.wurmatron.mining_goggles.config.wrapper.OreWavelength;
 import java.io.File;
 import java.io.IOException;

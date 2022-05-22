@@ -37,7 +37,7 @@ public class RenderBlock {
   public static NonBlockingHashSet<BlockPos> detectedBlocks = new NonBlockingHashSet<>();
   public static NonBlockingHashSet<BlockPos> activeRender = new NonBlockingHashSet<>();
 
-  public static int MAX_RADIUS = 96;
+  public static int MAX_RADIUS = 32;
   public static int MAX_GROWTH_PER_TICK = 5;
   public static AxisAlignedBB box = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
 

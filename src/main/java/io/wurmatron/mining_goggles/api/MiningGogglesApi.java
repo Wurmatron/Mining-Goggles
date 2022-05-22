@@ -1,6 +1,5 @@
-package io.wurmatron.mining_goggles.api.json;
+package io.wurmatron.mining_goggles.api;
 
-import io.wurmatron.mining_goggles.config.wrapper.OreWavelength;
 import java.util.HashMap;
 
 public class MiningGogglesApi {
