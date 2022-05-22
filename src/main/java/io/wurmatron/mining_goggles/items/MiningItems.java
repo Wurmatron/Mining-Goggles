@@ -1,8 +1,6 @@
 package io.wurmatron.mining_goggles.items;
 
 import java.util.function.Supplier;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemGroup;
@@ -17,8 +15,7 @@ public class MiningItems {
   public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(
       ForgeRegistries.ITEMS, "mininggoggles");
 
-  public static Item goggles = new ItemMiningGoggles(ArmorMaterial.DIAMOND,
-      EquipmentSlotType.HEAD,
+  public static Item goggles = new ItemMiningGoggles(
       new Item.Properties().stacksTo(1).tab(ItemGroup.TAB_COMBAT));
   public static Item crystal = new ItemCrystal(
       new Item.Properties().stacksTo(4).tab(ItemGroup.TAB_COMBAT).durability(100)

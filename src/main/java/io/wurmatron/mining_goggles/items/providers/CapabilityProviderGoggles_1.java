@@ -1,6 +1,7 @@
 package io.wurmatron.mining_goggles.items.providers;
 
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerCrystalBag;
+import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_1;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.INBT;
@@ -11,10 +12,10 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class CapabilityProviderCrystalBag implements ICapabilitySerializable<INBT> {
+public class CapabilityProviderGoggles_1 implements ICapabilitySerializable<INBT> {
 
   private final Direction NO_SPECIFIC_SIDE = null;
-  private ItemStackHandlerCrystalBag stackHandlerCrystalBag;
+  private ItemStackHandlerGoggles_1 itemStackHandlerGoggles_1;
 
   @Nonnull
   @Override
@@ -38,11 +39,11 @@ public class CapabilityProviderCrystalBag implements ICapabilitySerializable<INB
         NO_SPECIFIC_SIDE, nbt);
   }
 
-  private ItemStackHandlerCrystalBag getCachedInventory() {
-    if (stackHandlerCrystalBag == null) {
-      stackHandlerCrystalBag = new ItemStackHandlerCrystalBag();
+  private ItemStackHandlerGoggles_1 getCachedInventory() {
+    if (itemStackHandlerGoggles_1 == null) {
+      itemStackHandlerGoggles_1 = new ItemStackHandlerGoggles_1();
     }
-    return stackHandlerCrystalBag;
+    return itemStackHandlerGoggles_1;
   }
 
 

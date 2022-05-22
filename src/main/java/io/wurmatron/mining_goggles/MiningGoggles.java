@@ -3,6 +3,7 @@ package io.wurmatron.mining_goggles;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.wurmatron.mining_goggles.api.MiningGogglesApi;
+import io.wurmatron.mining_goggles.client.gui.ScreenMiningGoggles_1;
 import io.wurmatron.mining_goggles.client.render.RenderBlock;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.MiningItems;
@@ -49,6 +50,7 @@ public class MiningGoggles {
   }
 
   private void doClientStuff(final FMLClientSetupEvent event) {
-    ScreenManager.register(ContainerRegistry.containerTypeMiningGoggles, ScreenCrystalBag::new);
+    ScreenManager.register(ContainerRegistry.containerTypeCrystalBag, ScreenCrystalBag::new);
+    ScreenManager.register(ContainerRegistry.containerTypeGoggles_1, ScreenMiningGoggles_1::new);
   }
 }
