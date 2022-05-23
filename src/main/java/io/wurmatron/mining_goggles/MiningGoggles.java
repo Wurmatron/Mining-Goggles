@@ -9,9 +9,11 @@ import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.MiningItems;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
 import io.wurmatron.mining_goggles.client.gui.ScreenCrystalBag;
+import io.wurmatron.mining_goggles.tab.MiningGogglesItemGroup;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.item.ItemGroup;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -29,6 +31,7 @@ public class MiningGoggles {
 
   public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   public static final ExecutorService EXECUTORS = Executors.newFixedThreadPool(4);
+  public static ItemGroup TAB_GOGGLES = new MiningGogglesItemGroup("tab.goggles");
 
   public MiningGoggles() {
     IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();

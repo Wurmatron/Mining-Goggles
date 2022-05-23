@@ -1,0 +1,14 @@
+site_name: Mining Goggles Wiki
+site_url: https://wiki.wurmatron.io/mining-goggles
+repo_url: https://www.curseforge.com/minecraft/mc-mods/mining-goggles
+repo_name: Mining Goggles
+theme:
+  name: material
+nav:
+  - 'Guides':
+    - 'Basics': './guides/basic'
+  - 'Links':
+    - 'CurseForge': 'https://www.curseforge.com/minecraft/mc-mods/mining-goggles'
+    - 'Github': 'https://github.com/Wurmatron/Mining-Goggles'
+    - 'Issues': 'https://github.com/Wurmatron/Mining-Goggles/issues'
+    - 'Ci / Nightly Builds': 'https://ci.wurmatron.io/job/Minecraft/job/Mining%20Goggles/'

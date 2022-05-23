@@ -1,9 +1,9 @@
 package io.wurmatron.mining_goggles.items;
 
+import io.wurmatron.mining_goggles.MiningGoggles;
 import java.util.function.Supplier;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.Properties;
-import net.minecraft.item.ItemGroup;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.RegistryObject;
@@ -16,12 +16,12 @@ public class MiningItems {
       ForgeRegistries.ITEMS, "mininggoggles");
 
   public static Item goggles = new ItemMiningGoggles(
-      new Item.Properties().stacksTo(1).tab(ItemGroup.TAB_COMBAT));
+      new Item.Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES));
   public static Item crystal = new ItemCrystal(
-      new Item.Properties().stacksTo(4).tab(ItemGroup.TAB_COMBAT).durability(100)
+      new Item.Properties().stacksTo(4).tab(MiningGoggles.TAB_GOGGLES).durability(100)
           .setNoRepair().fireResistant());
   public static Item bag = new ItemCrystalBag(
-      new Properties().stacksTo(1).tab(ItemGroup.TAB_COMBAT));
+      new Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES));
 
   public static <T extends Item> RegistryObject<T> register(final String name,
       final Supplier<T> sup) {
