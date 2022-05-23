@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 public class ContainerMiningGoggles_1 extends Container {
 
   private final ItemStackHandlerGoggles_1 itemStackHandler;
-  private final ItemStack itemStackBeingHeld;
+  public final ItemStack itemStackBeingHeld;
 
   private static final int HOTBAR_SLOT_COUNT = 9;
   private static final int PLAYER_INVENTORY_ROW_COUNT = 3;

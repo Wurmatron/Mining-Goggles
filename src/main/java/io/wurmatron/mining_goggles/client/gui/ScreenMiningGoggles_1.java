@@ -4,10 +4,15 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.wurmatron.mining_goggles.inventory.ContainerCrystalBag;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_1;
+import io.wurmatron.mining_goggles.items.ItemCrystal;
+import io.wurmatron.mining_goggles.items.ItemMiningGoggles;
 import io.wurmatron.mining_goggles.items.MiningItems;
+import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import java.awt.Color;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -17,11 +22,12 @@ public class ScreenMiningGoggles_1 extends ContainerScreen<ContainerMiningGoggle
   private static final ResourceLocation TEXTURE = new ResourceLocation("mininggoggles",
       "textures/gui/goggles_1.png");
 
-  public static final float BAG_LABEL_YPOS = 0;
+  public static final float BAG_LABEL_YPOS = -2;
   public static final float PLAYER_LABEL_XPOS = 8;
   public static final float PLAYER_LABEL_DISTANCE_FROM_BOTTOM = 97;
 
-  public ScreenMiningGoggles_1(ContainerMiningGoggles_1 container, PlayerInventory playerInv,
+  public ScreenMiningGoggles_1(ContainerMiningGoggles_1 container,
+      PlayerInventory playerInv,
       ITextComponent title) {
     super(container, playerInv, title);
   }
@@ -32,21 +38,35 @@ public class ScreenMiningGoggles_1 extends ContainerScreen<ContainerMiningGoggle
     this.renderBackground(matrixStack);
     super.render(matrixStack, mouseX, mouseY, partialTicks);
     super.renderTooltip(matrixStack, mouseX, mouseY);
-    this.renderLabels(matrixStack, mouseX, mouseY);
   }
 
   @Override
   protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
-    TranslationTextComponent bagLabel = new TranslationTextComponent(
-        "item." + MiningItems.goggles.getRegistryName().getNamespace() + "."
-            + MiningItems.goggles.getRegistryName().getPath());
-    float BAG_LABEL_XPOS =
-        (getXSize() / 2.0F) - font.getSplitter().stringWidth(bagLabel.getString()) / 2.0F;
-    font.draw(matrixStack, bagLabel, BAG_LABEL_XPOS, BAG_LABEL_YPOS,
-        Color.darkGray.getRGB());
     float PLAYER_LABEL_YPOS = getYSize() - PLAYER_LABEL_DISTANCE_FROM_BOTTOM;
     font.draw(matrixStack, this.inventory.getDisplayName(), PLAYER_LABEL_XPOS,
         PLAYER_LABEL_YPOS, Color.darkGray.getRGB());
+    // Render Wavelength
+    NonNullList<ItemStack> items = this.getMenu().getItems();
+    int[] leftWavelength = WavelengthCalculator.computeWavelength(
+        new int[][]{ItemCrystal.getWavelength(items.get(36)),
+            ItemCrystal.getWavelength(items.get(37))});
+    int[] rightWavelength = WavelengthCalculator.computeWavelength(
+        new int[][]{ItemCrystal.getWavelength(items.get(38)),
+            ItemCrystal.getWavelength(items.get(39))});
+    RenderSystem.pushMatrix();
+    RenderSystem.scalef(.75f, .75f, .75f);
+    // Left
+    font.draw(matrixStack, display(leftWavelength[0]), 10, 22, Color.RED.getRGB());
+    font.draw(matrixStack, display(leftWavelength[1]), 83, 22, Color.RED.getRGB());
+    long avg = (leftWavelength[0] + leftWavelength[1]) / 2;
+    font.draw(matrixStack, display(avg), 48, -2, Color.RED.getRGB());
+    // Right
+    font.draw(matrixStack, display(rightWavelength[0]), 130, 22, Color.BLUE.getRGB());
+    font.draw(matrixStack, display(rightWavelength[1]), 203, 22, Color.BLUE.getRGB());
+    avg = (rightWavelength[0] + rightWavelength[1]) / 2;
+    font.draw(matrixStack, display(avg), 165, -2, Color.BLUE.getRGB());
+    RenderSystem.scalef(1f, 1f, 1f);
+    RenderSystem.popMatrix();
   }
 
   @Override
@@ -57,5 +77,13 @@ public class ScreenMiningGoggles_1 extends ContainerScreen<ContainerMiningGoggle
     int edgeSpacingX = (this.width - this.getXSize()) / 2;
     int edgeSpacingY = (this.height - this.getXSize()) / 2;
     blit(matrixStack, edgeSpacingX, edgeSpacingY, 0, 0, getXSize(), getYSize());
+  }
+
+  private static String display(long num) {
+    if (num > -1) {
+      return "" + num;
+    } else {
+      return "n/a";
+    }
   }
 }

@@ -4,6 +4,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
+import io.wurmatron.mining_goggles.items.ItemMiningGoggles;
+import io.wurmatron.mining_goggles.items.MiningItems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,15 +45,22 @@ public class RenderBlock {
 
   @SubscribeEvent
   public void onRenderWorldEvent(RenderWorldLastEvent e) {
-    final GameRenderer gameRenderer = Minecraft.getInstance().gameRenderer;
-    gameRenderer.resetProjectionMatrix(e.getProjectionMatrix());
-    for (BlockPos p : activeRender) {
-      drawBoundingBoxAtBlockPos(e.getMatrixStack(), box, .75F, 0.25F, .25F, 1.0F, p);
+    if (activeRender.size() > 0) {
+      final GameRenderer gameRenderer = Minecraft.getInstance().gameRenderer;
+      gameRenderer.resetProjectionMatrix(e.getProjectionMatrix());
+      for (BlockPos p : activeRender) {
+        float[] color = getColor(p);
+        drawBoundingBoxAtBlockPos(e.getMatrixStack(), box, color[0], color[1], color[2], .75f, p);
+      }
     }
   }
 
-  public static void addNewRendering() {
-//    MiningGoggles.EXECUTORS.submit(() -> {
+  public static void addNewRendering(PlayerEntity player) {
+    ItemStack stack = player.inventory.armor.get(3);
+    if (!stack.getItem().getItem().equals(MiningItems.goggles)) {
+      activeRender.clear();
+      return;
+    }
     if (activeRender.size() < detectedBlocks.size()) {
       for (int x = 0; x < MAX_GROWTH_PER_TICK; x++) {
         int currentIndex = activeRender.size() + x;
@@ -67,7 +76,6 @@ public class RenderBlock {
         }
       }
     }
-//    });
   }
 
   static int maxRadius = MAX_RADIUS;
@@ -77,45 +85,48 @@ public class RenderBlock {
   @SubscribeEvent
   public void onClientTick(PlayerTickEvent e) {
     if (e.side.isClient()) {
-      if (renderUpdater >= 20) {
-        addNewRendering();
-        renderUpdater = 0;
-      } else {
-        renderUpdater++;
-      }
-      if (count >= 100 || detectedBlocks.size() == 0 && count <= 5) {
-        count = 0;
-        // 1st Half
-        MiningGoggles.EXECUTORS.submit(() -> {
-          PlayerEntity player = Minecraft.getInstance().player;
-          World world = player.level;
-          // Remove old entries
-          removeOldEntries(player, world);
+      if (e.player.inventory.armor.get(3).getItem().equals(MiningItems.goggles)) {
+        if (renderUpdater >= 20) {
+          addNewRendering(e.player);
+          renderUpdater = 0;
+        } else {
+          renderUpdater++;
+        }
+        if (count >= 100 || detectedBlocks.size() == 0 && count <= 60) {
+          count = 0;
+          // 1st Half
           MiningGoggles.EXECUTORS.submit(() -> {
-            List<BlockPos> fullBlockList = generateList((int) (player.getX() - maxRadius),
-                (int) (player.getY() - maxRadius), (int) (player.getZ() - maxRadius),
-                (int) (player.getX() + maxRadius), (int) (player.getY() + maxRadius),
-                (int) (player.getZ() + maxRadius));
-            BlockPos[] subA = Arrays.copyOfRange(fullBlockList.toArray(new BlockPos[0]),
-                0, fullBlockList.size() / 2);
-            BlockPos[] subB = Arrays.copyOfRange(fullBlockList.toArray(new BlockPos[0]),
-                fullBlockList.size() / 2, fullBlockList.size());
-            // Test Group A
+            PlayerEntity player = Minecraft.getInstance().player;
+            World world = player.level;
+            // Remove old entries
+            removeOldEntries(player, world);
             MiningGoggles.EXECUTORS.submit(() -> {
-              for (BlockPos a : subA) {
-                validatePos(player, a);
-              }
-            });
-            // Test Group B
-            MiningGoggles.EXECUTORS.submit(() -> {
-              for (BlockPos b : subB) {
-                validatePos(player, b);
-              }
+              List<BlockPos> fullBlockList = generateList(
+                  (int) (player.getX() - maxRadius),
+                  (int) (player.getY() - maxRadius), (int) (player.getZ() - maxRadius),
+                  (int) (player.getX() + maxRadius), (int) (player.getY() + maxRadius),
+                  (int) (player.getZ() + maxRadius));
+              BlockPos[] subA = Arrays.copyOfRange(fullBlockList.toArray(new BlockPos[0]),
+                  0, fullBlockList.size() / 2);
+              BlockPos[] subB = Arrays.copyOfRange(fullBlockList.toArray(new BlockPos[0]),
+                  fullBlockList.size() / 2, fullBlockList.size());
+              // Test Group A
+              MiningGoggles.EXECUTORS.submit(() -> {
+                for (BlockPos a : subA) {
+                  validatePos(player, a);
+                }
+              });
+              // Test Group B
+              MiningGoggles.EXECUTORS.submit(() -> {
+                for (BlockPos b : subB) {
+                  validatePos(player, b);
+                }
+              });
             });
           });
-        });
-      } else {
-        count++;
+        } else {
+          count++;
+        }
       }
     }
   }
@@ -136,7 +147,7 @@ public class RenderBlock {
   private static void removeOldEntries(PlayerEntity player, World world) {
     MiningGoggles.EXECUTORS.submit(() -> {
       for (BlockPos pos : detectedBlocks) {
-        if (!withinRange(player, pos)) {
+        if (!validatePos(player, pos)) {
           detectedBlocks.remove(pos);
           activeRender.remove(pos);
         }
@@ -144,9 +155,13 @@ public class RenderBlock {
     });
   }
 
-  private static boolean withinRange(PlayerEntity player, BlockPos pos) {
+  private static boolean withinRange(PlayerEntity player, BlockPos pos, String name) {
+    int waveLength = OreConfigLoader.get(name);
+    double range = ItemMiningGoggles.getMaxRange(player.inventory.armor.get(3));
+    range = getBlockRadius(range, waveLength,
+        ItemMiningGoggles.getVisibleWavelength(player.inventory.armor.get(3)));
     if (pos.closerThan(new Vector3i(player.getX(), player.getY(), player.getZ()),
-        maxRadius)) {
+        range)) {
       BlockState state = player.level.getBlockState(pos);
       if (!state.getBlock().is(Blocks.AIR)) {
         return true;
@@ -155,16 +170,53 @@ public class RenderBlock {
     return false;
   }
 
-  private static void validatePos(PlayerEntity player, BlockPos pos) {
+  public static boolean canSeeWavelength(BlockPos pos, PlayerEntity player, String name) {
+    int wavelength = -1;
+    wavelength = OreConfigLoader.get(name);
+    if (wavelength != -1) {
+      int[] visible = ItemMiningGoggles.getVisibleWavelength(
+          player.inventory.armor.get(3));
+      if (wavelength >= visible[0] && wavelength <= visible[1]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static double BEST_RANGE_FUZZY = .2;
+  public static double MIN_PERC_RANGE = .3;
+
+  public static int getBlockRadius(double maxRange, int wavelength, int[] minMaxHelmet) {
+    double mid = ((double) minMaxHelmet[0] + minMaxHelmet[1]) / 2;
+    double variation = (double) (minMaxHelmet[1] - minMaxHelmet[0]) / minMaxHelmet[1];
+    // No Distance degradation
+    if (wavelength == mid || wavelength < (mid * (1 + BEST_RANGE_FUZZY)) && wavelength > (
+        mid
+            * (1 - BEST_RANGE_FUZZY))) {
+      return (int) maxRange;
+    }
+    // Dynamic
+    int diff = (int) Math.abs(mid - wavelength);
+    double adjustedRange = ((1 - variation) * diff) / 10;
+    adjustedRange = (maxRange + adjustedRange) / maxRange;
+    if (adjustedRange < (maxRange * MIN_PERC_RANGE)) {
+      return 0;
+    }
+    return (int) adjustedRange;
+  }
+
+  private static boolean validatePos(PlayerEntity player, BlockPos pos) {
     BlockState state = player.level.getBlockState(pos);
     if (!state.getBlock().is(Blocks.AIR)) {
       String[] names = getBlockNames(state);
       for (String name : names) {
-        if (name.contains("forge:ores") && withinRange(player, pos)) {
+        if (canSeeWavelength(pos, player, name) && withinRange(player, pos, name)) {
           add(name, pos);
+          return true;
         }
       }
     }
+    return false;
   }
 
   private static void add(String name, BlockPos pos) {
@@ -216,5 +268,7 @@ public class RenderBlock {
     renderTypeBuffer.endBatch(RenderType.lines());
   }
 
-
+  public static float[] getColor(BlockPos pos) {
+    return new float[]{1.0f, .3f, .3f};
+  }
 }

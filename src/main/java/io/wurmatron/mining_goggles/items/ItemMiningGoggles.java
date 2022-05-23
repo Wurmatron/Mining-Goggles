@@ -2,13 +2,11 @@ package io.wurmatron.mining_goggles.items;
 
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_1;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_1;
-import io.wurmatron.mining_goggles.items.providers.CapabilityProviderCrystalBag;
-import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerCrystalBag;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_1;
+import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -38,8 +36,10 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 
 public class ItemMiningGoggles extends ArmorItem {
 
+  public static final int MAX_RADIUS = 16;
+
   public ItemMiningGoggles(Properties prop) {
-    super(ArmorMaterial.DIAMOND, EquipmentSlotType.HEAD,prop);
+    super(ArmorMaterial.DIAMOND, EquipmentSlotType.HEAD, prop);
   }
 
   @Nonnull
@@ -55,7 +55,6 @@ public class ItemMiningGoggles extends ArmorItem {
     }
     return ActionResult.pass(stack);
   }
-
 
 
   @Nonnull
@@ -128,7 +127,7 @@ public class ItemMiningGoggles extends ArmorItem {
     return new CapabilityProviderGoggles_1();
   }
 
-  private static ItemStackHandlerGoggles_1 getItemStackGoggles_1(
+  public static ItemStackHandlerGoggles_1 getItemStackGoggles_1(
       ItemStack itemStack) {
     IItemHandler goggles = itemStack.getCapability(
         CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
@@ -169,18 +168,47 @@ public class ItemMiningGoggles extends ArmorItem {
     itemStackHandlerGoggles_1.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
   }
 
-  public static float getFullnessPropertyOverride(ItemStack itemStack,
-      @Nullable World world, @Nullable LivingEntity livingEntity) {
-    ItemStackHandlerGoggles_1 itemStackHandler = getItemStackGoggles_1(itemStack);
-    float fractionEmpty =
-        itemStackHandler.getNumberOfEmptySlots() / (float) itemStackHandler.getSlots();
-    return 1.0F - fractionEmpty;
-  }
-
   @Nullable
   @Override
   public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot,
       String type) {
     return "mininggoggles:textures/models/goggles_t1.png"; // TODO Dynamic based on lens / modules
+  }
+
+  public static int[][] getWavelength(ItemStack stack, int side) {
+    if (side == 0) {
+      ItemStack crystal0 = getItemStackGoggles_1(stack).getStackInSlot(0);
+      ItemStack crystal1 = getItemStackGoggles_1(stack).getStackInSlot(1);
+      int[][] crystalWavelengths = new int[2][2];
+      crystalWavelengths[0] = ItemCrystal.getWavelength(crystal0);
+      crystalWavelengths[1] = ItemCrystal.getWavelength(crystal1);
+      return crystalWavelengths;
+    } else if (side == 1) {
+      ItemStack crystal2 = getItemStackGoggles_1(stack).getStackInSlot(2);
+      ItemStack crystal3 = getItemStackGoggles_1(stack).getStackInSlot(3);
+      int[][] crystalWavelengths = new int[2][2];
+      crystalWavelengths[0] = ItemCrystal.getWavelength(crystal2);
+      crystalWavelengths[1] = ItemCrystal.getWavelength(crystal3);
+      return crystalWavelengths;
+    }
+    return new int[0][0];
+  }
+
+  public static int[] getVisibleWavelength(ItemStack stack) {
+    int[] leftWave = WavelengthCalculator.computeWavelength(getWavelength(stack, 0));
+    int[] rightWave = WavelengthCalculator.computeWavelength(getWavelength(stack, 1));
+    if(leftWave[0] == -1)
+      leftWave[0] = rightWave[0];
+    if(rightWave[0] == -1)
+      rightWave[0] = leftWave[0];
+    if(leftWave[1] == -1)
+      leftWave[1] = rightWave[1];
+    if(rightWave[1] == -1)
+      rightWave[1] = leftWave[1];
+    return new int[] {Math.min(leftWave[0], rightWave[0]), Math.max(leftWave[1], rightWave[1])};
+  }
+
+  public static int getMaxRange(ItemStack stack) {
+    return MAX_RADIUS;
   }
 }

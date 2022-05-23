@@ -52,4 +52,11 @@ public class ItemCrystal extends Item {
       items.add(set(900, 1100));
     super.fillItemCategory(group, items);
   }
+
+  public static int[] getWavelength(ItemStack stack) {
+    if(stack != null && stack.hasTag() && !stack.getTag().isEmpty()) {
+      return new int[] {stack.getTag().getInt("min-wavelength"), stack.getTag().getInt("max-wavelength")};
+    }
+    return new int[] {-1,-1};
+  }
 }
