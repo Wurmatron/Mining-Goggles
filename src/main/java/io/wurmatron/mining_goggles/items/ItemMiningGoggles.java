@@ -33,6 +33,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import org.lwjgl.system.CallbackI.P;
 
 public class ItemMiningGoggles extends ArmorItem {
 
@@ -194,18 +195,8 @@ public class ItemMiningGoggles extends ArmorItem {
     return new int[0][0];
   }
 
-  public static int[] getVisibleWavelength(ItemStack stack) {
-    int[] leftWave = WavelengthCalculator.computeWavelength(getWavelength(stack, 0));
-    int[] rightWave = WavelengthCalculator.computeWavelength(getWavelength(stack, 1));
-    if(leftWave[0] == -1)
-      leftWave[0] = rightWave[0];
-    if(rightWave[0] == -1)
-      rightWave[0] = leftWave[0];
-    if(leftWave[1] == -1)
-      leftWave[1] = rightWave[1];
-    if(rightWave[1] == -1)
-      rightWave[1] = leftWave[1];
-    return new int[] {Math.min(leftWave[0], rightWave[0]), Math.max(leftWave[1], rightWave[1])};
+  public static int[] getVisibleWavelength(ItemStack stack, int side) {
+    return WavelengthCalculator.computeWavelength(getWavelength(stack, side));
   }
 
   public static int getMaxRange(ItemStack stack) {

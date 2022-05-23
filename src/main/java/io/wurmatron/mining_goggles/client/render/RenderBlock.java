@@ -50,7 +50,8 @@ public class RenderBlock {
       gameRenderer.resetProjectionMatrix(e.getProjectionMatrix());
       for (BlockPos p : activeRender) {
         float[] color = getColor(p);
-        drawBoundingBoxAtBlockPos(e.getMatrixStack(), box, color[0], color[1], color[2], .75f, p);
+        drawBoundingBoxAtBlockPos(e.getMatrixStack(), box, color[0], color[1], color[2],
+            .75f, p);
       }
     }
   }
@@ -159,7 +160,12 @@ public class RenderBlock {
     int waveLength = OreConfigLoader.get(name);
     double range = ItemMiningGoggles.getMaxRange(player.inventory.armor.get(3));
     range = getBlockRadius(range, waveLength,
-        ItemMiningGoggles.getVisibleWavelength(player.inventory.armor.get(3)));
+        ItemMiningGoggles.getVisibleWavelength(player.inventory.armor.get(3), 0));
+    if (range == -1 || range == 0) {
+      range = ItemMiningGoggles.getMaxRange(player.inventory.armor.get(3));
+      range = getBlockRadius(range, waveLength,
+          ItemMiningGoggles.getVisibleWavelength(player.inventory.armor.get(3), 1));
+    }
     if (pos.closerThan(new Vector3i(player.getX(), player.getY(), player.getZ()),
         range)) {
       BlockState state = player.level.getBlockState(pos);
@@ -174,9 +180,14 @@ public class RenderBlock {
     int wavelength = -1;
     wavelength = OreConfigLoader.get(name);
     if (wavelength != -1) {
-      int[] visible = ItemMiningGoggles.getVisibleWavelength(
-          player.inventory.armor.get(3));
-      if (wavelength >= visible[0] && wavelength <= visible[1]) {
+      int[] visibleLeft = ItemMiningGoggles.getVisibleWavelength(
+          player.inventory.armor.get(3), 0);
+      if (wavelength >= visibleLeft[0] && wavelength <= visibleLeft[1]) {
+        return true;
+      }
+      int[] visibleRight = ItemMiningGoggles.getVisibleWavelength(
+          player.inventory.armor.get(3), 1);
+      if (wavelength >= visibleRight[0] && wavelength <= visibleRight[1]) {
         return true;
       }
     }
@@ -187,6 +198,9 @@ public class RenderBlock {
   public static double MIN_PERC_RANGE = .3;
 
   public static int getBlockRadius(double maxRange, int wavelength, int[] minMaxHelmet) {
+    if (minMaxHelmet[0] == -1 || minMaxHelmet[1] == -1) {
+      return -1;
+    }
     double mid = ((double) minMaxHelmet[0] + minMaxHelmet[1]) / 2;
     double variation = (double) (minMaxHelmet[1] - minMaxHelmet[0]) / minMaxHelmet[1];
     // No Distance degradation
@@ -211,19 +225,12 @@ public class RenderBlock {
       String[] names = getBlockNames(state);
       for (String name : names) {
         if (canSeeWavelength(pos, player, name) && withinRange(player, pos, name)) {
-          add(name, pos);
+          detectedBlocks.add(pos);
           return true;
         }
       }
     }
     return false;
-  }
-
-  private static void add(String name, BlockPos pos) {
-    int wavelength = OreConfigLoader.get(name);
-    if (wavelength != -1) {
-      detectedBlocks.add(pos);
-    }
   }
 
   private static String[] getBlockNames(BlockState block) {
