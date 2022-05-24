@@ -1,6 +1,7 @@
 package io.wurmatron.mining_goggles.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.wurmatron.mining_goggles.inventory.ContainerCrystalBag;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_1;
@@ -65,6 +66,17 @@ public class ScreenMiningGoggles_1 extends ContainerScreen<ContainerMiningGoggle
     font.draw(matrixStack, display(rightWavelength[1]), 203, 22, Color.BLUE.getRGB());
     avg = (rightWavelength[0] + rightWavelength[1]) / 2;
     font.draw(matrixStack, display(avg), 165, -2, Color.BLUE.getRGB());
+    RenderSystem.scalef(1f, 1f, 1f);
+    RenderSystem.popMatrix();
+    RenderSystem.pushMatrix();
+    RenderSystem.scalef(.6f, .6f, .6f);
+    // Range
+    font.draw(matrixStack, new TranslationTextComponent("stat.max_range.name").append(
+            " " + ItemMiningGoggles.getMaxRange(this.inventory.armor.get(3))), 107, 48,
+        Color.BLACK.getRGB());
+    font.draw(matrixStack, new TranslationTextComponent("stat.optimal_range.name").append(
+        " " + (int) ((double) ItemMiningGoggles.getMaxRange(this.inventory.armor.get(3))
+            * .3)), 107, 58, Color.BLACK.getRGB());
     RenderSystem.scalef(1f, 1f, 1f);
     RenderSystem.popMatrix();
   }

@@ -3,12 +3,12 @@ package io.wurmatron.mining_goggles;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.wurmatron.mining_goggles.api.MiningGogglesApi;
+import io.wurmatron.mining_goggles.client.gui.ScreenCrystalBag;
 import io.wurmatron.mining_goggles.client.gui.ScreenMiningGoggles_1;
 import io.wurmatron.mining_goggles.client.render.RenderBlock;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.MiningItems;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
-import io.wurmatron.mining_goggles.client.gui.ScreenCrystalBag;
 import io.wurmatron.mining_goggles.tab.MiningGogglesItemGroup;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,10 +50,13 @@ public class MiningGoggles {
     MiningItems.ITEMS.register(modBus);
     // Config
     MiningGogglesApi.oreWavelengths = OreConfigLoader.load();
+
   }
 
   private void doClientStuff(final FMLClientSetupEvent event) {
-    ScreenManager.register(ContainerRegistry.containerTypeCrystalBag, ScreenCrystalBag::new);
-    ScreenManager.register(ContainerRegistry.containerTypeGoggles_1, ScreenMiningGoggles_1::new);
+    ScreenManager.register(ContainerRegistry.containerTypeCrystalBag,
+        ScreenCrystalBag::new);
+    ScreenManager.register(ContainerRegistry.containerTypeGoggles_1,
+        ScreenMiningGoggles_1::new);
   }
 }

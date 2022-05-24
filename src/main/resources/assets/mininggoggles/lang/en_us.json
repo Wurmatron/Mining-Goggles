@@ -2,5 +2,7 @@
   "item.mininggoggles.goggles": "Primitive Mining Goggles",
   "item.mininggoggles.crystal": "Crystal",
   "item.mininggoggles.bag_crystal": "Crystal Bag",
-  "itemGroup.tab.goggles": "Mining Goggles"
+  "itemGroup.tab.goggles": "Mining Goggles",
+  "stat.max_range.name": "Max Range:",
+  "stat.optimal_range.name": "Optimal: "
 }

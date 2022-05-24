@@ -128,6 +128,8 @@ public class RenderBlock {
         } else {
           count++;
         }
+      } else {
+        activeRender.clear();
       }
     }
   }
