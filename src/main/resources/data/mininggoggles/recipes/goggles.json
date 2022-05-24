@@ -1,0 +1,31 @@
+{
+  "type": "crafting_shaped",
+  "pattern": [
+    "CIC",
+    "LWL",
+    "DED"
+  ],
+  "key": {
+    "C": {
+      "item": "mininggoggles:crystal"
+    },
+    "I": {
+      "item": "minecraft:packed_ice"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "D": {
+      "tag": "forge:gems/diamond"
+    },
+    "E": {
+      "item": "minecraft:emerald_block"
+    }
+  },
+  "result": {
+    "item": "mininggoggles:goggles"
+  }
+}

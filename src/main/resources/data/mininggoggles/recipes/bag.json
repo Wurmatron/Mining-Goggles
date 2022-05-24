@@ -1,0 +1,22 @@
+{
+  "type": "crafting_shaped",
+  "pattern": [
+    "XAX",
+    "ACA",
+    "XAX"
+  ],
+  "key": {
+    "A": {
+      "item": "mininggoggles:crystal"
+    },
+    "X": {
+      "item": "minecraft:packed_ice"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    }
+  },
+  "result": {
+    "item": "mininggoggles:bag_crystal"
+  }
+}
