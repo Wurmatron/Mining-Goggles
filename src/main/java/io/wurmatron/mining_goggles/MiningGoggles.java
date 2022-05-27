@@ -5,7 +5,8 @@ import com.google.gson.GsonBuilder;
 import io.wurmatron.mining_goggles.api.MiningGogglesApi;
 import io.wurmatron.mining_goggles.client.gui.ScreenCrystalBag;
 import io.wurmatron.mining_goggles.client.gui.ScreenMiningGoggles_1;
-import io.wurmatron.mining_goggles.client.render.RenderBlock;
+import io.wurmatron.mining_goggles.client.gui.ScreenMiningGoggles_2;
+import io.wurmatron.mining_goggles.client.render.RenderBasicGoggles;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.MiningItems;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
@@ -41,12 +42,13 @@ public class MiningGoggles {
     ClientOnly clientOnly = new ClientOnly(modBus);
     DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> clientOnly::registerClientOnlyEvents);
     // Events
-    MinecraftForge.EVENT_BUS.register(new RenderBlock());
+    MinecraftForge.EVENT_BUS.register(new RenderBasicGoggles());
     MinecraftForge.EVENT_BUS.register(new MiningItems());
     // Items
     MiningItems.register("goggles", () -> MiningItems.goggles);
     MiningItems.register("crystal", () -> MiningItems.crystal);
     MiningItems.register("bag_crystal", () -> MiningItems.bag);
+    MiningItems.register("goggles_upgraded", () -> MiningItems.gogglesUpgraded);
     MiningItems.ITEMS.register(modBus);
     // Config
     MiningGogglesApi.oreWavelengths = OreConfigLoader.load();
@@ -58,5 +60,7 @@ public class MiningGoggles {
         ScreenCrystalBag::new);
     ScreenManager.register(ContainerRegistry.containerTypeGoggles_1,
         ScreenMiningGoggles_1::new);
+    ScreenManager.register(ContainerRegistry.containerTypeGoggles_2,
+        ScreenMiningGoggles_2::new);
   }
 }

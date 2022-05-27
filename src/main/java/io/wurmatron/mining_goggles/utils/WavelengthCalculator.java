@@ -36,15 +36,19 @@ public class WavelengthCalculator {
       // Verify Output
       return new int[]{(int) Math.round(Math.min(step3A, step3B)),
           (int) Math.round(Math.max(step3A, step3B))};
+    } else if (minMaxWavelengths.length == 3) {
+      int[] minMax = computeWavelength(Arrays.copyOfRange(minMaxWavelengths, 0, 2));
+      return computeWavelength(new int[][]{minMax, minMaxWavelengths[2]});
     }
     return new int[]{-1, -1};
   }
 
   private static int[][] removeEmptyValues(int[][] val) {
     List<int[]> arr = new ArrayList<>();
-    int[] prev = new int[] {-1, -1};
+    int[] prev = new int[]{-1, -1};
     for (int[] x : val) {
-      if (x != null && x.length == 2 && x[0] > -1 && x[1] > -1 && prev[0] != x[0] && prev[1] != x[1]) {
+      if (x != null && x.length == 2 && x[0] > -1 && x[1] > -1 && prev[0] != x[0]
+          && prev[1] != x[1]) {
         arr.add(x);
       }
       prev = x;

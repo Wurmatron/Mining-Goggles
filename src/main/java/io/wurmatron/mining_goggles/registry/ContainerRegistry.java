@@ -2,6 +2,7 @@ package io.wurmatron.mining_goggles.registry;
 
 import io.wurmatron.mining_goggles.inventory.ContainerCrystalBag;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_1;
+import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_2;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
@@ -12,6 +13,7 @@ public class ContainerRegistry {
   //Containers
   public static ContainerType<ContainerCrystalBag> containerTypeCrystalBag;
   public static ContainerType<ContainerMiningGoggles_1> containerTypeGoggles_1;
+  public static ContainerType<ContainerMiningGoggles_2> containerTypeGoggles_2;
 
   @SubscribeEvent
   public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
@@ -23,6 +25,10 @@ public class ContainerRegistry {
     containerTypeGoggles_1 = IForgeContainerType.create(ContainerMiningGoggles_1::createContainerClientSide);
     containerTypeGoggles_1.setRegistryName("container_goggles1");
     event.getRegistry().register(containerTypeGoggles_1);
+    // Goggles 2 (Goggles Upgraded)
+    containerTypeGoggles_2 = IForgeContainerType.create(ContainerMiningGoggles_2::createContainerClientSide);
+    containerTypeGoggles_2.setRegistryName("container_goggles2");
+    event.getRegistry().register(containerTypeGoggles_2);
   }
 
 }

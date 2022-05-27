@@ -1,8 +1,8 @@
 package io.wurmatron.mining_goggles.items;
 
-import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_1;
-import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_1;
-import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_1;
+import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_2;
+import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_2;
+import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_2;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,14 +33,13 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import org.lwjgl.system.CallbackI.P;
 
-public class ItemMiningGoggles extends ArmorItem {
+public class ItemMiningGogglesUpgraded extends ArmorItem {
 
-  public static final int MAX_RADIUS = 16;
+  public static final int MAX_RADIUS = 24;
 
-  public ItemMiningGoggles(Properties prop) {
-    super(ArmorMaterial.DIAMOND, EquipmentSlotType.HEAD, prop);
+  public ItemMiningGogglesUpgraded(Properties prop) {
+    super(ArmorMaterial.NETHERITE, EquipmentSlotType.HEAD, prop);
   }
 
   @Nonnull
@@ -85,7 +84,7 @@ public class ItemMiningGoggles extends ArmorItem {
     } else {
       return ActionResultType.FAIL;
     }
-    ItemStackHandlerGoggles_1 itemStackHandler = getItemStackGoggles_1(itemStack);
+    ItemStackHandlerGoggles_2 itemStackHandler = getItemStackGoggles_2(itemStack);
     for (int i = 0; i < itemStackHandler.getSlots(); i++) {
       ItemStack flower = itemStackHandler.getStackInSlot(i);
       ItemStack flowersWhichDidNotFit = ItemHandlerHelper.insertItemStacked(tileInventory,
@@ -115,27 +114,27 @@ public class ItemMiningGoggles extends ArmorItem {
 
 
     @Override
-    public ContainerMiningGoggles_1 createMenu(int windowID, PlayerInventory inventory,
+    public ContainerMiningGoggles_2 createMenu(int windowID, PlayerInventory inventory,
         PlayerEntity player) {
-      return ContainerMiningGoggles_1.createContainerServerSide(windowID, inventory,
-          getItemStackGoggles_1(stackBag), stackBag);
+      return ContainerMiningGoggles_2.createContainerServerSide(windowID, inventory,
+          getItemStackGoggles_2(stackBag), stackBag);
     }
   }
 
   @Nonnull
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT oldCapNbt) {
-    return new CapabilityProviderGoggles_1();
+    return new CapabilityProviderGoggles_2();
   }
 
-  public static ItemStackHandlerGoggles_1 getItemStackGoggles_1(
+  public static ItemStackHandlerGoggles_2 getItemStackGoggles_2(
       ItemStack itemStack) {
     IItemHandler goggles = itemStack.getCapability(
         CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
-    if (!(goggles instanceof ItemStackHandlerGoggles_1)) {
-      return new ItemStackHandlerGoggles_1();
+    if (!(goggles instanceof ItemStackHandlerGoggles_2)) {
+      return new ItemStackHandlerGoggles_2();
     }
-    return (ItemStackHandlerGoggles_1) goggles;
+    return (ItemStackHandlerGoggles_2) goggles;
   }
 
   private final String BASE_NBT_TAG = "base";
@@ -145,7 +144,7 @@ public class ItemMiningGoggles extends ArmorItem {
   @Override
   public CompoundNBT getShareTag(ItemStack stack) {
     CompoundNBT baseTag = stack.getTag();
-    ItemStackHandlerGoggles_1 itemStackHandler = getItemStackGoggles_1(stack);
+    ItemStackHandlerGoggles_2 itemStackHandler = getItemStackGoggles_2(stack);
     CompoundNBT capabilityTag = itemStackHandler.serializeNBT();
     CompoundNBT combinedTag = new CompoundNBT();
     if (baseTag != null) {
@@ -164,35 +163,43 @@ public class ItemMiningGoggles extends ArmorItem {
       return;
     }
     stack.setTag(nbt.getCompound(BASE_NBT_TAG));
-    ItemStackHandlerGoggles_1 itemStackHandlerGoggles_1 = getItemStackGoggles_1(
+    ItemStackHandlerGoggles_2 itemStackHandlerGoggles_2 = getItemStackGoggles_2(
         stack);
-    itemStackHandlerGoggles_1.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
+    itemStackHandlerGoggles_2.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
   }
 
   @Nullable
   @Override
   public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot,
       String type) {
-    return "mininggoggles:textures/models/goggles_t1.png"; // TODO Dynamic based on lens / modules
+    return "mininggoggles:textures/models/goggles_t2.png"; // TODO Dynamic based on lens / modules
   }
 
   public static int[][] getWavelength(ItemStack stack, int side) {
     if (side == 0) {
-      ItemStack crystal0 = getItemStackGoggles_1(stack).getStackInSlot(0);
-      ItemStack crystal1 = getItemStackGoggles_1(stack).getStackInSlot(1);
-      int[][] crystalWavelengths = new int[2][2];
+      ItemStack crystal0 = getItemStackGoggles_2(stack).getStackInSlot(0);
+      ItemStack crystal1 = getItemStackGoggles_2(stack).getStackInSlot(1);
+      ItemStack crystal2 = getItemStackGoggles_2(stack).getStackInSlot(2);
+      int[][] crystalWavelengths = new int[3][2];
       crystalWavelengths[0] = ItemCrystal.getWavelength(crystal0);
       crystalWavelengths[1] = ItemCrystal.getWavelength(crystal1);
+      crystalWavelengths[2] = ItemCrystal.getWavelength(crystal2);
       return crystalWavelengths;
     } else if (side == 1) {
-      ItemStack crystal2 = getItemStackGoggles_1(stack).getStackInSlot(2);
-      ItemStack crystal3 = getItemStackGoggles_1(stack).getStackInSlot(3);
-      int[][] crystalWavelengths = new int[2][2];
-      crystalWavelengths[0] = ItemCrystal.getWavelength(crystal2);
-      crystalWavelengths[1] = ItemCrystal.getWavelength(crystal3);
+      ItemStack crystal3 = getItemStackGoggles_2(stack).getStackInSlot(3);
+      ItemStack crystal4 = getItemStackGoggles_2(stack).getStackInSlot(4);
+      ItemStack crystal5 = getItemStackGoggles_2(stack).getStackInSlot(5);
+      int[][] crystalWavelengths = new int[3][2];
+      crystalWavelengths[0] = ItemCrystal.getWavelength(crystal3);
+      crystalWavelengths[1] = ItemCrystal.getWavelength(crystal4);
+      crystalWavelengths[1] = ItemCrystal.getWavelength(crystal5);
       return crystalWavelengths;
     }
     return new int[0][0];
+  }
+
+  public static int[] getVisibleWavelength(ItemStack stack, int side) {
+    return WavelengthCalculator.computeWavelength(getWavelength(stack, side));
   }
 
   public static int getMaxRange(ItemStack stack) {

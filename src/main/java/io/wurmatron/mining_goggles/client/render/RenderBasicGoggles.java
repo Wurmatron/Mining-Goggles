@@ -5,7 +5,9 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.ItemMiningGoggles;
+import io.wurmatron.mining_goggles.items.ItemMiningGogglesUpgraded;
 import io.wurmatron.mining_goggles.items.MiningItems;
+import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +36,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.cliffc.high_scale_lib.NonBlockingHashSet;
 import org.lwjgl.opengl.GL11;
 
-public class RenderBlock {
+public class RenderBasicGoggles {
 
   public static NonBlockingHashSet<BlockPos> detectedBlocks = new NonBlockingHashSet<>();
   public static NonBlockingHashSet<BlockPos> activeRender = new NonBlockingHashSet<>();
@@ -58,7 +60,7 @@ public class RenderBlock {
 
   public static void addNewRendering(PlayerEntity player) {
     ItemStack stack = player.inventory.armor.get(3);
-    if (!stack.getItem().getItem().equals(MiningItems.goggles)) {
+    if (!stack.getItem().getItem().equals(MiningItems.goggles) && !stack.getItem().getItem().equals(MiningItems.gogglesUpgraded)) {
       activeRender.clear();
       return;
     }
@@ -86,7 +88,7 @@ public class RenderBlock {
   @SubscribeEvent
   public void onClientTick(PlayerTickEvent e) {
     if (e.side.isClient()) {
-      if (e.player.inventory.armor.get(3).getItem().equals(MiningItems.goggles)) {
+      if (e.player.inventory.armor.get(3).getItem().equals(MiningItems.goggles) || e.player.inventory.armor.get(3).getItem().equals(MiningItems.gogglesUpgraded)) {
         if (renderUpdater >= 20) {
           addNewRendering(e.player);
           renderUpdater = 0;
@@ -160,13 +162,15 @@ public class RenderBlock {
 
   private static boolean withinRange(PlayerEntity player, BlockPos pos, String name) {
     int waveLength = OreConfigLoader.get(name);
-    double range = ItemMiningGoggles.getMaxRange(player.inventory.armor.get(3));
+    double range = getRange(player.inventory.armor.get(3));
     range = getBlockRadius(range, waveLength,
-        ItemMiningGoggles.getVisibleWavelength(player.inventory.armor.get(3), 0));
+        WavelengthCalculator.computeWavelength(
+            getWavelength(player.inventory.armor.get(3), 0)));
     if (range == -1 || range == 0) {
-      range = ItemMiningGoggles.getMaxRange(player.inventory.armor.get(3));
+      range = getRange(player.inventory.armor.get(3));
       range = getBlockRadius(range, waveLength,
-          ItemMiningGoggles.getVisibleWavelength(player.inventory.armor.get(3), 1));
+          WavelengthCalculator.computeWavelength(
+              getWavelength(player.inventory.armor.get(3), 1)));
     }
     if (pos.closerThan(new Vector3i(player.getX(), player.getY(), player.getZ()),
         range)) {
@@ -178,17 +182,37 @@ public class RenderBlock {
     return false;
   }
 
+  public static int getRange(ItemStack stack) {
+    if (stack.getItem().equals(MiningItems.goggles)) {
+      return ItemMiningGoggles.getMaxRange(stack);
+    }
+    if (stack.getItem().equals(MiningItems.gogglesUpgraded)) {
+      return ItemMiningGogglesUpgraded.getMaxRange(stack);
+    }
+    return 0;
+  }
+
+  public static int[][] getWavelength(ItemStack stack, int side) {
+    if (stack.getItem().equals(MiningItems.goggles)) {
+      return ItemMiningGoggles.getWavelength(stack, side);
+    }
+    if (stack.getItem().equals(MiningItems.gogglesUpgraded)) {
+      return ItemMiningGogglesUpgraded.getWavelength(stack, side);
+    }
+    return new int[0][0];
+  }
+
   public static boolean canSeeWavelength(BlockPos pos, PlayerEntity player, String name) {
     int wavelength = -1;
     wavelength = OreConfigLoader.get(name);
     if (wavelength != -1) {
-      int[] visibleLeft = ItemMiningGoggles.getVisibleWavelength(
-          player.inventory.armor.get(3), 0);
+      int[] visibleLeft = WavelengthCalculator.computeWavelength(
+          getWavelength(player.inventory.armor.get(3), 0));
       if (wavelength >= visibleLeft[0] && wavelength <= visibleLeft[1]) {
         return true;
       }
-      int[] visibleRight = ItemMiningGoggles.getVisibleWavelength(
-          player.inventory.armor.get(3), 1);
+      int[] visibleRight = WavelengthCalculator.computeWavelength(
+          getWavelength(player.inventory.armor.get(3), 1));
       if (wavelength >= visibleRight[0] && wavelength <= visibleRight[1]) {
         return true;
       }
