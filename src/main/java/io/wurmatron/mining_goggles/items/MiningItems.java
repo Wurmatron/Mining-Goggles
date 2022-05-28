@@ -18,7 +18,7 @@ public class MiningItems {
   public static Item goggles = new ItemMiningGoggles(
       new Item.Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES));
   public static Item crystal = new ItemCrystal(
-      new Item.Properties().stacksTo(4).tab(MiningGoggles.TAB_GOGGLES).durability(100)
+      new Item.Properties().stacksTo(4).tab(MiningGoggles.TAB_GOGGLES).durability(5000)
           .setNoRepair().fireResistant());
   public static Item bag = new ItemCrystalBag(
       new Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES));

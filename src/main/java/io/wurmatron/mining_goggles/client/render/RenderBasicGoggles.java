@@ -7,10 +7,12 @@ import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.ItemMiningGoggles;
 import io.wurmatron.mining_goggles.items.ItemMiningGogglesUpgraded;
 import io.wurmatron.mining_goggles.items.MiningItems;
+import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_1;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -33,6 +35,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.items.ItemStackHandler;
 import org.cliffc.high_scale_lib.NonBlockingHashSet;
 import org.lwjgl.opengl.GL11;
 
@@ -60,10 +63,12 @@ public class RenderBasicGoggles {
 
   public static void addNewRendering(PlayerEntity player) {
     ItemStack stack = player.inventory.armor.get(3);
-    if (!stack.getItem().getItem().equals(MiningItems.goggles) && !stack.getItem().getItem().equals(MiningItems.gogglesUpgraded)) {
+    if (!stack.getItem().getItem().equals(MiningItems.goggles) && !stack.getItem()
+        .getItem().equals(MiningItems.gogglesUpgraded)) {
       activeRender.clear();
       return;
     }
+    damageCrystals(player.level.random, stack);
     if (activeRender.size() < detectedBlocks.size()) {
       for (int x = 0; x < MAX_GROWTH_PER_TICK; x++) {
         int currentIndex = activeRender.size() + x;
@@ -85,10 +90,41 @@ public class RenderBasicGoggles {
   int count = 0;
   int renderUpdater = 0;
 
+  private static void damageCrystals(Random rand, ItemStack stack) {
+    ItemStackHandler stackHandler = null;
+    int chance = 2;
+    if (stack.getItem().equals(MiningItems.goggles)) {
+      stackHandler = ItemMiningGoggles.getItemStackGoggles_1(stack);
+    } else if (stack.getItem().equals(MiningItems.gogglesUpgraded)) {
+      stackHandler = ItemMiningGogglesUpgraded.getItemStackGoggles_2(stack);
+      chance = 4;
+    }
+    if (stackHandler != null) {
+      for (int count = 0; count < stackHandler.getSlots(); count++) {
+        damageCrystal(rand, stackHandler, count, chance);
+      }
+    }
+  }
+
+  // TODO Server support
+  // TODO Enable / disable ?
+  private static void damageCrystal(Random rand, ItemStackHandler stackHandler, int index,
+      int chance) {
+    if (!stackHandler.getStackInSlot(index).isEmpty() && rand.nextInt(chance) == 0) {
+      stackHandler.getStackInSlot(index)
+          .setDamageValue(stackHandler.getStackInSlot(index).getDamageValue() + 1);
+      if (stackHandler.getStackInSlot(index).getDamageValue() >= stackHandler.getStackInSlot(index).getMaxDamage()) {
+        stackHandler.setStackInSlot(index, ItemStack.EMPTY);
+      }
+    }
+  }
+
   @SubscribeEvent
   public void onClientTick(PlayerTickEvent e) {
     if (e.side.isClient()) {
-      if (e.player.inventory.armor.get(3).getItem().equals(MiningItems.goggles) || e.player.inventory.armor.get(3).getItem().equals(MiningItems.gogglesUpgraded)) {
+      if (e.player.inventory.armor.get(3).getItem().equals(MiningItems.goggles)
+          || e.player.inventory.armor.get(3).getItem()
+          .equals(MiningItems.gogglesUpgraded)) {
         if (renderUpdater >= 20) {
           addNewRendering(e.player);
           renderUpdater = 0;
