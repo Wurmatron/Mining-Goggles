@@ -1,9 +1,16 @@
 package io.wurmatron.mining_goggles.items;
 
+import static io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay.generateList;
+
+import io.wurmatron.mining_goggles.MiningGoggles;
+import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
+import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_2;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_2;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_2;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
+import java.util.Arrays;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
@@ -33,10 +40,12 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import org.cliffc.high_scale_lib.NonBlockingHashMap;
 
-public class ItemMiningGogglesUpgraded extends ArmorItem {
+public class ItemMiningGogglesUpgraded extends ArmorItem implements
+    MiningGogglesCollector {
 
-  public static final int MAX_RADIUS = 24;
+  public static final int MAX_RADIUS = 12;
 
   public ItemMiningGogglesUpgraded(Properties prop) {
     super(ArmorMaterial.NETHERITE, EquipmentSlotType.HEAD, prop);
@@ -175,7 +184,7 @@ public class ItemMiningGogglesUpgraded extends ArmorItem {
     return "mininggoggles:textures/models/goggles_t2.png"; // TODO Dynamic based on lens / modules
   }
 
-  public static int[][] getWavelength(ItemStack stack, int side) {
+  public int[][] getWavelength(ItemStack stack, int side) {
     if (side == 0) {
       ItemStack crystal0 = getItemStackGoggles_2(stack).getStackInSlot(0);
       ItemStack crystal1 = getItemStackGoggles_2(stack).getStackInSlot(1);
@@ -198,11 +207,73 @@ public class ItemMiningGogglesUpgraded extends ArmorItem {
     return new int[0][0];
   }
 
-  public static int[] getVisibleWavelength(ItemStack stack, int side) {
-    return WavelengthCalculator.computeWavelength(getWavelength(stack, side));
-  }
-
   public static int getMaxRange(ItemStack stack) {
     return MAX_RADIUS;
+  }
+
+  public static NonBlockingHashMap<BlockPos, Float[]> detectedBlocks = new NonBlockingHashMap<>();
+
+
+  @Override
+  public NonBlockingHashMap<BlockPos, Float[]> findBlocks(PlayerEntity player,
+      ItemStack stack, boolean rescan) {
+    if (!rescan) {
+      return detectedBlocks;
+    }
+    MiningGoggles.EXECUTORS.submit(() -> {
+      int maxRadius = maxRange(stack);
+      detectedBlocks.clear();
+      MiningGoggles.EXECUTORS.submit(() -> {
+        List<BlockPos> fullBlockList = generateList(
+            (int) (player.getX() - maxRadius),
+            (int) (player.getY() - maxRadius), (int) (player.getZ() - maxRadius),
+            (int) (player.getX() + maxRadius), (int) (player.getY() + maxRadius),
+            (int) (player.getZ() + maxRadius));
+        BlockPos[] subA = Arrays.copyOfRange(fullBlockList.toArray(new BlockPos[0]),
+            0, fullBlockList.size() / 2);
+        BlockPos[] subB = Arrays.copyOfRange(fullBlockList.toArray(new BlockPos[0]),
+            fullBlockList.size() / 2, fullBlockList.size());
+        // Test Group A
+        MiningGoggles.EXECUTORS.submit(() -> {
+          for (BlockPos a : subA) {
+            if (RenderGoggleOverlay.isValidPos(player, a)) {
+              detectedBlocks.put(a, getColors());
+            }
+          }
+        });
+        // Test Group B
+        MiningGoggles.EXECUTORS.submit(() -> {
+          for (BlockPos b : subB) {
+            if (RenderGoggleOverlay.isValidPos(player, b)) {
+              detectedBlocks.put(b, getColors());
+            }
+          }
+        });
+      });
+    });
+    return detectedBlocks;
+  }
+
+  @Override
+  public int maxRange(ItemStack stack) {
+    return MAX_RADIUS;
+  }
+
+  private static Float[] getColors() {
+    return new Float[]{1f, 0f, 0f, 1f};
+  }
+
+  @Override
+  public boolean canSeeBlock(PlayerEntity player, ItemStack stack, BlockPos pos,
+      int wavelength) {
+    if(wavelength != -1) {
+      int[] visibleLeft = WavelengthCalculator.computeWavelength(getWavelength(stack, 0));
+      if (wavelength >= visibleLeft[0] && wavelength <= visibleLeft[1]) {
+        return true;
+      }
+      int[] visibleRight = WavelengthCalculator.computeWavelength(getWavelength(stack, 1));
+      return wavelength >= visibleRight[0] && wavelength <= visibleRight[1];
+    }
+    return false;
   }
 }
