@@ -1,11 +1,21 @@
 package io.wurmatron.mining_goggles.items;
 
+import static io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay.generateList;
+
+import io.wurmatron.mining_goggles.MiningGoggles;
+import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
+import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
+import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_1;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_1;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_1;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
+import java.util.Arrays;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -33,11 +43,13 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import org.cliffc.high_scale_lib.NonBlockingHashMap;
+import org.cliffc.high_scale_lib.NonBlockingHashSet;
 import org.lwjgl.system.CallbackI.P;
 
-public class ItemMiningGoggles extends ArmorItem {
+public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollector {
 
-  public static final int MAX_RADIUS = 16;
+  public static final int MAX_RADIUS = 8;
 
   public ItemMiningGoggles(Properties prop) {
     super(ArmorMaterial.DIAMOND, EquipmentSlotType.HEAD, prop);
@@ -56,7 +68,6 @@ public class ItemMiningGoggles extends ArmorItem {
     }
     return ActionResult.pass(stack);
   }
-
 
   @Nonnull
   @Override
@@ -112,7 +123,6 @@ public class ItemMiningGoggles extends ArmorItem {
     public ITextComponent getDisplayName() {
       return stackBag.getDisplayName();
     }
-
 
     @Override
     public ContainerMiningGoggles_1 createMenu(int windowID, PlayerInventory inventory,
@@ -176,7 +186,7 @@ public class ItemMiningGoggles extends ArmorItem {
     return "mininggoggles:textures/models/goggles_t1.png"; // TODO Dynamic based on lens / modules
   }
 
-  public static int[][] getWavelength(ItemStack stack, int side) {
+  public int[][] getWavelength(ItemStack stack, int side) {
     if (side == 0) {
       ItemStack crystal0 = getItemStackGoggles_1(stack).getStackInSlot(0);
       ItemStack crystal1 = getItemStackGoggles_1(stack).getStackInSlot(1);
@@ -197,5 +207,72 @@ public class ItemMiningGoggles extends ArmorItem {
 
   public static int getMaxRange(ItemStack stack) {
     return MAX_RADIUS;
+  }
+
+  public static NonBlockingHashMap<BlockPos, Float[]> detectedBlocks = new NonBlockingHashMap<>();
+
+  @Override
+  public NonBlockingHashMap<BlockPos, Float[]> findBlocks(PlayerEntity player,
+      ItemStack stack, boolean rescan) {
+    if (!rescan) {
+      return detectedBlocks;
+    }
+    MiningGoggles.EXECUTORS.submit(() -> {
+      int maxRadius = maxRange(stack);
+      detectedBlocks.clear();
+      MiningGoggles.EXECUTORS.submit(() -> {
+        List<BlockPos> fullBlockList = generateList(
+            (int) (player.getX() - maxRadius),
+            (int) (player.getY() - maxRadius), (int) (player.getZ() - maxRadius),
+            (int) (player.getX() + maxRadius), (int) (player.getY() + maxRadius),
+            (int) (player.getZ() + maxRadius));
+        BlockPos[] subA = Arrays.copyOfRange(fullBlockList.toArray(new BlockPos[0]),
+            0, fullBlockList.size() / 2);
+        BlockPos[] subB = Arrays.copyOfRange(fullBlockList.toArray(new BlockPos[0]),
+            fullBlockList.size() / 2, fullBlockList.size());
+        // Test Group A
+        MiningGoggles.EXECUTORS.submit(() -> {
+          for (BlockPos a : subA) {
+            if (RenderGoggleOverlay.isValidPos(player, a)) {
+              detectedBlocks.put(a, getColors());
+            }
+          }
+        });
+        // Test Group B
+        MiningGoggles.EXECUTORS.submit(() -> {
+          for (BlockPos b : subB) {
+            if (RenderGoggleOverlay.isValidPos(player, b)) {
+              detectedBlocks.put(b, getColors());
+            }
+          }
+        });
+      });
+    });
+    return detectedBlocks;
+  }
+
+  private static Float[] getColors() {
+    return new Float[]{1f, 0f, 0f, 1f};
+  }
+
+  @Override
+  public int maxRange(ItemStack stack) {
+    return MAX_RADIUS;
+  }
+
+  @Override
+  public boolean canSeeBlock(PlayerEntity player, ItemStack stack, BlockPos pos,
+      int wavelength) {
+    if(wavelength != -1) {
+      int[] visibleLeft = WavelengthCalculator.computeWavelength(getWavelength(stack, 0));
+      if (wavelength >= visibleLeft[0] && wavelength <= visibleLeft[1]) {
+        return true;
+      }
+      int[] visibleRight = WavelengthCalculator.computeWavelength(getWavelength(stack, 1));
+      if (wavelength >= visibleRight[0] && wavelength <= visibleRight[1]) {
+        return true;
+      }
+    }
+    return false;
   }
 }

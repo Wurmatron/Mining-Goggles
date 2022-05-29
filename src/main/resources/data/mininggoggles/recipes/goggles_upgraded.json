@@ -1,0 +1,25 @@
+{
+  "type": "crafting_shaped",
+  "pattern": [
+    "CCC",
+    "GXG",
+    "BBB"
+  ],
+  "key": {
+    "C": {
+      "item": "mininggoggles:crystal"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "X": {
+      "item": "mininggoggles:goggles"
+    },
+    "B": {
+      "item": "minecraft:iron_block"
+    }
+  },
+  "result": {
+    "item": "mininggoggles:goggles_upgraded"
+  }
+}
