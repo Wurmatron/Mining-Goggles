@@ -12,6 +12,7 @@ import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_1;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
@@ -42,6 +43,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 import org.cliffc.high_scale_lib.NonBlockingHashSet;
@@ -263,16 +265,40 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
   @Override
   public boolean canSeeBlock(PlayerEntity player, ItemStack stack, BlockPos pos,
       int wavelength) {
-    if(wavelength != -1) {
+    if (wavelength != -1) {
       int[] visibleLeft = WavelengthCalculator.computeWavelength(getWavelength(stack, 0));
       if (wavelength >= visibleLeft[0] && wavelength <= visibleLeft[1]) {
         return true;
       }
-      int[] visibleRight = WavelengthCalculator.computeWavelength(getWavelength(stack, 1));
+      int[] visibleRight = WavelengthCalculator.computeWavelength(
+          getWavelength(stack, 1));
       if (wavelength >= visibleRight[0] && wavelength <= visibleRight[1]) {
         return true;
       }
     }
     return false;
+  }
+
+  @Override
+  public void damageCrystals(Random random, ItemStack stack) {
+    ItemStackHandlerGoggles_1 handler = getItemStackGoggles_1(stack);
+    for (int index = 0; index < handler.getSlots(); index++) {
+      damageCrystal(random, handler, index);
+    }
+  }
+
+  public static final int DAMAGE_CHANCE = 2;
+
+  private static void damageCrystal(Random rand, ItemStackHandler handler, int index) {
+    if (!handler.getStackInSlot(index).isEmpty()) {
+      if (rand.nextInt(DAMAGE_CHANCE) == 0) {
+        handler.getStackInSlot(index)
+            .setDamageValue(handler.getStackInSlot(index).getDamageValue() + 1);
+        if (handler.getStackInSlot(index).getDamageValue() == handler.getStackInSlot(
+            index).getMaxDamage()) {
+          handler.setStackInSlot(index, ItemStack.EMPTY);
+        }
+      }
+    }
   }
 }

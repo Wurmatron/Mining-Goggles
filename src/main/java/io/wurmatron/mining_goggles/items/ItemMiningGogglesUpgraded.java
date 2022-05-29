@@ -6,11 +6,13 @@ import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_2;
+import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_1;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_2;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_2;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
@@ -39,6 +41,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 
@@ -275,5 +278,28 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
       return wavelength >= visibleRight[0] && wavelength <= visibleRight[1];
     }
     return false;
+  }
+
+  @Override
+  public void damageCrystals(Random random, ItemStack stack) {
+    ItemStackHandlerGoggles_2 handler = getItemStackGoggles_2(stack);
+    for (int index = 0; index < handler.getSlots(); index++) {
+      damageCrystal(random, handler, index);
+    }
+  }
+
+  public static final int DAMAGE_CHANCE = 4;
+
+  private static void damageCrystal(Random rand, ItemStackHandler handler, int index) {
+    if (!handler.getStackInSlot(index).isEmpty()) {
+      if (rand.nextInt(DAMAGE_CHANCE) == 0) {
+        handler.getStackInSlot(index)
+            .setDamageValue(handler.getStackInSlot(index).getDamageValue() + 1);
+        if (handler.getStackInSlot(index).getDamageValue() == handler.getStackInSlot(
+            index).getMaxDamage()) {
+          handler.setStackInSlot(index, ItemStack.EMPTY);
+        }
+      }
+    }
   }
 }

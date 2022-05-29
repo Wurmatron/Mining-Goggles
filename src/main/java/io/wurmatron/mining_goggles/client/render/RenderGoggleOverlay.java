@@ -43,11 +43,13 @@ public class RenderGoggleOverlay {
   public static final double FUZZY_RANGE_BEST = .2; // overall total (1 * x)
   public static final double FUZZY_RANGE_LOW = .3; // overall total (1 * x)
   public static final int RESCAN_INTERVAL = 5; // multiple's of RENDER_UPDATE_TIMER
+  public static final int DAMAGE_INTERVAL = 5; // sec (in world ticks at 20tps)
 
   // Timers
   public static int renderTimer;
   public static int cleanupTimer;
   public static int rescanTimer;
+  public static int damageTimer;
 
   @SubscribeEvent
   public void onRenderWorld(RenderWorldLastEvent e) {
@@ -85,7 +87,16 @@ public class RenderGoggleOverlay {
       }
 
     } else if (e.side.isServer()) {
-
+      if (e.player.inventory.armor.get(3).getItem() instanceof MiningGogglesCollector) {
+        MiningGogglesCollector collector = (MiningGogglesCollector) e.player.inventory.armor.get(
+            3).getItem();
+        if (damageTimer == 0) {
+          collector.damageCrystals(e.player.level.random,e.player.inventory.armor.get(3));
+          damageTimer = 20 * DAMAGE_INTERVAL;
+        } else {
+          damageTimer--;
+        }
+      }
     }
   }
 
