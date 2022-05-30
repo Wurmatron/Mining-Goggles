@@ -49,6 +49,7 @@ public class MiningGoggles {
     MiningItems.register("crystal", () -> MiningItems.crystal);
     MiningItems.register("bag_crystal", () -> MiningItems.bag);
     MiningItems.register("goggles_upgraded", () -> MiningItems.gogglesUpgraded);
+    MiningItems.register("crystal_constructed", () -> MiningItems.constructedCrystal);
     MiningItems.ITEMS.register(modBus);
     // Config
     MiningGogglesApi.oreWavelengths = OreConfigLoader.load();

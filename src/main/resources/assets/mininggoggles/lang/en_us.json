@@ -5,5 +5,6 @@
   "itemGroup.tab.goggles": "Mining Goggles",
   "stat.max_range.name": "Max Range:",
   "stat.optimal_range.name": "Optimal: ",
-  "item.mininggoggles.goggles_upgraded": "Mining Goggles"
+  "item.mininggoggles.goggles_upgraded": "Mining Goggles",
+  "item.mininggoggles.crystal_constructed": "Constructed Crystal"
 }

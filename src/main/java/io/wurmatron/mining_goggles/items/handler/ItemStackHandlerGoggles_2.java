@@ -19,7 +19,7 @@ public class ItemStackHandlerGoggles_2 extends ItemStackHandler {
       return false;
     }
     Item item = stack.getItem();
-    if (item.equals(MiningItems.crystal)) {
+    if (item.equals(MiningItems.crystal) || item.equals(MiningItems.constructedCrystal)) {
       return true;
     }
     return false;

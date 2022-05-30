@@ -23,9 +23,9 @@ public class MiningItems {
   public static Item bag = new ItemCrystalBag(
       new Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES));
   public static Item gogglesUpgraded = new ItemMiningGogglesUpgraded(new Item.Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES));
+  public static ItemConstructedCrystal constructedCrystal = new ItemConstructedCrystal(new Item.Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES).fireResistant().durability(2500));
 
-  public static <T extends Item> RegistryObject<T> register(final String name,
-      final Supplier<T> sup) {
+  public static <T extends Item> RegistryObject<T> register(final String name, final Supplier<T> sup) {
     return ITEMS.register(name, sup);
   }
 
@@ -35,5 +35,6 @@ public class MiningItems {
     e.getRegistry().register(crystal);
     e.getRegistry().register(bag);
     e.getRegistry().register(gogglesUpgraded);
+    e.getRegistry().register(constructedCrystal);
   }
 }
