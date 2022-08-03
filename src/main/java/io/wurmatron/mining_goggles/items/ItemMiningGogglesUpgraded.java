@@ -68,7 +68,6 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
     return ActionResult.pass(stack);
   }
 
-
   @Nonnull
   @Override
   public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext ctx) {

@@ -12,8 +12,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.SlotItemHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class ContainerMiningGoggles_1 extends Container {
 
@@ -137,8 +135,4 @@ public class ContainerMiningGoggles_1 extends Container {
     }
     super.broadcastChanges();
   }
-
-
-  private static final Logger LOGGER = LogManager.getLogger();
-
 }

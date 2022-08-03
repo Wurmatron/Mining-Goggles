@@ -6,6 +6,7 @@ import io.wurmatron.mining_goggles.api.MiningGogglesApi;
 import io.wurmatron.mining_goggles.client.gui.ScreenCrystalBag;
 import io.wurmatron.mining_goggles.client.gui.ScreenMiningGoggles_1;
 import io.wurmatron.mining_goggles.client.gui.ScreenMiningGoggles_2;
+import io.wurmatron.mining_goggles.client.gui.ScreenTuningFork;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.MiningItems;
@@ -50,6 +51,9 @@ public class MiningGoggles {
     MiningItems.register("bag_crystal", () -> MiningItems.bag);
     MiningItems.register("goggles_upgraded", () -> MiningItems.gogglesUpgraded);
     MiningItems.register("crystal_constructed", () -> MiningItems.constructedCrystal);
+    MiningItems.register("goggles_digital", () -> MiningItems.gogglesDigital);
+    MiningItems.register("adjustable_crystal", () -> MiningItems.adjustableCrystal);
+    MiningItems.register("tuning_fork", () -> MiningItems.tuningFork);
     MiningItems.ITEMS.register(modBus);
     // Config
     MiningGogglesApi.oreWavelengths = OreConfigLoader.load();
@@ -63,5 +67,7 @@ public class MiningGoggles {
         ScreenMiningGoggles_1::new);
     ScreenManager.register(ContainerRegistry.containerTypeGoggles_2,
         ScreenMiningGoggles_2::new);
+    ScreenManager.register(ContainerRegistry.containerTuningFork,
+        ScreenTuningFork::new);
   }
 }
