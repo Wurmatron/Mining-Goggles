@@ -9,9 +9,12 @@ import io.wurmatron.mining_goggles.client.gui.ScreenMiningGoggles_2;
 import io.wurmatron.mining_goggles.client.gui.ScreenTuningFork;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
+import io.wurmatron.mining_goggles.config.wrapper.OreWavelength;
+import io.wurmatron.mining_goggles.event.TuningBlockEvents;
 import io.wurmatron.mining_goggles.items.MiningItems;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
 import io.wurmatron.mining_goggles.tab.MiningGogglesItemGroup;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import net.minecraft.client.gui.ScreenManager;
@@ -45,6 +48,7 @@ public class MiningGoggles {
     // Events
     MinecraftForge.EVENT_BUS.register(new RenderGoggleOverlay());
     MinecraftForge.EVENT_BUS.register(new MiningItems());
+    MinecraftForge.EVENT_BUS.register(new TuningBlockEvents());
     // Items
     MiningItems.register("goggles", () -> MiningItems.goggles);
     MiningItems.register("crystal", () -> MiningItems.crystal);
@@ -52,11 +56,17 @@ public class MiningGoggles {
     MiningItems.register("goggles_upgraded", () -> MiningItems.gogglesUpgraded);
     MiningItems.register("crystal_constructed", () -> MiningItems.constructedCrystal);
     MiningItems.register("goggles_digital", () -> MiningItems.gogglesDigital);
-    MiningItems.register("adjustable_crystal", () -> MiningItems.adjustableCrystal);
+    MiningItems.register("attunment_crystal", () -> MiningItems.attunmentCrystal);
     MiningItems.register("tuning_fork", () -> MiningItems.tuningFork);
     MiningItems.ITEMS.register(modBus);
     // Config
-    MiningGogglesApi.oreWavelengths = OreConfigLoader.load();
+    HashMap<String, OreWavelength> loadedOres = OreConfigLoader.load();
+    MiningGogglesApi.oreWavelengths = new HashMap<>();
+    MiningGogglesApi.oreTuning = new HashMap<>();
+    for (String name : loadedOres.keySet()) {
+      MiningGogglesApi.oreWavelengths.put(name, loadedOres.get(name).optimalWavelength);
+      MiningGogglesApi.oreTuning.put(name, loadedOres.get(name).tuning);
+    }
 
   }
 

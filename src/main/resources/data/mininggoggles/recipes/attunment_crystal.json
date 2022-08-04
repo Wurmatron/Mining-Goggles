@@ -1,0 +1,28 @@
+{
+  "type": "crafting_shaped",
+  "pattern": [
+    "EPE",
+    "SCS",
+    "EXE"
+  ],
+  "key": {
+    "C": {
+      "item": "mininggoggles:crystal"
+    },
+    "S": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "P": {
+      "item": "minecraft:ender_pearl"
+    },
+    "E": {
+      "tag": "forge:gems/emerald"
+    },
+    "X": {
+      "item": "minecraft:quartz"
+    }
+  },
+  "result": {
+    "item": "mininggoggles:attunment_crystal"
+  }
+}

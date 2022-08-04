@@ -35,10 +35,10 @@ public class ContainerCrystalBag extends Container {
   public static final int PLAYER_INVENTORY_YPOS = 69;
 
   private ContainerCrystalBag(int windowId, PlayerInventory playerInv,
-      ItemStackHandlerCrystalBag itemStackHandlerFlowerBag,
+      ItemStackHandlerCrystalBag itemStackHandlerCrystalBag,
       ItemStack itemStackBeingHeld) {
     super(ContainerRegistry.containerTypeCrystalBag, windowId);
-    this.itemStackHandler = itemStackHandlerFlowerBag;
+    this.itemStackHandler = itemStackHandlerCrystalBag;
     this.itemStackBeingHeld = itemStackBeingHeld;
     int SLOT_X_SPACING = 18;
     int SLOT_Y_SPACING = 18;
@@ -61,11 +61,11 @@ public class ContainerCrystalBag extends Container {
       }
     }
     // Bag slots
-    int bagSlotCount = itemStackHandlerFlowerBag.getSlots();
+    int bagSlotCount = itemStackHandlerCrystalBag.getSlots();
     final int BAG_SLOTS_PER_ROW = 7;
     final int BAG_INVENTORY_XPOS = 26;
     for (int bagSlot = 0; bagSlot < bagSlotCount; ++bagSlot) {
-      addSlot(new SlotItemHandler(itemStackHandlerFlowerBag, bagSlot,
+      addSlot(new SlotItemHandler(itemStackHandlerCrystalBag, bagSlot,
           (BAG_INVENTORY_XPOS + SLOT_X_SPACING * (bagSlot % BAG_SLOTS_PER_ROW)),
           (BAG_INVENTORY_YPOS + SLOT_Y_SPACING * (bagSlot / BAG_SLOTS_PER_ROW))));
     }
@@ -143,8 +143,4 @@ public class ContainerCrystalBag extends Container {
     }
     super.broadcastChanges();
   }
-
-
-  private static final Logger LOGGER = LogManager.getLogger();
-
 }

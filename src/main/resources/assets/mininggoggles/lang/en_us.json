@@ -7,7 +7,7 @@
   "stat.optimal_range.name": "Optimal: ",
   "item.mininggoggles.goggles_upgraded": "Mining Goggles",
   "item.mininggoggles.crystal_constructed": "Constructed Crystal",
-  "item.mininggoggles.goggles_digital": "Digital Mining Goggles",
-  "item.mininggoggles.adjustable_crystal": "Adjustable Crystal",
+  "item.mininggoggles.goggles_digital": "[WIP] Digital Mining Goggles",
+  "item.mininggoggles.attunment_crystal": "Attunment Crystal",
   "item.mininggoggles.tuning_fork": "Turning Fork (Crystal)"
 }

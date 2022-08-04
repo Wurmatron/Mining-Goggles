@@ -7,10 +7,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 
 
-public class ItemStackHandlerGoggles_2 extends ItemStackHandler {
+public class ItemStackHandlerTuningFork extends ItemStackHandler {
 
-  public ItemStackHandlerGoggles_2() {
-    super(6);
+  public ItemStackHandlerTuningFork() {
+    super(1);
   }
 
   @Override
@@ -19,7 +19,7 @@ public class ItemStackHandlerGoggles_2 extends ItemStackHandler {
       return false;
     }
     Item item = stack.getItem();
-    if (item.equals(MiningItems.crystal) || item.equals(MiningItems.constructedCrystal) || item.equals(MiningItems.attunmentCrystal)) {
+    if (item.equals(MiningItems.attunmentCrystal)) {
       return true;
     }
     return false;

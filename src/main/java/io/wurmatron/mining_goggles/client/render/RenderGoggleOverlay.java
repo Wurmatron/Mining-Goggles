@@ -156,7 +156,7 @@ public class RenderGoggleOverlay {
     return false;
   }
 
-  private static List<String> getBlockNames(BlockState block) {
+  public static List<String> getBlockNames(BlockState block) {
     ItemStack itemBlock = new ItemStack(
         Item.BY_BLOCK.get(block.getBlock()), 1);
     if (!itemBlock.equals(ItemStack.EMPTY)) {

@@ -30,12 +30,12 @@ public class MiningItems {
           .durability(2500));
   public static Item gogglesDigital = new ItemMiningGogglesDigital(
       new Item.Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES));
-  public static Item adjustableCrystal = new ItemAdjustableCrystal(
+  public static Item attunmentCrystal = new ItemAttunmentCrystal(
       new Item.Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES).fireResistant()
           .rarity(
               Rarity.RARE).durability(5000));
   public static Item tuningFork = new ItemTuningFork(
-      (new Item.Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES).durability(10)));
+      (new Item.Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES).durability(50)));
 
   public static <T extends Item> RegistryObject<T> register(final String name,
       final Supplier<T> sup) {
@@ -50,7 +50,7 @@ public class MiningItems {
     e.getRegistry().register(gogglesUpgraded);
     e.getRegistry().register(constructedCrystal);
     e.getRegistry().register(gogglesDigital);
-    e.getRegistry().register(adjustableCrystal);
+    e.getRegistry().register(attunmentCrystal);
     e.getRegistry().register(tuningFork);
   }
 }

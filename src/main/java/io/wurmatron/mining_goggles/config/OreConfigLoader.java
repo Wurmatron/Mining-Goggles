@@ -42,14 +42,14 @@ public class OreConfigLoader {
     }
   }
 
-  public static HashMap<String, Integer> load() {
-    HashMap<String, Integer> oreConfig = new HashMap<>();
+  public static HashMap<String, OreWavelength> load() {
+    HashMap<String, OreWavelength> oreConfig = new HashMap<>();
     try {
       OreWavelength[] ores = MiningGoggles.GSON.fromJson(Strings.join(Files.readAllLines(
               Paths.get(CONFIG_DIR + File.separator + "wavelengths.json")), "\n"),
           OreWavelength[].class);
       for (OreWavelength ore : ores) {
-        oreConfig.put(ore.ore, ore.optimalWavelength);
+        oreConfig.put(ore.ore,ore);
       }
     } catch (Exception e) {
       MiningGoggles.LOGGER.info("Failed to load wavelengths.json, attempting to create");
@@ -66,14 +66,14 @@ public class OreConfigLoader {
   }
 
   public static void generateWavelengthsForOres() {
-    save(new OreWavelength("forge:ores/iron", 250));
-    save(new OreWavelength("forge:ores/coal", 350));
-    save(new OreWavelength("forge:ores/gold", 500));
-    save(new OreWavelength("forge:ores/debris", 510));
-    save(new OreWavelength("forge:ores/redstone", 550));
-    save(new OreWavelength("forge:ores/diamond", 750));
-    save(new OreWavelength("forge:ores/lapis", 800));
-    save(new OreWavelength("forge:ores/emerald", 1000));
-    save(new OreWavelength("forge:ores/copper", 1050));
+    save(new OreWavelength("forge:ores/iron", 250, 100));
+    save(new OreWavelength("forge:ores/coal", 350, 100));
+    save(new OreWavelength("forge:ores/gold", 500, 50));
+    save(new OreWavelength("forge:ores/debris", 510, 25));
+    save(new OreWavelength("forge:ores/redstone", 550, 100));
+    save(new OreWavelength("forge:ores/diamond", 750, 25));
+    save(new OreWavelength("forge:ores/lapis", 800, 50));
+    save(new OreWavelength("forge:ores/emerald", 1000, 30));
+    save(new OreWavelength("forge:ores/copper", 1050, 100));
   }
 }
