@@ -14,11 +14,6 @@ public class ItemConstructedCrystal extends ItemCrystal {
   @Override
   public void fillItemCategory(ItemGroup group,
       NonNullList<ItemStack> items) {
-    for (ItemStack stack : items) {
-      if (stack.getItem().equals(MiningItems.crystal)) {
-        items.remove(stack);
-      }
-    }
     if (group == MiningGoggles.TAB_GOGGLES) {
       items.add(new ItemStack(MiningItems.constructedCrystal, 1));
     }

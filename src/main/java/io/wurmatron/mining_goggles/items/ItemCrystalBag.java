@@ -1,5 +1,7 @@
 package io.wurmatron.mining_goggles.items;
 
+import io.wurmatron.mining_goggles.MiningGoggles;
+import io.wurmatron.mining_goggles.api.MiningGogglesApi;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderCrystalBag;
 import io.wurmatron.mining_goggles.inventory.ContainerCrystalBag;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerCrystalBag;
@@ -12,6 +14,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
@@ -20,6 +23,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -78,7 +82,7 @@ public class ItemCrystalBag extends Item {
     } else {
       return ActionResultType.FAIL;
     }
-    ItemStackHandlerCrystalBag itemStackHandler = getItemStackHandlerFlowerBag(itemStack);
+    ItemStackHandlerCrystalBag itemStackHandler = getItemStackCrystalBag(itemStack);
     for (int i = 0; i < itemStackHandler.getSlots(); i++) {
       ItemStack flower = itemStackHandler.getStackInSlot(i);
       ItemStack flowersWhichDidNotFit = ItemHandlerHelper.insertItemStacked(tileInventory,
@@ -106,12 +110,11 @@ public class ItemCrystalBag extends Item {
       return stackBag.getDisplayName();
     }
 
-
     @Override
     public ContainerCrystalBag createMenu(int windowID, PlayerInventory inventory,
         PlayerEntity player) {
       return ContainerCrystalBag.createContainerServerSide(windowID, inventory,
-          getItemStackHandlerFlowerBag(stackBag), stackBag);
+          getItemStackCrystalBag(stackBag), stackBag);
     }
   }
 
@@ -121,7 +124,7 @@ public class ItemCrystalBag extends Item {
     return new CapabilityProviderCrystalBag();
   }
 
-  private static ItemStackHandlerCrystalBag getItemStackHandlerFlowerBag(
+  private static ItemStackHandlerCrystalBag getItemStackCrystalBag(
       ItemStack itemStack) {
     IItemHandler crystalBag = itemStack.getCapability(
         CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
@@ -138,7 +141,7 @@ public class ItemCrystalBag extends Item {
   @Override
   public CompoundNBT getShareTag(ItemStack stack) {
     CompoundNBT baseTag = stack.getTag();
-    ItemStackHandlerCrystalBag itemStackHandler = getItemStackHandlerFlowerBag(stack);
+    ItemStackHandlerCrystalBag itemStackHandler = getItemStackCrystalBag(stack);
     CompoundNBT capabilityTag = itemStackHandler.serializeNBT();
     CompoundNBT combinedTag = new CompoundNBT();
     if (baseTag != null) {
@@ -157,16 +160,47 @@ public class ItemCrystalBag extends Item {
       return;
     }
     stack.setTag(nbt.getCompound(BASE_NBT_TAG));
-    ItemStackHandlerCrystalBag itemStackHandlerFlowerBag = getItemStackHandlerFlowerBag(
+    ItemStackHandlerCrystalBag itemStackHandlerFlowerBag = getItemStackCrystalBag(
         stack);
     itemStackHandlerFlowerBag.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
   }
 
   public static float getFullnessPropertyOverride(ItemStack itemStack,
       @Nullable World world, @Nullable LivingEntity livingEntity) {
-    ItemStackHandlerCrystalBag itemStackHandler = getItemStackHandlerFlowerBag(itemStack);
+    ItemStackHandlerCrystalBag itemStackHandler = getItemStackCrystalBag(itemStack);
     float fractionEmpty =
         itemStackHandler.getNumberOfEmptySlots() / (float) itemStackHandler.getSlots();
     return 1.0F - fractionEmpty;
   }
+
+  @Override
+  public void fillItemCategory(ItemGroup group,
+      NonNullList<ItemStack> items) {
+    if (group == MiningGoggles.TAB_GOGGLES) {
+        items.add(new ItemStack(MiningItems.bag));
+        ItemStack filled = create(listCrystals());
+        items.add(filled);
+    }
+  }
+
+  private static ItemStack[] listCrystals() {
+    ItemStack[] items = new ItemStack[MiningGogglesApi.oreTuning.keySet().size()];
+    for(int x = 0; x < MiningGogglesApi.oreTuning.keySet().size(); x++) {
+      items[x] = ItemAttunmentCrystal.create(
+          (String) MiningGogglesApi.oreTuning.keySet().toArray()[x]);
+    }
+    return items;
+  }
+
+  public static ItemStack create(ItemStack[] items) {
+    ItemStack bag = new ItemStack(MiningItems.bag);
+    ItemStackHandlerCrystalBag handler = getItemStackCrystalBag(bag);
+    for (int x = 0; x < handler.getNumberOfEmptySlots(); x++) {
+      if (items.length > x) {
+        handler.insertItem(x, items[x], false);
+      }
+    }
+    return bag;
+  }
+
 }

@@ -64,11 +64,6 @@ public class ItemAttunmentCrystal extends ItemCrystal {
   @Override
   public void fillItemCategory(ItemGroup group,
       NonNullList<ItemStack> items) {
-    for (ItemStack stack : items) {
-      if (stack.getItem().equals(MiningItems.crystal) || stack.getItem().equals(MiningItems.constructedCrystal)) {
-        items.remove(stack);
-      }
-    }
     if (group == MiningGoggles.TAB_GOGGLES) {
       items.add(new ItemStack(MiningItems.attunmentCrystal));
         for(String ore : MiningGogglesApi.oreTuning.keySet()) {

@@ -1,6 +1,6 @@
 package io.wurmatron.mining_goggles.items.handler;
 
-import io.wurmatron.mining_goggles.items.MiningItems;
+import io.wurmatron.mining_goggles.items.ItemCrystal;
 import javax.annotation.Nonnull;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,7 +19,7 @@ public class ItemStackHandlerCrystalBag extends ItemStackHandler {
       return false;
     }
     Item item = stack.getItem();
-    if (item.equals(MiningItems.crystal)) {
+    if (item instanceof ItemCrystal) {
       return true;
     }
     return false;
