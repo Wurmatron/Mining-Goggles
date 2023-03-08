@@ -11,4 +11,5 @@ nav:
     - 'CurseForge': 'https://www.curseforge.com/minecraft/mc-mods/mining-goggles'
     - 'Github': 'https://github.com/Wurmatron/Mining-Goggles'
     - 'Issues': 'https://github.com/Wurmatron/Mining-Goggles/issues'
-    - 'Ci / Nightly Builds': 'https://ci.wurmatron.io/job/Minecraft/job/Mining%20Goggles/'
+    - 'Ci / Nightly Builds': 'https://ci.wurmatron.io/job/Mining%20Goggles/'
+  - 'Items': './items'
