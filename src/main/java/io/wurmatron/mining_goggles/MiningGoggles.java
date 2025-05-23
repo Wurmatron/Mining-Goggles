@@ -3,10 +3,7 @@ package io.wurmatron.mining_goggles;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.wurmatron.mining_goggles.api.MiningGogglesApi;
-import io.wurmatron.mining_goggles.client.gui.ScreenCrystalBag;
-import io.wurmatron.mining_goggles.client.gui.ScreenMiningGoggles_1;
-import io.wurmatron.mining_goggles.client.gui.ScreenMiningGoggles_2;
-import io.wurmatron.mining_goggles.client.gui.ScreenTuningFork;
+import io.wurmatron.mining_goggles.client.gui.*;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.config.wrapper.OreWavelength;
@@ -33,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 public class MiningGoggles {
 
   public static final Logger LOGGER = LogManager.getLogger();
+  public static final String MODID= "mininggoggles";
 
   public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   public static final ExecutorService EXECUTORS = Executors.newFixedThreadPool(4);
@@ -78,6 +76,7 @@ public class MiningGoggles {
     ScreenManager.register(ContainerRegistry.containerTypeGoggles_2,
         ScreenMiningGoggles_2::new);
     ScreenManager.register(ContainerRegistry.containerTuningFork,
-        ScreenTuningFork::new);
+            ScreenTuningFork::new);
+    ScreenManager.register(ContainerRegistry.containerTypeGoggles_Digital, ScreenFilterDigital::new);
   }
 }

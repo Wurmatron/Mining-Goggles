@@ -1,9 +1,6 @@
 package io.wurmatron.mining_goggles.registry;
 
-import io.wurmatron.mining_goggles.inventory.ContainerCrystalBag;
-import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_1;
-import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_2;
-import io.wurmatron.mining_goggles.inventory.ContainerTuningFork;
+import io.wurmatron.mining_goggles.inventory.*;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
@@ -16,6 +13,7 @@ public class ContainerRegistry {
   public static ContainerType<ContainerMiningGoggles_1> containerTypeGoggles_1;
   public static ContainerType<ContainerMiningGoggles_2> containerTypeGoggles_2;
   public static ContainerType<ContainerTuningFork> containerTuningFork;
+  public static ContainerType<ContainerFilter> containerTypeGoggles_Digital;
 
   @SubscribeEvent
   public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
@@ -35,6 +33,10 @@ public class ContainerRegistry {
     containerTuningFork = IForgeContainerType.create(ContainerTuningFork::createContainerClientSide);
     containerTuningFork.setRegistryName("container_tuningfork");
     event.getRegistry().register(containerTuningFork);
+    // Goggles (Digital)
+    containerTypeGoggles_Digital = IForgeContainerType.create(ContainerFilter::createContainerClientSide);
+    containerTypeGoggles_Digital.setRegistryName("container_filterdigital");
+    event.getRegistry().register(containerTypeGoggles_Digital);
   }
 
 }
