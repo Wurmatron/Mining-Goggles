@@ -38,9 +38,12 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
             for(int index = 0; index < 16; index++) {
                 GuiColorFilter entry = new GuiColorFilter(this.font,new TranslationTextComponent("Title"));
                 entry.init(Minecraft.getInstance(),width,height);
+                // TODO Load and save from item
                 entry.text.setValue("AHHH " + x);
+                entry.text.setEditable(true);
                 entry.text.setTextColor(Color.WHITE.getRGB());
                 this.filters[index] = entry;
+                this.children.add(entry.text);
                 x++;
             }
         }

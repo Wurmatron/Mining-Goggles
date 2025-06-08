@@ -3,6 +3,7 @@ package io.wurmatron.mining_goggles.client.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.AnvilScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
