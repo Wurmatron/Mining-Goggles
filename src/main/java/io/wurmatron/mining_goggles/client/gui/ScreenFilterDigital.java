@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.inventory.ContainerFilter;
+import io.wurmatron.mining_goggles.network.PacketUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -28,6 +29,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
 
     public ScreenFilterDigital(ContainerFilter containerFilter, PlayerInventory inventory, ITextComponent title) {
         super(containerFilter, inventory, title);
+        stack = inventory.getSelected();
     }
 
     @Override
@@ -95,5 +97,12 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
         if (startingIndex < 0) {
             startingIndex = 0;
         }
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        // TODO Fill data into stack, so server can update
+        MiningGoggles.NETWORK.sendToServer(new PacketUtils.UpdateHelmet(Minecraft.getInstance().player.getUUID(), stack));
     }
 }

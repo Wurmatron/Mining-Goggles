@@ -39,5 +39,4 @@ public class ContainerFilter extends Container {
   public static ContainerFilter createContainerServerSide(int windowID, PlayerInventory playerInventory ,ItemStack helmet) {
     return new ContainerFilter(windowID, helmet);
   }
-
 }

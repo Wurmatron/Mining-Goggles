@@ -14,8 +14,11 @@ import io.wurmatron.mining_goggles.tab.MiningGogglesItemGroup;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import io.wurmatron.mining_goggles.network.PacketUtils;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -23,6 +26,8 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,6 +41,14 @@ public class MiningGoggles {
   public static final ExecutorService EXECUTORS = Executors.newFixedThreadPool(4);
   public static ItemGroup TAB_GOGGLES = new MiningGogglesItemGroup("tab.goggles");
 
+  private static final String PROTOCOL_VERSION = "1";
+  public static final SimpleChannel NETWORK = NetworkRegistry.newSimpleChannel(
+          new ResourceLocation(MODID, "main"),
+          () -> PROTOCOL_VERSION,
+          PROTOCOL_VERSION::equals,
+          PROTOCOL_VERSION::equals
+  );
+
   public MiningGoggles() {
     IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
     // Registry
@@ -43,6 +56,7 @@ public class MiningGoggles {
     modBus.register(ContainerRegistry.class);
     ClientOnly clientOnly = new ClientOnly(modBus);
     DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> clientOnly::registerClientOnlyEvents);
+    PacketUtils.register();
     // Events
     MinecraftForge.EVENT_BUS.register(new RenderGoggleOverlay());
     MinecraftForge.EVENT_BUS.register(new MiningItems());
@@ -65,7 +79,6 @@ public class MiningGoggles {
       MiningGogglesApi.oreWavelengths.put(name, loadedOres.get(name).optimalWavelength);
       MiningGogglesApi.oreTuning.put(name, loadedOres.get(name).tuning);
     }
-
   }
 
   private void doClientStuff(final FMLClientSetupEvent event) {
