@@ -9,8 +9,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.NBTTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import java.awt.*;
@@ -35,15 +37,27 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
     @Override
     protected void init() {
         super.init();
-        if(filters == null || filters[0] == null) {
+        if (filters == null || filters[0] == null) {
             int x = 0;
-            for(int index = 0; index < 16; index++) {
-                GuiColorFilter entry = new GuiColorFilter(this.font,new TranslationTextComponent("Title"));
-                entry.init(Minecraft.getInstance(),width,height);
-                // TODO Load and save from item
-                entry.text.setValue("AHHH " + x);
-                entry.text.setEditable(true);
-                entry.text.setTextColor(Color.WHITE.getRGB());
+            for (int index = 0; index < 16; index++) {
+                GuiColorFilter entry = new GuiColorFilter(this.font, new TranslationTextComponent("Title"));
+                entry.init(Minecraft.getInstance(), width, height);
+                if (stack.hasTag()) {
+                    CompoundNBT colorNBT = stack.getTagElement("color_" + index);
+                    if (colorNBT != null) {
+                        String filter = colorNBT.getString("filter");
+                        boolean active = colorNBT.getInt("active") == 1;
+                        entry.text.setValue(filter);
+                        entry.text.setEditable(true);
+                        entry.text.setTextColor(Color.WHITE.getRGB());
+                    } else {
+                        colorNBT = new CompoundNBT();
+                        colorNBT.putString("filter", "");
+                        colorNBT.putInt("active", 0);
+                    }
+                } else {
+                    stack.setTag(new CompoundNBT());
+                }
                 this.filters[index] = entry;
                 this.children.add(entry.text);
                 x++;
@@ -60,7 +74,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
         this.blit(stack, edgeSpacingX, edgeSpacingY, 0, 0, this.xSize, this.ySize);
         // Bar
         drawTexturedModalRect(((width - 218) / 2) + 199,
-                (((height - 154) / 2) + 6) + (int) (((142f / 16) * startingIndex)), 219, 6, 12, 53,1);
+                (((height - 154) / 2) + 6) + (int) (((142f / 16) * startingIndex)), 219, 6, 12, 53, 1);
         // Boxes
         for (int index = startingIndex; index < startingIndex + 6; index++) {
             filters[index].text.x = edgeSpacingX + 29;
@@ -68,21 +82,22 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
             filters[index].draw(this.minecraft);
         }
         for (int index = startingIndex; index < startingIndex + 6; index++) {
-            filters[index].text.render(stack, mouseX,mouseY,delta);
+            filters[index].text.render(stack, mouseX, mouseY, delta);
         }
     }
 
     @Override
-    protected void renderBg(MatrixStack matrixStack, float v, int i, int i1) {}
+    protected void renderBg(MatrixStack matrixStack, float v, int i, int i1) {
+    }
 
     @Override
     public boolean mouseScrolled(double a, double b, double direction) {
-        if(direction == 1) {
+        if (direction == 1) {
             moveUp();
         } else if (direction == -1) {
             moveDown();
         }
-        return super.mouseScrolled(a,b,direction);
+        return super.mouseScrolled(a, b, direction);
     }
 
     private void moveDown() {
@@ -102,7 +117,14 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
     @Override
     public void onClose() {
         super.onClose();
-        // TODO Fill data into stack, so server can update
-        MiningGoggles.NETWORK.sendToServer(new PacketUtils.UpdateHelmet(Minecraft.getInstance().player.getUUID(), stack));
+        CompoundNBT stackNBT = stack.getTag();
+        for (int index = 0; index < 16; index++) {
+            CompoundNBT nbt = new CompoundNBT();
+            nbt.putString("filter", filters[index].text.getValue());
+            nbt.putInt("active", filters[index].enabled ? 1 : 0);
+            stackNBT.put("color_" + index, nbt);
+        }
+        stack.setTag(stackNBT);
+        MiningGoggles.NETWORK.sendToServer(new PacketUtils.UpdateHelmet(stack));
     }
 }

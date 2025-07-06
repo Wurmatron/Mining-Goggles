@@ -1,11 +1,12 @@
 package io.wurmatron.mining_goggles.network;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
+import io.wurmatron.mining_goggles.items.MiningItems;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public class PacketUtils {
@@ -32,10 +33,14 @@ public class PacketUtils {
             return new UpdateHelmet(buf.readItem());
         }
 
-        // TODO Update Itemstack server-side
         public static void handle(UpdateHelmet update, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
-                System.out.println("Update: " + update);
+                ServerPlayerEntity player = ctx.get().getSender();
+                if (player.inventory.getItem(player.inventory.selected).getItem().equals(MiningItems.gogglesDigital)) {
+                    player.inventory.setItem(player.inventory.selected, update.helmet);
+                } else {
+                    MiningGoggles.LOGGER.error("Failed to find helmet, to update!");
+                }
             });
         }
     }
