@@ -6,11 +6,13 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
+import io.wurmatron.mining_goggles.items.MiningItems;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -154,16 +156,27 @@ public class RenderGoggleOverlay {
 
     public static boolean isValidPos(PlayerEntity player, BlockPos pos) {
         BlockState state = player.level.getBlockState(pos);
+        if(state.is(Blocks.AIR))
+            return false;
         List<String> names = getBlockNames(state);
         MiningGogglesCollector collector = ((MiningGogglesCollector) player.inventory.armor.get(
                 3).getItem());
-        for (String name : names) {
-            int wavelength = OreConfigLoader.get(name);
-            if (wavelength != -1 && withinRange(player, player.inventory.armor.get(3), pos,
-                    name, wavelength)
-                    && collector.canSeeBlock(player, player.inventory.armor.get(3), pos,
-                    wavelength)) {
-                return true;
+        if(!player.inventory.armor.get(3).getItem().equals(MiningItems.gogglesDigital)) {
+            for (String name : names) {
+                int wavelength = OreConfigLoader.get(name);
+                if (wavelength != -1 &&
+                        withinRange(player, player.inventory.armor.get(3), pos,
+                                name, wavelength)
+                        && collector.canSeeBlock(player, player.inventory.armor.get(3), pos,
+                        wavelength)) {
+                    return true;
+                }
+            }
+        } else {
+            for (String name : names) {
+                if (withinRange(player, player.inventory.armor.get(3), pos, name, 0)
+                        && collector.canSeeBlock(player, player.inventory.armor.get(3), pos, 0))
+                    return true;
             }
         }
         return false;
@@ -189,15 +202,17 @@ public class RenderGoggleOverlay {
         MiningGogglesCollector collector = ((MiningGogglesCollector) player.inventory.armor.get(
                 3).getItem());
         double range = collector.maxRange(stack);
-        range = getBlockRadius(range, waveLength,
-                WavelengthCalculator.computeWavelength(
-                        collector.getWavelength(player.inventory.armor.get(3), 0)));
-        if (range == -1 || range == 0) {
-            range = collector.maxRange(player.inventory.armor.get(3));
+        if(!stack.getItem().equals(MiningItems.gogglesDigital)) {
             range = getBlockRadius(range, waveLength,
                     WavelengthCalculator.computeWavelength(
-                            ((MiningGogglesCollector) player.inventory.armor.get(3)
-                                    .getItem()).getWavelength(player.inventory.armor.get(3), 1)));
+                            collector.getWavelength(player.inventory.armor.get(3), 0)));
+            if (range == -1 || range == 0) {
+                range = collector.maxRange(player.inventory.armor.get(3));
+                range = getBlockRadius(range, waveLength,
+                        WavelengthCalculator.computeWavelength(
+                                ((MiningGogglesCollector) player.inventory.armor.get(3)
+                                        .getItem()).getWavelength(player.inventory.armor.get(3), 1)));
+            }
         }
         if (pos.closerThan(new Vector3i(player.getX(), player.getY(), player.getZ()),
                 range)) {

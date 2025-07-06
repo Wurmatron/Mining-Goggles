@@ -1,10 +1,13 @@
 package io.wurmatron.mining_goggles.items;
 
+import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
+import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.inventory.ContainerFilter;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_2;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_Digital;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,6 +18,8 @@ import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -23,7 +28,9 @@ import net.minecraftforge.items.IItemHandler;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 
 import javax.annotation.Nullable;
-import java.util.Random;
+import java.util.*;
+
+import static io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay.generateList;
 
 public class ItemMiningGogglesDigital extends ArmorItem implements
         MiningGogglesCollector {
@@ -34,10 +41,47 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
         super(ArmorMaterial.NETHERITE, EquipmentSlotType.HEAD, prop);
     }
 
+    public static NonBlockingHashMap<BlockPos, Float[]> detectedBlocks = new NonBlockingHashMap<>();
+
     @Override
     public NonBlockingHashMap<BlockPos, Float[]> findBlocks(PlayerEntity player,
                                                             ItemStack stack, boolean rescan) {
-        return null;
+        if (!rescan) {
+            return detectedBlocks;
+        }
+        MiningGoggles.EXECUTORS.submit(() -> {
+            int maxRadius = maxRange(stack);
+            List<BlockPos> fullBlockList = generateList(
+                    (int) (player.getX() - maxRadius),
+                    (int) (player.getY() - maxRadius), (int) (player.getZ() - maxRadius),
+                    (int) (player.getX() + maxRadius), (int) (player.getY() + maxRadius),
+                    (int) (player.getZ() + maxRadius));
+            BlockPos[] subA = Arrays.copyOfRange(fullBlockList.toArray(new BlockPos[0]),
+                    0, fullBlockList.size() / 2);
+            BlockPos[] subB = Arrays.copyOfRange(fullBlockList.toArray(new BlockPos[0]),
+                    fullBlockList.size() / 2, fullBlockList.size());
+            // Test Group A
+            MiningGoggles.EXECUTORS.submit(() -> {
+                for (BlockPos a : subA) {
+                    if (RenderGoggleOverlay.isValidPos(player, a)) {
+                        detectedBlocks.put(a, getColors());
+                    }
+                }
+            });
+            // Test Group B
+            MiningGoggles.EXECUTORS.submit(() -> {
+                for (BlockPos b : subB) {
+                    if (RenderGoggleOverlay.isValidPos(player, b)) {
+                        detectedBlocks.put(b, getColors());
+                    }
+                }
+            });
+        });
+        return detectedBlocks;
+    }
+
+    private static Float[] getColors() {
+        return new Float[]{1f, 0f, 0f, 1f};
     }
 
     @Override
@@ -46,9 +90,49 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
     }
 
     @Override
-    public boolean canSeeBlock(PlayerEntity player, ItemStack stack, BlockPos pos,
-                               int wavelength) {
-        return true;
+    public boolean canSeeBlock(PlayerEntity player, ItemStack stack, BlockPos pos, int wavelength) {
+        String[] filters = getFilters(stack);
+        for (String tag : RenderGoggleOverlay.getBlockNames(player.level.getBlockState(pos)))
+            for (String f : filters)
+                if (f.equalsIgnoreCase(tag))
+                    return true;
+        return false;
+    }
+
+    public String[] getFilters(ItemStack helmet) {
+        HashMap<Integer, String[]> settings = getSettings(helmet);
+        List<String> filters = new ArrayList<>();
+        for (String[] s : settings.values())
+            filters.addAll(Arrays.asList(s));
+        return filters.toArray(new String[0]);
+    }
+
+    private HashMap<Integer, String[]> getSettings(ItemStack helmet) {
+        if (helmet.hasTag()) {
+            HashMap<Integer, String[]> map = new HashMap();
+            for (int index = 0; index < 16; index++) {
+                List<String> colorFilter = new ArrayList<>();
+                CompoundNBT nbt = helmet.getTagElement("color_" + index);
+                if (nbt != null) {
+                    int enabled = nbt.getInt("active");
+                    if (enabled == 0) {
+                        continue;
+                    }
+                    String filter = nbt.getString("filter");
+                    if(filter.isEmpty())
+                        continue;
+                    if (filter.contains(";"))
+                        colorFilter.addAll(Arrays.asList(filter.split(";")));
+                    if (filter.contains(","))
+                        colorFilter.addAll(Arrays.asList(filter.split(",")));
+                    else
+                        colorFilter.add(filter);
+                }
+                map.put(index, colorFilter.toArray(new String[0]));
+            }
+            return map;
+        }
+        return new HashMap<>();
     }
 
     @Override
