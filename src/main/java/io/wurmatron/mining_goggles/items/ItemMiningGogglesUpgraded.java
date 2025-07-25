@@ -222,9 +222,9 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
     if (!rescan) {
       return detectedBlocks;
     }
+    detectedBlocks.clear();
     MiningGoggles.EXECUTORS.submit(() -> {
       int maxRadius = maxRange(stack);
-      detectedBlocks.clear();
       MiningGoggles.EXECUTORS.submit(() -> {
         List<BlockPos> fullBlockList = generateList(
             (int) (player.getX() - maxRadius),

@@ -40,7 +40,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
         if (filters == null || filters[0] == null) {
             int x = 0;
             for (int index = 0; index < 16; index++) {
-                GuiColorFilter entry = new GuiColorFilter(this.font, new TranslationTextComponent("Title"));
+                GuiColorFilter entry = new GuiColorFilter(this.font, new TranslationTextComponent("Title"), index);
                 entry.init(Minecraft.getInstance(), width, height);
                 if (stack.hasTag()) {
                     CompoundNBT colorNBT = stack.getTagElement("color_" + index);
@@ -71,7 +71,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         int edgeSpacingX = (this.width - xSize) / 2;
         int edgeSpacingY = (this.height - ySize) / 2;
-        this.blit(stack, edgeSpacingX, edgeSpacingY, 0, 0, this.xSize, this.ySize);
+        this.blit(stack, edgeSpacingX, edgeSpacingY, 0, 0, xSize, ySize);
         // Bar
         drawTexturedModalRect(((width - 218) / 2) + 199,
                 (((height - 154) / 2) + 6) + (int) (((142f / 16) * startingIndex)), 219, 6, 12, 53, 1);
@@ -79,7 +79,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
         for (int index = startingIndex; index < startingIndex + 6; index++) {
             filters[index].text.x = edgeSpacingX + 29;
             filters[index].text.y = edgeSpacingY + 8 + (24 * (index - startingIndex));
-            filters[index].draw(this.minecraft);
+            filters[index].draw(stack,this.minecraft);
         }
         for (int index = startingIndex; index < startingIndex + 6; index++) {
             filters[index].text.render(stack, mouseX, mouseY, delta);
@@ -98,6 +98,15 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
             moveDown();
         }
         return super.mouseScrolled(a, b, direction);
+    }
+
+    @Override
+    public boolean mouseReleased(double x, double y, int type) {
+        if (x <= this.leftPos + 6 && x <= this.leftPos + 28) {
+           int yx = (int) (y - (this.topPos + 8)) / 24;
+            filters[yx + startingIndex].enabled = !filters[yx + startingIndex].enabled;
+        }
+        return super.mouseReleased(x, y, type);
     }
 
     private void moveDown() {
