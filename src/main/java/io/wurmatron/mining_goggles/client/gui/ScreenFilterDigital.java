@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.inventory.ContainerFilter;
+import io.wurmatron.mining_goggles.items.ItemMiningGogglesDigital;
 import io.wurmatron.mining_goggles.network.PacketUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -135,5 +136,6 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
         }
         stack.setTag(stackNBT);
         MiningGoggles.NETWORK.sendToServer(new PacketUtils.UpdateHelmet(stack));
+        ItemMiningGogglesDigital.detectedBlocks.clear(); // Resets Client upon edit
     }
 }

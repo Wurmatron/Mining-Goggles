@@ -1,0 +1,31 @@
+{
+  "type": "crafting_shaped",
+  "pattern": [
+    "DEG",
+    "FXF",
+    "AAA"
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:diamond_block"
+    },
+    "E": {
+      "item": "minecraft:dragon_head"
+    },
+    "G": {
+      "item": "minecraft:emerald_block"
+    },
+    "F": {
+      "item": "mininggoggles:goggles_upgraded"
+    },
+    "X": {
+      "item": "minecraft:nether_star"
+    },
+	"A": {
+      "item": "minecraft:netherite_block"
+    }
+  },
+  "result": {
+    "item": "mininggoggles:goggles_digital"
+  }
+}

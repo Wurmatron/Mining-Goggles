@@ -4,10 +4,7 @@ import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.inventory.ContainerFilter;
-import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_2;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_Digital;
-import io.wurmatron.mining_goggles.registry.ContainerRegistry;
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,9 +16,9 @@ import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -51,6 +48,7 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
         }
         MiningGoggles.EXECUTORS.submit(() -> {
             int maxRadius = maxRange(stack);
+            HashMap<Integer, String[]> helmetSettings = getSettings(stack);
             List<BlockPos> fullBlockList = generateList(
                     (int) (player.getX() - maxRadius),
                     (int) (player.getY() - maxRadius), (int) (player.getZ() - maxRadius),
@@ -64,7 +62,7 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
             MiningGoggles.EXECUTORS.submit(() -> {
                 for (BlockPos a : subA) {
                     if (RenderGoggleOverlay.isValidPos(player, a)) {
-                        detectedBlocks.put(a, getColors());
+                        detectedBlocks.put(a, getColors(player.level, helmetSettings, a));
                     }
                 }
             });
@@ -72,7 +70,7 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
             MiningGoggles.EXECUTORS.submit(() -> {
                 for (BlockPos b : subB) {
                     if (RenderGoggleOverlay.isValidPos(player, b)) {
-                        detectedBlocks.put(b, getColors());
+                        detectedBlocks.put(b, getColors(player.level, helmetSettings, b));
                     }
                 }
             });
@@ -80,8 +78,43 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
         return detectedBlocks;
     }
 
-    private static Float[] getColors() {
-        return new Float[]{1f, 0f, 0f, 1f};
+    private static Float[] getColors(World world, HashMap<Integer, String[]> settings, BlockPos pos) {
+        List<String> names = RenderGoggleOverlay.getBlockNames(world.getBlockState(pos));
+        for (int index = 0; index < 16; index++) {
+            if (settings.get(index) == null)
+                continue;
+            if (hasFilter(names, settings.get(index)))
+                return COLORS[index];
+        }
+        return COLORS[0];
+    }
+
+    public static boolean hasFilter(List<String> names, String[] test) {
+        for (String f : names)
+            for (String t : test)
+                if (f.equalsIgnoreCase(t))
+                    return true;
+        return false;
+    }
+
+    private static final Float[][] COLORS = new Float[][]{
+            new Float[]{1f, 1f, 1f, 1f},
+            new Float[]{1f, .65f, 0f, 1f},
+            new Float[]{.67f, .85f, .9f, 1f},
+            new Float[]{1f, 1f, 0f, 1f},
+            new Float[]{1f, .74f, .7f, 1f},
+            new Float[]{.09f, .09f, .09f, 1f},
+            new Float[]{.36f, .36f, .36f, 1f},
+            new Float[]{.93f, .5f, .93f, 1f},
+            new Float[]{0f, 0f, 1f, 1f},
+            new Float[]{.8f, .52f, .24f, 1f},
+            new Float[]{0f, .50f, 0f, 1f},
+            new Float[]{1f, 0f, 0f, 1f},
+            new Float[]{0f, 0f, 0f, 1f},
+    };
+
+    public static Float[] getColorFromIndex(int slot) {
+        return COLORS[slot];
     }
 
     @Override
@@ -119,7 +152,7 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
                         continue;
                     }
                     String filter = nbt.getString("filter");
-                    if(filter.isEmpty())
+                    if (filter.isEmpty())
                         continue;
                     if (filter.contains(";"))
                         colorFilter.addAll(Arrays.asList(filter.split(";")));
