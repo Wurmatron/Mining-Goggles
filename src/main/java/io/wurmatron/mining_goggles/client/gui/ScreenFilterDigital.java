@@ -8,6 +8,7 @@ import io.wurmatron.mining_goggles.items.ItemMiningGogglesDigital;
 import io.wurmatron.mining_goggles.network.PacketUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -80,7 +81,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
         for (int index = startingIndex; index < startingIndex + 6; index++) {
             filters[index].text.x = edgeSpacingX + 29;
             filters[index].text.y = edgeSpacingY + 8 + (24 * (index - startingIndex));
-            filters[index].draw(stack,this.minecraft);
+            filters[index].draw(stack, this.minecraft);
         }
         for (int index = startingIndex; index < startingIndex + 6; index++) {
             filters[index].text.render(stack, mouseX, mouseY, delta);
@@ -89,6 +90,14 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
 
     @Override
     protected void renderBg(MatrixStack matrixStack, float v, int i, int i1) {
+    }
+
+    @Override
+    public boolean keyPressed(int p_231046_1_, int p_231046_2_, int p_231046_3_) {
+        InputMappings.Input mouseKey = InputMappings.getKey(p_231046_1_, p_231046_2_);
+        if (!(mouseKey.getValue() == 69))
+            return super.keyPressed(p_231046_1_, p_231046_2_, p_231046_3_);
+        return false;
     }
 
     @Override
@@ -104,7 +113,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
     @Override
     public boolean mouseReleased(double x, double y, int type) {
         if (x <= this.leftPos + 6 && x <= this.leftPos + 28) {
-           int yx = (int) (y - (this.topPos + 8)) / 24;
+            int yx = (int) (y - (this.topPos + 8)) / 24;
             filters[yx + startingIndex].enabled = !filters[yx + startingIndex].enabled;
         }
         return super.mouseReleased(x, y, type);
