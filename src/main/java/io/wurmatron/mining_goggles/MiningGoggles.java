@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import io.wurmatron.mining_goggles.api.MiningGogglesApi;
 import io.wurmatron.mining_goggles.client.gui.*;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
+import io.wurmatron.mining_goggles.config.MiningGogglesConfig;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.config.wrapper.OreWavelength;
 import io.wurmatron.mining_goggles.event.TuningBlockEvents;
@@ -40,6 +41,7 @@ public class MiningGoggles {
   public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   public static final ExecutorService EXECUTORS = Executors.newFixedThreadPool(4);
   public static ItemGroup TAB_GOGGLES = new MiningGogglesItemGroup("tab.goggles");
+  public static MiningGogglesConfig config;
 
   private static final String PROTOCOL_VERSION = "1";
   public static final SimpleChannel NETWORK = NetworkRegistry.newSimpleChannel(
@@ -51,6 +53,7 @@ public class MiningGoggles {
 
   public MiningGoggles() {
     IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    config = MiningGogglesConfig.load();
     // Registry
     modBus.addListener(this::doClientStuff);
     modBus.register(ContainerRegistry.class);

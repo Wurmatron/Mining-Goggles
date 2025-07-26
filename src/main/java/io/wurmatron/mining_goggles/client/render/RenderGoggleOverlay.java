@@ -44,13 +44,13 @@ public class RenderGoggleOverlay {
     public static final AxisAlignedBB BOX = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
 
     // Configurable
-    public static final int MAX_GROWTH_PER_UPDATE = 5; // count
-    public static final int RENDER_UPDATE_TIMER = 20; // tick
-    public static final int RENDER_CLEANUP_TIMER = 5; // multiple's of RENDER_UPDATE_TIMER
-    public static final double FUZZY_RANGE_BEST = .2; // overall total (1 * x)
-    public static final double FUZZY_RANGE_LOW = .3; // overall total (1 * x)
-    public static final int RESCAN_INTERVAL = 5; // multiple's of RENDER_UPDATE_TIMER
-    public static final int DAMAGE_INTERVAL = 5; // sec (in world ticks at 20tps)
+    public static int MAX_GROWTH_PER_UPDATE = MiningGoggles.config.maxBlocksPerUpdate; // count
+    public static int RENDER_UPDATE_TIMER = MiningGoggles.config.renderUpdateTimerTicks; // tick
+    public static int RENDER_CLEANUP_TIMER = MiningGoggles.config.renderCleanup; // multiple's of RENDER_UPDATE_TIMER
+    public static double FUZZY_RANGE_BEST = MiningGoggles.config.fuzzyRangeBest; // overall total (1 * x)
+    public static double FUZZY_RANGE_LOW = MiningGoggles.config.fuzzyRangeLow; // overall total (1 * x)
+    public static int RESCAN_INTERVAL = MiningGoggles.config.rescanInterval; // multiple's of RENDER_UPDATE_TIMER
+    public static int DAMAGE_INTERVAL = MiningGoggles.config.damageInterval; // sec (in world ticks at 20tps)
 
     // Timers
     public static int renderTimer;

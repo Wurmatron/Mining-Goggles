@@ -32,7 +32,7 @@ import static io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay.gene
 public class ItemMiningGogglesDigital extends ArmorItem implements
         MiningGogglesCollector {
 
-    public static final int MAX_RADIUS = 24;
+    public static int MAX_RADIUS = MiningGoggles.config.digitalGoggles.maxRadius;
 
     public ItemMiningGogglesDigital(Properties prop) {
         super(ArmorMaterial.NETHERITE, EquipmentSlotType.HEAD, prop);
@@ -113,10 +113,6 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
             new Float[]{0f, 0f, 0f, 1f},
     };
 
-    public static Float[] getColorFromIndex(int slot) {
-        return COLORS[slot];
-    }
-
     @Override
     public int maxRange(ItemStack stack) {
         return MAX_RADIUS;
@@ -136,7 +132,17 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
         HashMap<Integer, String[]> settings = getSettings(helmet);
         List<String> filters = new ArrayList<>();
         for (String[] s : settings.values())
-            filters.addAll(Arrays.asList(s));
+            for(String x : s) {
+                boolean valid = true;
+                for (String blacklist : MiningGoggles.config.digitalGoggles.filterBlacklist) {
+                    if (blacklist.equalsIgnoreCase(x)) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if(valid)
+                    filters.add(x);
+            }
         return filters.toArray(new String[0]);
     }
 
