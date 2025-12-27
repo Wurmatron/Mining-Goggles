@@ -121,7 +121,7 @@ public class RenderGoggleOverlay {
             NonBlockingHashMap<BlockPos, Float[]> detectedBlocks = collectDetectedBlocks(player,
                     stack, rescanTimer == 0);
             // Track for next rescan
-            if (rescanTimer == 0 || rescanTimer >= 40 && activeRendering.size() == 0) {
+            if (rescanTimer == 0 || rescanTimer >= 40 && activeRendering.isEmpty()) {
                 rescanTimer = RESCAN_INTERVAL;
             } else {
                 rescanTimer--;
@@ -131,7 +131,7 @@ public class RenderGoggleOverlay {
                     int index = activeRendering.size() + count;
                     if (detectedBlocks.size() > index) {
                         for (BlockPos pos : detectedBlocks.keySet()) {
-                            if (!activeRendering.containsKey(pos)) {
+                            if (!activeRendering.containsKey(pos) && isValidPos(player,pos)) {
                                 activeRendering.put(pos, detectedBlocks.get(pos));
                                 break;
                             }
@@ -214,12 +214,17 @@ public class RenderGoggleOverlay {
                                         .getItem()).getWavelength(player.inventory.armor.get(3), 1)));
             }
         }
-        if (pos.closerThan(new Vector3i(player.getX(), player.getY(), player.getZ()),
-                range)) {
+        if (isClose(new BlockPos(player.getX(), player.getY(), player.getZ()), pos,range, .99)) {
             BlockState state = player.level.getBlockState(pos);
-            if (!state.getBlock().is(Blocks.AIR)) {
-                return true;
-            }
+            return !state.getBlock().is(Blocks.AIR);
+        }
+        return false;
+    }
+
+    private static boolean isClose(BlockPos playerPos, BlockPos blockPos, double range, double fuzzyDistance) {
+        if(playerPos.getX() - range - fuzzyDistance < blockPos.getX() && playerPos.getY() - range - fuzzyDistance < blockPos.getY() && playerPos.getZ() - range - fuzzyDistance < blockPos.getZ()) { // Fuzzy Min check
+            // Fuzzy Max check
+            return playerPos.getX() + range + fuzzyDistance > blockPos.getX() && playerPos.getY() + range + fuzzyDistance > blockPos.getY() && playerPos.getZ() + range + fuzzyDistance > blockPos.getZ();
         }
         return false;
     }
