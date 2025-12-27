@@ -205,7 +205,7 @@ public class RenderGoggleOverlay {
         if(!stack.getItem().equals(MiningItems.gogglesDigital)) {
             range = getBlockRadius(range, waveLength,
                     WavelengthCalculator.computeWavelength(
-                            collector.getWavelength(player.inventory.armor.get(3), 0)));
+                            collector.getWavelength(player.inventory.armor.get(3), 0))) + .9; // Add .9 to avoid flicking when near edge of block
             if (range == -1 || range == 0) {
                 range = collector.maxRange(player.inventory.armor.get(3));
                 range = getBlockRadius(range, waveLength,
