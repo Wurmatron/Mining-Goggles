@@ -132,7 +132,7 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
         HashMap<Integer, String[]> settings = getSettings(helmet);
         List<String> filters = new ArrayList<>();
         for (String[] s : settings.values())
-            for(String x : s) {
+            for (String x : s) {
                 boolean valid = true;
                 for (String blacklist : MiningGoggles.config.digitalGoggles.filterBlacklist) {
                     if (blacklist.equalsIgnoreCase(x)) {
@@ -140,7 +140,7 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
                         break;
                     }
                 }
-                if(valid)
+                if (valid)
                     filters.add(x);
             }
         return filters.toArray(new String[0]);

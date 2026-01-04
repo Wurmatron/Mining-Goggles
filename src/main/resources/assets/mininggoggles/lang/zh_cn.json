@@ -1,13 +1,13 @@
 {
-    "item.mininggoggles.goggles": "原始矿工护目镜",
-    "item.mininggoggles.crystal": "水晶",
-    "item.mininggoggles.bag_crystal": "水晶背包",
-    "itemGroup.tab.goggles": "矿工护目镜",
-    "stat.max_range.name": "最大范围：",
-    "stat.optimal_range.name": "最佳：",
-    "item.mininggoggles.goggles_upgraded": "矿工护目镜",
-    "item.mininggoggles.crystal_constructed": "同构水晶",
-    "item.mininggoggles.goggles_digital": "数码矿工护目镜",
-    "item.mininggoggles.attunment_crystal": "调和水晶",
-    "item.mininggoggles.tuning_fork": "转钩"
+  "item.mininggoggles.goggles": "原始矿工护目镜",
+  "item.mininggoggles.crystal": "水晶",
+  "item.mininggoggles.bag_crystal": "水晶背包",
+  "itemGroup.tab.goggles": "矿工护目镜",
+  "stat.max_range.name": "最大范围：",
+  "stat.optimal_range.name": "最佳：",
+  "item.mininggoggles.goggles_upgraded": "矿工护目镜",
+  "item.mininggoggles.crystal_constructed": "同构水晶",
+  "item.mininggoggles.goggles_digital": "数码矿工护目镜",
+  "item.mininggoggles.attunment_crystal": "调和水晶",
+  "item.mininggoggles.tuning_fork": "转钩"
 }

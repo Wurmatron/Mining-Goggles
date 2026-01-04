@@ -1,17 +1,17 @@
 package io.wurmatron.mining_goggles.tab;
 
 import io.wurmatron.mining_goggles.items.MiningItems;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 
-public class MiningGogglesItemGroup extends ItemGroup {
+public class MiningGogglesItemGroup extends CreativeModeTab {
 
-  public MiningGogglesItemGroup(String label) {
-    super(label);
-  }
+    public MiningGogglesItemGroup(String label) {
+        super(label);
+    }
 
-  @Override
-  public ItemStack makeIcon() {
-    return new ItemStack(MiningItems.goggles, 1);
-  }
+    @Override
+    public ItemStack makeIcon() {
+        return new ItemStack(MiningItems.goggles, 1);
+    }
 }

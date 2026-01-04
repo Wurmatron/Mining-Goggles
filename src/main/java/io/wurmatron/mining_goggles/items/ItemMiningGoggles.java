@@ -1,68 +1,47 @@
 package io.wurmatron.mining_goggles.items;
 
-import static io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay.generateList;
-
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
-import io.wurmatron.mining_goggles.config.MiningGogglesConfig;
-import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_1;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_1;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_1;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
-import org.cliffc.high_scale_lib.NonBlockingHashSet;
-import org.lwjgl.system.CallbackI.P;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+import static io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay.generateList;
+
 
 public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollector {
 
     public static int MAX_RADIUS = MiningGoggles.config.primitiveGoggles.maxRadius > 0 ? MiningGoggles.config.primitiveGoggles.maxRadius : 1;
 
     public ItemMiningGoggles(Properties prop) {
-        super(ArmorMaterial.DIAMOND, EquipmentSlotType.HEAD, prop);
+        super(ArmorMaterial.DIAMOND, EquipmentSlot.HEAD, prop);
     }
 
     @Nonnull
     @Override
-    public ActionResult<ItemStack> use(World world, PlayerEntity player,
+    public ActionResult<ItemStack> use(LevelAccessor world, Player player,
                                        @Nonnull Hand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (!world.isClientSide) {

@@ -1,47 +1,30 @@
 package io.wurmatron.mining_goggles.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.MiningItems;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mojang.blaze3d.systems.RenderSystem.*;
 
 public class RenderGoggleOverlay {
 
     public static NonBlockingHashMap<BlockPos, Float[]> activeRendering = new NonBlockingHashMap<>();
-    public static final AxisAlignedBB BOX = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
+    public static final BoundingBox BOX = new BoundingBox(0, 0, 0, 1, 1, 1);
 
     // Configurable
     public static int MAX_GROWTH_PER_UPDATE = MiningGoggles.config.maxBlocksPerUpdate; // count
@@ -131,7 +114,7 @@ public class RenderGoggleOverlay {
                     int index = activeRendering.size() + count;
                     if (detectedBlocks.size() > index) {
                         for (BlockPos pos : detectedBlocks.keySet()) {
-                            if (!activeRendering.containsKey(pos) && isValidPos(player,pos)) {
+                            if (!activeRendering.containsKey(pos) && isValidPos(player, pos)) {
                                 activeRendering.put(pos, detectedBlocks.get(pos));
                                 break;
                             }
@@ -156,12 +139,12 @@ public class RenderGoggleOverlay {
 
     public static boolean isValidPos(PlayerEntity player, BlockPos pos) {
         BlockState state = player.level.getBlockState(pos);
-        if(state.is(Blocks.AIR))
+        if (state.is(Blocks.AIR))
             return false;
         List<String> names = getBlockNames(state);
         MiningGogglesCollector collector = ((MiningGogglesCollector) player.inventory.armor.get(
                 3).getItem());
-        if(!player.inventory.armor.get(3).getItem().equals(MiningItems.gogglesDigital)) {
+        if (!player.inventory.armor.get(3).getItem().equals(MiningItems.gogglesDigital)) {
             for (String name : names) {
                 int wavelength = OreConfigLoader.get(name);
                 if (wavelength != -1 &&
@@ -202,7 +185,7 @@ public class RenderGoggleOverlay {
         MiningGogglesCollector collector = ((MiningGogglesCollector) player.inventory.armor.get(
                 3).getItem());
         double range = collector.maxRange(stack);
-        if(!stack.getItem().equals(MiningItems.gogglesDigital)) {
+        if (!stack.getItem().equals(MiningItems.gogglesDigital)) {
             range = getBlockRadius(range, waveLength,
                     WavelengthCalculator.computeWavelength(
                             collector.getWavelength(player.inventory.armor.get(3), 0))) + .9; // Add .9 to avoid flicking when near edge of block
@@ -214,7 +197,7 @@ public class RenderGoggleOverlay {
                                         .getItem()).getWavelength(player.inventory.armor.get(3), 1)));
             }
         }
-        if (isClose(new BlockPos(player.getX(), player.getY(), player.getZ()), pos,range, .99)) {
+        if (isClose(new BlockPos(player.getX(), player.getY(), player.getZ()), pos, range, .99)) {
             BlockState state = player.level.getBlockState(pos);
             return !state.getBlock().is(Blocks.AIR);
         }
@@ -222,7 +205,7 @@ public class RenderGoggleOverlay {
     }
 
     private static boolean isClose(BlockPos playerPos, BlockPos blockPos, double range, double fuzzyDistance) {
-        if(playerPos.getX() - range - fuzzyDistance < blockPos.getX() && playerPos.getY() - range - fuzzyDistance < blockPos.getY() && playerPos.getZ() - range - fuzzyDistance < blockPos.getZ()) { // Fuzzy Min check
+        if (playerPos.getX() - range - fuzzyDistance < blockPos.getX() && playerPos.getY() - range - fuzzyDistance < blockPos.getY() && playerPos.getZ() - range - fuzzyDistance < blockPos.getZ()) { // Fuzzy Min check
             // Fuzzy Max check
             return playerPos.getX() + range + fuzzyDistance > blockPos.getX() && playerPos.getY() + range + fuzzyDistance > blockPos.getY() && playerPos.getZ() + range + fuzzyDistance > blockPos.getZ();
         }

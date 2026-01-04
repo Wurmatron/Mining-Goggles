@@ -74,7 +74,7 @@ public class MiningGogglesConfig {
                     f.printStackTrace();
                     MiningGoggles.LOGGER.error("Failed to move error'd config!");
                 }
-                if(configLocation.delete())
+                if (configLocation.delete())
                     MiningGoggles.LOGGER.error("Failed to delete config.json");
                 createDefaults();
                 return load();

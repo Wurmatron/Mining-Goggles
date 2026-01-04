@@ -1,21 +1,23 @@
 package io.wurmatron.mining_goggles.api;
 
-import java.util.Random;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
+
+import java.util.Random;
+
 
 public interface MiningGogglesCollector {
 
-  NonBlockingHashMap<BlockPos, Float[]> findBlocks(PlayerEntity player, ItemStack stack, boolean rescan);
+    NonBlockingHashMap<BlockPos, Float[]> findBlocks(Player player, ItemStack stack, boolean rescan);
 
-  int maxRange(ItemStack stack);
+    int maxRange(ItemStack stack);
 
-  boolean canSeeBlock(PlayerEntity player, ItemStack stack, BlockPos pos, int wavelength);
+    boolean canSeeBlock(Player player, ItemStack stack, BlockPos pos, int wavelength);
 
-  int[][] getWavelength(ItemStack stack, int side);
+    int[][] getWavelength(ItemStack stack, int side);
 
-  void damageCrystals(Random rand, ItemStack stack);
+    void damageCrystals(Random rand, ItemStack stack);
 
 }
