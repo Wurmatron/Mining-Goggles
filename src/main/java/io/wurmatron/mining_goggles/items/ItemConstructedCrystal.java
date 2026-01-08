@@ -1,9 +1,6 @@
 package io.wurmatron.mining_goggles.items;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 
 public class ItemConstructedCrystal extends ItemCrystal {
 

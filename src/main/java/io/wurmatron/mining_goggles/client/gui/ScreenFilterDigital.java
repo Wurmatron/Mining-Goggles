@@ -1,20 +1,11 @@
 package io.wurmatron.mining_goggles.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.inventory.ContainerFilter;
 import io.wurmatron.mining_goggles.items.ItemMiningGogglesDigital;
 import io.wurmatron.mining_goggles.network.PacketUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 
 import java.awt.*;
 

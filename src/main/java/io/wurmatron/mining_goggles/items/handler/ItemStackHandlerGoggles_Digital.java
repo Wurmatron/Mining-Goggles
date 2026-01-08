@@ -1,6 +1,5 @@
 package io.wurmatron.mining_goggles.items.handler;
 
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;

@@ -2,10 +2,6 @@ package io.wurmatron.mining_goggles.network;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.items.MiningItems;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 

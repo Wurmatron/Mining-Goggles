@@ -2,6 +2,7 @@ package io.wurmatron.mining_goggles.inventory;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 

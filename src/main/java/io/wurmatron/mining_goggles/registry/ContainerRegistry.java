@@ -1,8 +1,6 @@
 package io.wurmatron.mining_goggles.registry;
 
 import io.wurmatron.mining_goggles.inventory.*;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
