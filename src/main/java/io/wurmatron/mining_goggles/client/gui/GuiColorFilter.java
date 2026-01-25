@@ -1,6 +1,7 @@
 package io.wurmatron.mining_goggles.client.gui;
 
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
@@ -24,7 +25,7 @@ public class GuiColorFilter extends Screen {
         this.ID = ID;
     }
 
-    public void draw(MatrixStack stack, Minecraft mc) {
+    public void draw(PoseStack stack, Minecraft mc) {
         mc.getTextureManager().bindForSetup(BACKGROUND_TEXTURE);
         drawTexturedModalRect(text.x - 22, text.y - 2, 1, 158, 187, 22, 0);
         drawTexturedModalRect(text.x - 18, text.y + 2, ID * 14, 183, 14, 14, 0);

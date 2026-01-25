@@ -1,20 +1,21 @@
 package io.wurmatron.mining_goggles.registry;
 
 import io.wurmatron.mining_goggles.inventory.*;
+import net.minecraft.Level.inventory.MenuType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ContainerRegistry {
 
     //Containers
-    public static ContainerType<ContainerCrystalBag> containerTypeCrystalBag;
-    public static ContainerType<ContainerMiningGoggles_1> containerTypeGoggles_1;
-    public static ContainerType<ContainerMiningGoggles_2> containerTypeGoggles_2;
-    public static ContainerType<ContainerTuningFork> containerTuningFork;
-    public static ContainerType<ContainerFilter> containerTypeGoggles_Digital;
+    public static MenuType<ContainerCrystalBag> containerTypeCrystalBag;
+    public static MenuType<ContainerMiningGoggles_1> containerTypeGoggles_1;
+    public static MenuType<ContainerMiningGoggles_2> containerTypeGoggles_2;
+    public static MenuType<ContainerTuningFork> containerTuningFork;
+    public static MenuType<ContainerFilter> containerTypeGoggles_Digital;
 
     @SubscribeEvent
-    public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
+    public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) {
         // Crystal Bag
         containerTypeCrystalBag = IForgeContainerType.create(ContainerCrystalBag::createContainerClientSide);
         containerTypeCrystalBag.setRegistryName("container_crystalbag");

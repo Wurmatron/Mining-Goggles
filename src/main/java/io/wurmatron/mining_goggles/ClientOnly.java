@@ -2,8 +2,8 @@ package io.wurmatron.mining_goggles;
 
 import io.wurmatron.mining_goggles.items.ItemCrystalBag;
 import io.wurmatron.mining_goggles.items.MiningItems;
-import net.minecraft.item.ItemModelsProperties;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 public class ClientOnly {
@@ -22,6 +22,6 @@ public class ClientOnly {
     }
 
     public static void registerPropertyOverride() {
-        ItemModelsProperties.register(MiningItems.bag, new ResourceLocation("fullness"), ItemCrystalBag::getFullnessPropertyOverride);
+        ItemProperties.register(MiningItems.bag, new ResourceLocation("fullness"), ItemCrystalBag::getFullnessPropertyOverride);
     }
 }

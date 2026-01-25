@@ -1,13 +1,13 @@
 package io.wurmatron.mining_goggles.items.providers;
 
-import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerTuningFork;
+import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerTuningFork;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.CapabilityItemInteractionHandler;
+import net.minecraftforge.items.IItemInteractionHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,13 +15,13 @@ import javax.annotation.Nullable;
 public class CapabilityProviderTuningFork implements ICapabilitySerializable<INBT> {
 
     private final Direction NO_SPECIFIC_SIDE = null;
-    private ItemStackHandlerTuningFork itemStackHandlerTuningFork;
+    private ItemStackInteractionHandlerTuningFork itemStackInteractionHandlerTuningFork;
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability,
                                              @Nullable Direction facing) {
-        if (CapabilityItemHandler.ITEM_HANDLER_CAPABILITY == capability) {
+        if (CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY == capability) {
             return (LazyOptional<T>) (lazyInitialisionSupplier);
         }
         return LazyOptional.empty();
@@ -29,24 +29,24 @@ public class CapabilityProviderTuningFork implements ICapabilitySerializable<INB
 
     @Override
     public INBT serializeNBT() {
-        return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(getCachedInventory(),
+        return CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY.writeNBT(getCachedInventory(),
                 NO_SPECIFIC_SIDE);
     }
 
     @Override
     public void deserializeNBT(INBT nbt) {
-        CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(getCachedInventory(),
+        CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY.readNBT(getCachedInventory(),
                 NO_SPECIFIC_SIDE, nbt);
     }
 
-    private ItemStackHandlerTuningFork getCachedInventory() {
-        if (itemStackHandlerTuningFork == null) {
-            itemStackHandlerTuningFork = new ItemStackHandlerTuningFork();
+    private ItemStackInteractionHandlerTuningFork getCachedInventory() {
+        if (itemStackInteractionHandlerTuningFork == null) {
+            itemStackInteractionHandlerTuningFork = new ItemStackInteractionHandlerTuningFork();
         }
-        return itemStackHandlerTuningFork;
+        return itemStackInteractionHandlerTuningFork;
     }
 
 
-    private final LazyOptional<IItemHandler> lazyInitialisionSupplier = LazyOptional.of(
+    private final LazyOptional<IItemInteractionHandler> lazyInitialisionSupplier = LazyOptional.of(
             this::getCachedInventory);
 }

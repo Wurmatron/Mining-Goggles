@@ -2,7 +2,9 @@ package io.wurmatron.mining_goggles.inventory;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -21,7 +23,7 @@ public class ContainerFilter extends Container {
     }
 
     public static ContainerFilter createContainerClientSide(int windowID,
-                                                            PlayerInventory playerInventory, PacketBuffer extraData) {
+                                                            Inventory Inventory, FriendlyByteBuf extraData) {
         try {
             return new ContainerFilter(windowID, ItemStack.EMPTY);
         } catch (IllegalArgumentException e) {
@@ -30,7 +32,7 @@ public class ContainerFilter extends Container {
         return null;
     }
 
-    public static ContainerFilter createContainerServerSide(int windowID, PlayerInventory playerInventory, ItemStack helmet) {
+    public static ContainerFilter createContainerServerSide(int windowID, Inventory Inventory, ItemStack helmet) {
         return new ContainerFilter(windowID, helmet);
     }
 }

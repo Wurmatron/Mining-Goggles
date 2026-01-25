@@ -1,18 +1,20 @@
 package io.wurmatron.mining_goggles.inventory;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
-import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerCrystalBag;
+import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerCrystalBag;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 
 public class ContainerCrystalBag extends Container {
 
-    private final ItemStackHandlerCrystalBag itemStackHandler;
+    private final ItemStackInteractionHandlerCrystalBag itemStackInteractionHandler;
     private final ItemStack itemStackBeingHeld;
 
 
@@ -30,10 +32,10 @@ public class ContainerCrystalBag extends Container {
     public static final int PLAYER_INVENTORY_YPOS = 69;
 
     private ContainerCrystalBag(int windowId, Player playerInv,
-                                ItemStackHandlerCrystalBag itemStackHandlerCrystalBag,
+                                ItemStackInteractionHandlerCrystalBag itemStackInteractionHandlerCrystalBag,
                                 ItemStack itemStackBeingHeld) {
         super(ContainerRegistry.containerTypeCrystalBag, windowId);
-        this.itemStackHandler = itemStackHandlerCrystalBag;
+        this.itemStackInteractionHandler = itemStackInteractionHandlerCrystalBag;
         this.itemStackBeingHeld = itemStackBeingHeld;
         int SLOT_X_SPACING = 18;
         int SLOT_Y_SPACING = 18;
@@ -56,11 +58,11 @@ public class ContainerCrystalBag extends Container {
             }
         }
         // Bag slots
-        int bagSlotCount = itemStackHandlerCrystalBag.getSlots();
+        int bagSlotCount = itemStackInteractionHandlerCrystalBag.getSlots();
         final int BAG_SLOTS_PER_ROW = 7;
         final int BAG_INVENTORY_XPOS = 26;
         for (int bagSlot = 0; bagSlot < bagSlotCount; ++bagSlot) {
-            addSlot(new SlotItemHandler(itemStackHandlerCrystalBag, bagSlot,
+            addSlot(new SlotItemInteractionHandler(itemStackInteractionHandlerCrystalBag, bagSlot,
                     (BAG_INVENTORY_XPOS + SLOT_X_SPACING * (bagSlot % BAG_SLOTS_PER_ROW)),
                     (BAG_INVENTORY_YPOS + SLOT_Y_SPACING * (bagSlot / BAG_SLOTS_PER_ROW))));
         }
@@ -68,8 +70,8 @@ public class ContainerCrystalBag extends Container {
 
     @Override
     public boolean stillValid(@Nonnull Player player) {
-        ItemStack main = player.getMainHandItem();
-        ItemStack off = player.getOffhandItem();
+        ItemStack main = player.getMainInteractionHandItem();
+        ItemStack off = player.getOffInteractionHandItem();
         return (!main.isEmpty() && main == itemStackBeingHeld) ||
                 (!off.isEmpty() && off == itemStackBeingHeld);
     }
@@ -83,7 +85,7 @@ public class ContainerCrystalBag extends Container {
         }
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack copyOfSourceStack = sourceStack.copy();
-        int BAG_SLOT_COUNT = itemStackHandler.getSlots();
+        int BAG_SLOT_COUNT = itemStackInteractionHandler.getSlots();
 
         if (sourceSlotIndex >= VANILLA_FIRST_SLOT_INDEX
                 && sourceSlotIndex < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
@@ -110,16 +112,16 @@ public class ContainerCrystalBag extends Container {
     }
 
     public static ContainerCrystalBag createContainerServerSide(int windowID,
-                                                                PlayerInventory playerInventory, ItemStackHandlerCrystalBag bagContents,
+                                                                Inventory Inventory, ItemStackInteractionHandlerCrystalBag bagContents,
                                                                 ItemStack bag) {
-        return new ContainerCrystalBag(windowID, playerInventory, bagContents, bag);
+        return new ContainerCrystalBag(windowID, Inventory, bagContents, bag);
     }
 
     public static ContainerCrystalBag createContainerClientSide(int windowID,
-                                                                PlayerInventory playerInventory, PacketBuffer extraData) {
+                                                                Inventory Inventory, FriendlyByteBuf extraData) {
         try {
-            ItemStackHandlerCrystalBag itemStackHandler = new ItemStackHandlerCrystalBag();
-            return new ContainerCrystalBag(windowID, playerInventory, itemStackHandler,
+            ItemStackInteractionHandlerCrystalBag itemStackInteractionHandler = new ItemStackInteractionHandlerCrystalBag();
+            return new ContainerCrystalBag(windowID, Inventory, itemStackInteractionHandler,
                     ItemStack.EMPTY);
         } catch (IllegalArgumentException e) {
             MiningGoggles.LOGGER.warn(e);
@@ -130,8 +132,8 @@ public class ContainerCrystalBag extends Container {
 
     @Override
     public void broadcastChanges() {
-        if (itemStackHandler.isDirty()) {
-            CompoundNBT nbt = itemStackBeingHeld.getOrCreateTag();
+        if (itemStackInteractionHandler.isDirty()) {
+            CompoundTag nbt = itemStackBeingHeld.getOrCreateTag();
             int dirtyCounter = nbt.getInt("dirtyCounter");
             nbt.putInt("dirtyCounter", dirtyCounter + 1);
             itemStackBeingHeld.setTag(nbt);

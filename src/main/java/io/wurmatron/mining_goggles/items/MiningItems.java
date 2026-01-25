@@ -1,11 +1,14 @@
 package io.wurmatron.mining_goggles.items;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
-import net.minecraft.world.item.Item;
+import net.minecraft.Level.item.Item;
+import net.minecraft.Level.item.Rarity;
+import net.minecraftforge.common.property.Properties;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 

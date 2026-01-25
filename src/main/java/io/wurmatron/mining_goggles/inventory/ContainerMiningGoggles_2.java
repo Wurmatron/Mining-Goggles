@@ -1,11 +1,14 @@
 package io.wurmatron.mining_goggles.inventory;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
-import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_2;
+import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerGoggles_2;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.SlotItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,7 +16,7 @@ import javax.annotation.Nonnull;
 
 public class ContainerMiningGoggles_2 extends Container {
 
-    private final ItemStackHandlerGoggles_2 itemStackHandler;
+    private final ItemStackInteractionHandlerGoggles_2 itemStackInteractionHandler;
     public final ItemStack itemStackBeingHeld;
 
     private static final int HOTBAR_SLOT_COUNT = 9;
@@ -28,11 +31,11 @@ public class ContainerMiningGoggles_2 extends Container {
             VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
     public static final int PLAYER_INVENTORY_YPOS = 107;
 
-    private ContainerMiningGoggles_2(int windowId, PlayerInventory playerInv,
-                                     ItemStackHandlerGoggles_2 itemStackHandlerGoggles_2,
+    private ContainerMiningGoggles_2(int windowId, Inventory playerInv,
+                                     ItemStackInteractionHandlerGoggles_2 itemStackInteractionHandlerGoggles_2,
                                      ItemStack itemStackBeingHeld) {
         super(ContainerRegistry.containerTypeGoggles_2, windowId);
-        this.itemStackHandler = itemStackHandlerGoggles_2;
+        this.itemStackInteractionHandler = itemStackInteractionHandlerGoggles_2;
         this.itemStackBeingHeld = itemStackBeingHeld;
         int SLOT_X_SPACING = 18;
         int SLOT_Y_SPACING = 18;
@@ -54,18 +57,18 @@ public class ContainerMiningGoggles_2 extends Container {
                                 PLAYER_INVENTORY_YPOS + y * SLOT_Y_SPACING));
             }
         }
-        addSlot(new SlotItemHandler(itemStackHandlerGoggles_2, 0, 34, 35));
-        addSlot(new SlotItemHandler(itemStackHandlerGoggles_2, 1, 34, 56));
-        addSlot(new SlotItemHandler(itemStackHandlerGoggles_2, 2, 34, 77));
-        addSlot(new SlotItemHandler(itemStackHandlerGoggles_2, 3, 124, 35));
-        addSlot(new SlotItemHandler(itemStackHandlerGoggles_2, 4, 124, 56));
-        addSlot(new SlotItemHandler(itemStackHandlerGoggles_2, 5, 124, 77));
+        addSlot(new SlotItemInteractionHandler(itemStackInteractionHandlerGoggles_2, 0, 34, 35));
+        addSlot(new SlotItemInteractionHandler(itemStackInteractionHandlerGoggles_2, 1, 34, 56));
+        addSlot(new SlotItemInteractionHandler(itemStackInteractionHandlerGoggles_2, 2, 34, 77));
+        addSlot(new SlotItemInteractionHandler(itemStackInteractionHandlerGoggles_2, 3, 124, 35));
+        addSlot(new SlotItemInteractionHandler(itemStackInteractionHandlerGoggles_2, 4, 124, 56));
+        addSlot(new SlotItemInteractionHandler(itemStackInteractionHandlerGoggles_2, 5, 124, 77));
     }
 
     @Override
     public boolean stillValid(@Nonnull Player player) {
-        ItemStack main = player.getMainHandItem();
-        ItemStack off = player.getOffhandItem();
+        ItemStack main = player.getMainInteractionHandItem();
+        ItemStack off = player.getOffInteractionHandItem();
         return (!main.isEmpty() && main == itemStackBeingHeld) ||
                 (!off.isEmpty() && off == itemStackBeingHeld);
     }
@@ -79,7 +82,7 @@ public class ContainerMiningGoggles_2 extends Container {
         }
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack copyOfSourceStack = sourceStack.copy();
-        int BAG_SLOT_COUNT = itemStackHandler.getSlots();
+        int BAG_SLOT_COUNT = itemStackInteractionHandler.getSlots();
 
         if (sourceSlotIndex >= VANILLA_FIRST_SLOT_INDEX
                 && sourceSlotIndex < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
@@ -106,16 +109,16 @@ public class ContainerMiningGoggles_2 extends Container {
     }
 
     public static ContainerMiningGoggles_2 createContainerServerSide(int windowID,
-                                                                     PlayerInventory playerInventory, ItemStackHandlerGoggles_2 goggleContents,
+                                                                     Inventory Inventory, ItemStackInteractionHandlerGoggles_2 goggleContents,
                                                                      ItemStack bag) {
-        return new ContainerMiningGoggles_2(windowID, playerInventory, goggleContents, bag);
+        return new ContainerMiningGoggles_2(windowID, Inventory, goggleContents, bag);
     }
 
     public static ContainerMiningGoggles_2 createContainerClientSide(int windowID,
-                                                                     PlayerInventory playerInventory, PacketBuffer extraData) {
+                                                                     Inventory Inventory, FriendlyByteBuf extraData) {
         try {
-            ItemStackHandlerGoggles_2 itemStackHandler = new ItemStackHandlerGoggles_2();
-            return new ContainerMiningGoggles_2(windowID, playerInventory, itemStackHandler,
+            ItemStackInteractionHandlerGoggles_2 itemStackInteractionHandler = new ItemStackInteractionHandlerGoggles_2();
+            return new ContainerMiningGoggles_2(windowID, Inventory, itemStackInteractionHandler,
                     ItemStack.EMPTY);
         } catch (IllegalArgumentException e) {
             MiningGoggles.LOGGER.warn(e);
@@ -126,8 +129,8 @@ public class ContainerMiningGoggles_2 extends Container {
 
     @Override
     public void broadcastChanges() {
-        if (itemStackHandler.isDirty()) {
-            CompoundNBT nbt = itemStackBeingHeld.getOrCreateTag();
+        if (itemStackInteractionHandler.isDirty()) {
+            CompoundTag nbt = itemStackBeingHeld.getOrCreateTag();
             int dirtyCounter = nbt.getInt("dirtyCounter");
             nbt.putInt("dirtyCounter", dirtyCounter + 1);
             itemStackBeingHeld.setTag(nbt);

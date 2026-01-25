@@ -3,30 +3,31 @@ package io.wurmatron.mining_goggles.items;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesApi;
 import io.wurmatron.mining_goggles.inventory.ContainerCrystalBag;
-import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerCrystalBag;
+import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerCrystalBag;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderCrystalBag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.network.NetworkHooks;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.CapabilityItemInteractionHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.IItemInteractionHandler;
+import net.minecraftforge.items.ItemInteractionHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,58 +40,58 @@ public class ItemCrystalBag extends Item {
 
     @Nonnull
     @Override
-    public ActionResult<ItemStack> use(World world, PlayerEntity player,
-                                       @Nonnull Hand hand) {
-        ItemStack stack = player.getItemInHand(hand);
-        if (!world.isClientSide) {
+    public InteractionResultHolder<ItemStack> use(Level Level, Player player,
+                                                  @Nonnull InteractionHand InteractionHand) {
+        ItemStack stack = player.getItemInInteractionHand(InteractionHand);
+        if (!Level.isClientSide) {
             INamedContainerProvider containerProvider = new ContainerProvidedCrystalBag(stack);
-            NetworkHooks.openGui((ServerPlayerEntity) player, containerProvider,
+            NetworkHooks.openGui((ServerPlayer) player, containerProvider,
                     (packetBuffer) -> {
                     });
         }
-        return ActionResult.pass(stack);
+        return InteractionResult.PASS;
     }
 
     @Nonnull
     @Override
-    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext ctx) {
-        World world = ctx.getLevel();
-        if (world.isClientSide()) {
-            return ActionResultType.PASS;
+    public InteractionResult onItemUseFirst(ItemStack stack, ItemUseContext ctx) {
+        Level Level = ctx.getLevel();
+        if (Level.isClientSide()) {
+            return InteractionResult.PASS;
         }
         BlockPos pos = ctx.getClickedPos();
         Direction side = ctx.getClickedFace();
-        ItemStack itemStack = ctx.getItemInHand();
-        TileEntity tile = world.getBlockEntity(pos);
+        ItemStack itemStack = ctx.getItemInInteractionHand();
+        BlockEntity tile = Level.getBlockEntity(pos);
         if (tile == null) {
-            return ActionResultType.PASS;
+            return InteractionResult.PASS;
         }
-        if (world.isClientSide()) {
-            return ActionResultType.SUCCESS;
+        if (Level.isClientSide()) {
+            return InteractionResult.SUCCESS;
         }
         IItemHandler tileInventory;
         LazyOptional<IItemHandler> capability = tile.getCapability(
-                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
+                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY, side);
         if (capability.isPresent()) {
             tileInventory = capability.orElseThrow(AssertionError::new);
-        } else if (tile instanceof IInventory) {
-            tileInventory = new InvWrapper((IInventory) tile);
+        } else if (tile instanceof Container) {
+            tileInventory = new InvWrapper((Container) tile);
         } else {
-            return ActionResultType.FAIL;
+            return InteractionResult.FAIL;
         }
-        ItemStackHandlerCrystalBag itemStackHandler = getItemStackCrystalBag(itemStack);
-        for (int i = 0; i < itemStackHandler.getSlots(); i++) {
-            ItemStack flower = itemStackHandler.getStackInSlot(i);
-            ItemStack flowersWhichDidNotFit = ItemHandlerHelper.insertItemStacked(tileInventory,
+        ItemStackInteractionHandlerCrystalBag itemStackInteractionHandler = getItemStackCrystalBag(itemStack);
+        for (int i = 0; i < itemStackInteractionHandler.getSlots(); i++) {
+            ItemStack flower = itemStackInteractionHandler.getStackInSlot(i);
+            ItemStack flowersWhichDidNotFit = ItemStackHandler.insertItemStacked(tileInventory,
                     flower, false);
-            itemStackHandler.setStackInSlot(i, flowersWhichDidNotFit);
+            itemStackInteractionHandler.setStackInSlot(i, flowersWhichDidNotFit);
         }
         tile.setChanged();
-        CompoundNBT nbt = itemStack.getOrCreateTag();
+        CompoundTag nbt = itemStack.getOrCreateTag();
         int dirtyCounter = nbt.getInt("dirtyCounter");
         nbt.putInt("dirtyCounter", dirtyCounter + 1);
         itemStack.setTag(nbt);
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     private static class ContainerProvidedCrystalBag implements INamedContainerProvider {
@@ -102,13 +103,13 @@ public class ItemCrystalBag extends Item {
         }
 
         @Override
-        public ITextComponent getDisplayName() {
+        public TextComponent getDisplayName() {
             return stackBag.getDisplayName();
         }
 
         @Override
-        public ContainerCrystalBag createMenu(int windowID, PlayerInventory inventory,
-                                              PlayerEntity player) {
+        public ContainerCrystalBag createMenu(int windowID, Inventory inventory,
+                                              Player player) {
             return ContainerCrystalBag.createContainerServerSide(windowID, inventory,
                     getItemStackCrystalBag(stackBag), stackBag);
         }
@@ -116,18 +117,18 @@ public class ItemCrystalBag extends Item {
 
     @Nonnull
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT oldCapNbt) {
+    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag oldCapNbt) {
         return new CapabilityProviderCrystalBag();
     }
 
-    private static ItemStackHandlerCrystalBag getItemStackCrystalBag(
+    private static ItemStackInteractionHandlerCrystalBag getItemStackCrystalBag(
             ItemStack itemStack) {
         IItemHandler crystalBag = itemStack.getCapability(
-                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
-        if (!(crystalBag instanceof ItemStackHandlerCrystalBag)) {
-            return new ItemStackHandlerCrystalBag();
+                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY).orElse(null);
+        if (!(crystalBag instanceof ItemStackInteractionHandlerCrystalBag)) {
+            return new ItemStackInteractionHandlerCrystalBag();
         }
-        return (ItemStackHandlerCrystalBag) crystalBag;
+        return (ItemStackInteractionHandlerCrystalBag) crystalBag;
     }
 
     private final String BASE_NBT_TAG = "base";
@@ -135,11 +136,11 @@ public class ItemCrystalBag extends Item {
 
     @Nullable
     @Override
-    public CompoundNBT getShareTag(ItemStack stack) {
-        CompoundNBT baseTag = stack.getTag();
-        ItemStackHandlerCrystalBag itemStackHandler = getItemStackCrystalBag(stack);
-        CompoundNBT capabilityTag = itemStackHandler.serializeNBT();
-        CompoundNBT combinedTag = new CompoundNBT();
+    public CompoundTag getShareTag(ItemStack stack) {
+        CompoundTag baseTag = stack.getTag();
+        ItemStackInteractionHandlerCrystalBag itemStackInteractionHandler = getItemStackCrystalBag(stack);
+        CompoundTag capabilityTag = itemStackInteractionHandler.serializeNBT();
+        CompoundTag combinedTag = new CompoundTag();
         if (baseTag != null) {
             combinedTag.put(BASE_NBT_TAG, baseTag);
         }
@@ -150,27 +151,27 @@ public class ItemCrystalBag extends Item {
     }
 
     @Override
-    public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
+    public void readShareTag(ItemStack stack, @Nullable CompoundTag nbt) {
         if (nbt == null) {
             stack.setTag(null);
             return;
         }
         stack.setTag(nbt.getCompound(BASE_NBT_TAG));
-        ItemStackHandlerCrystalBag itemStackHandlerFlowerBag = getItemStackCrystalBag(
+        ItemStackInteractionHandlerCrystalBag itemStackInteractionHandlerFlowerBag = getItemStackCrystalBag(
                 stack);
-        itemStackHandlerFlowerBag.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
+        itemStackInteractionHandlerFlowerBag.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
     }
 
     public static float getFullnessPropertyOverride(ItemStack itemStack,
-                                                    @Nullable World world, @Nullable LivingEntity livingEntity) {
-        ItemStackHandlerCrystalBag itemStackHandler = getItemStackCrystalBag(itemStack);
+                                                    @Nullable Level Level, @Nullable LivingEntity livingEntity) {
+        ItemStackInteractionHandlerCrystalBag itemStackInteractionHandler = getItemStackCrystalBag(itemStack);
         float fractionEmpty =
-                itemStackHandler.getNumberOfEmptySlots() / (float) itemStackHandler.getSlots();
+                itemStackInteractionHandler.getNumberOfEmptySlots() / (float) itemStackInteractionHandler.getSlots();
         return 1.0F - fractionEmpty;
     }
 
     @Override
-    public void fillItemCategory(ItemGroup group,
+    public void fillItemCategory(CreativeModeTab group,
                                  NonNullList<ItemStack> items) {
         if (group == MiningGoggles.TAB_GOGGLES) {
             items.add(new ItemStack(MiningItems.bag));
@@ -190,10 +191,10 @@ public class ItemCrystalBag extends Item {
 
     public static ItemStack create(ItemStack[] items) {
         ItemStack bag = new ItemStack(MiningItems.bag);
-        ItemStackHandlerCrystalBag handler = getItemStackCrystalBag(bag);
-        for (int x = 0; x < handler.getNumberOfEmptySlots(); x++) {
+        ItemStackInteractionHandlerCrystalBag InteractionHandler = getItemStackCrystalBag(bag);
+        for (int x = 0; x < InteractionHandler.getNumberOfEmptySlots(); x++) {
             if (items.length > x) {
-                handler.insertItem(x, items[x], false);
+                InteractionHandler.insertItem(x, items[x], false);
             }
         }
         return bag;

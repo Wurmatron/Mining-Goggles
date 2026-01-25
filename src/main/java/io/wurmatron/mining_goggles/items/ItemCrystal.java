@@ -1,6 +1,11 @@
 package io.wurmatron.mining_goggles.items;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.Level.item.Item;
+import net.minecraft.Level.item.ItemStack;
+import net.minecraft.Level.item.TooltipFlag;
+import net.minecraft.Level.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -13,7 +18,7 @@ public class ItemCrystal extends Item {
     }
 
     public static ItemStack set(int minWavelength, int maxWavelength) {
-        CompoundNBT nbt = new CompoundNBT();
+        CompoundTag nbt = new CompoundTag();
         nbt.putInt("min-wavelength", minWavelength);
         nbt.putInt("max-wavelength", maxWavelength);
         ItemStack stack = new ItemStack(MiningItems.crystal, 1);
@@ -27,26 +32,26 @@ public class ItemCrystal extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World world,
-                                List<ITextComponent> text, ITooltipFlag flag) {
-        super.appendHoverText(stack, world, text, flag);
+    public void appendHoverText(ItemStack stack, @Nullable Level Level,
+                                List<TextComponent> text, TooltipFlag flag) {
+        super.appendHoverText(stack, Level, text, flag);
         if (stack.getTag() != null && !stack.getTag().isEmpty()) {
             String min = stack.getTag().getInt("min-wavelength") > 0 ? "" + stack.getTag()
                     .getInt("min-wavelength") : "?";
             String max = stack.getTag().getInt("max-wavelength") > 0 ? "" + stack.getTag()
                     .getInt("max-wavelength") : "?";
-            text.add(new StringTextComponent(
+            text.add(new TextComponent(
                     "Wavelength: " + min + " ->  " + max));
         }
     }
 
     @Override
-    public ActionResult<ItemStack> use(World world, PlayerEntity player,
-                                       Hand hand) {
-        CompoundNBT nbt = player.getItemInHand(hand).getTag();
-        Random RAND = world.random;
+    public InteractionResult<ItemStack> use(Level Level, Player player,
+                                       InteractionHand InteractionHand) {
+        CompoundTag nbt = player.getItemInInteractionHand(InteractionHand).getTag();
+        Random RAND = Level.random;
         if (nbt == null) {
-            nbt = new CompoundNBT();
+            nbt = new CompoundTag();
         }
         if (nbt.getInt("min-wavelength") == 0) {
             int rarity = RAND.nextInt(3);
@@ -80,10 +85,10 @@ public class ItemCrystal extends Item {
                 nbt.putInt("min-wavelength", (base) + shift);
                 nbt.putInt("max-wavelength", (base + 50) + shift);
             }
-            player.getItemInHand(hand).setTag(nbt);
-            return ActionResult.pass(player.getItemInHand(hand));
+            player.getItemInInteractionHand(InteractionHand).setTag(nbt);
+            return InteractionResult.pass(player.getItemInInteractionHand(InteractionHand));
         }
-        return super.use(world, player, hand);
+        return super.use(Level, player, InteractionHand);
     }
 
     @Override

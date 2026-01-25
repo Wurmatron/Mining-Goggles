@@ -1,16 +1,29 @@
 package io.wurmatron.mining_goggles.client.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3d;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.config.OreConfigLoader;
 import io.wurmatron.mining_goggles.items.MiningItems;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.Level.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
@@ -33,7 +46,7 @@ public class RenderGoggleOverlay {
     public static double FUZZY_RANGE_BEST = MiningGoggles.config.fuzzyRangeBest; // overall total (1 * x)
     public static double FUZZY_RANGE_LOW = MiningGoggles.config.fuzzyRangeLow; // overall total (1 * x)
     public static int RESCAN_INTERVAL = MiningGoggles.config.rescanInterval; // multiple's of RENDER_UPDATE_TIMER
-    public static int DAMAGE_INTERVAL = MiningGoggles.config.damageInterval; // sec (in world ticks at 20tps)
+    public static int DAMAGE_INTERVAL = MiningGoggles.config.damageInterval; // sec (in Level ticks at 20tps)
 
     // Timers
     public static int renderTimer;
@@ -42,7 +55,7 @@ public class RenderGoggleOverlay {
     public static int damageTimer;
 
     @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent e) {
+    public void onRenderLevel(RenderLevelLastEvent e) {
         if (!activeRendering.isEmpty()) {
             Minecraft.getInstance().gameRenderer.resetProjectionMatrix(e.getProjectionMatrix());
             GL11.glPushMatrix();
@@ -54,7 +67,7 @@ public class RenderGoggleOverlay {
             GlStateManager._clear(GL11.GL_DEPTH_BUFFER_BIT, Minecraft.ON_OSX);
             for (BlockPos pos : activeRendering.keySet()) {
                 Float[] color = activeRendering.get(pos);
-                drawBoundingBoxAtBlockPos(e.getMatrixStack(), BOX, color[0], color[1], color[2],
+                drawBoundingBoxAtBlockPos(e.getPoseStack(), BOX, color[0], color[1], color[2],
                         color[3], pos);
             }
             GL11.glPopMatrix();
@@ -98,7 +111,7 @@ public class RenderGoggleOverlay {
         }
     }
 
-    private static void updateActiveRendering(PlayerEntity player) {
+    private static void updateActiveRendering(Player player) {
         ItemStack stack = player.inventory.armor.get(3);
         MiningGoggles.EXECUTORS.submit(() -> {
             NonBlockingHashMap<BlockPos, Float[]> detectedBlocks = collectDetectedBlocks(player,
@@ -127,7 +140,7 @@ public class RenderGoggleOverlay {
         });
     }
 
-    private static void cleanupRenderEntries(PlayerEntity player) {
+    private static void cleanupRenderEntries(Player player) {
         MiningGoggles.EXECUTORS.submit(() -> {
             for (BlockPos pos : activeRendering.keySet()) {
                 if (!isValidPos(player, pos)) {
@@ -137,7 +150,7 @@ public class RenderGoggleOverlay {
         });
     }
 
-    public static boolean isValidPos(PlayerEntity player, BlockPos pos) {
+    public static boolean isValidPos(Player player, BlockPos pos) {
         BlockState state = player.level.getBlockState(pos);
         if (state.is(Blocks.AIR))
             return false;
@@ -179,7 +192,7 @@ public class RenderGoggleOverlay {
         return new ArrayList<>();
     }
 
-    private static boolean withinRange(PlayerEntity player, ItemStack stack, BlockPos pos,
+    private static boolean withinRange(Player player, ItemStack stack, BlockPos pos,
                                        String ore, int wavelength) {
         int waveLength = OreConfigLoader.get(ore);
         MiningGogglesCollector collector = ((MiningGogglesCollector) player.inventory.armor.get(
@@ -237,28 +250,28 @@ public class RenderGoggleOverlay {
     }
 
     private static NonBlockingHashMap<BlockPos, Float[]> collectDetectedBlocks(
-            PlayerEntity player, ItemStack stack, boolean rescan) {
+            Player player, ItemStack stack, boolean rescan) {
         if (stack.getItem() instanceof MiningGogglesCollector) {
             return ((MiningGogglesCollector) stack.getItem()).findBlocks(player, stack, rescan);
         }
         return new NonBlockingHashMap<>();
     }
 
-    public void drawBoundingBoxAtBlockPos(MatrixStack matrixStackIn, AxisAlignedBB aabbIn,
+    public void drawBoundingBoxAtBlockPos(PoseStack PoseStackIn, AABB aabbIn,
                                           float red, float green, float blue, float alpha, BlockPos pos) {
         Vector3d cam = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         double camX = cam.x(), camY = cam.y(), camZ = cam.z();
-        drawShapeOutline(matrixStackIn, VoxelShapes.create(aabbIn), pos.getX() - camX,
+        drawShapeOutline(PoseStackIn, VoxelShapes.create(aabbIn), pos.getX() - camX,
                 pos.getY() - camY, pos.getZ() - camZ, red, green, blue, alpha);
     }
 
-    private void drawShapeOutline(MatrixStack matrixStack, VoxelShape voxelShape,
+    private void drawShapeOutline(PoseStack PoseStack, VoxelShape voxelShape,
                                   double originX, double originY, double originZ, float red, float green, float blue,
                                   float alpha) {
-        Matrix4f matrix4f = matrixStack.last().pose();
-        IRenderTypeBuffer.Impl renderTypeBuffer = Minecraft.getInstance().renderBuffers()
+        Matrix4f matrix4f = PoseStack.last().pose();
+        MultiBufferSource.Impl renderTypeBuffer = Minecraft.getInstance().renderBuffers()
                 .bufferSource();
-        IVertexBuilder bufferIn = renderTypeBuffer.getBuffer(RenderType.lines());
+        VertexConsumer bufferIn = renderTypeBuffer.getBuffer(RenderType.lines());
         voxelShape.forAllEdges((xMin, yMin, zMin, xMax, yMax, zMax) -> {
             bufferIn.vertex(matrix4f, (float) (xMin + originX), (float) (yMin + originY),
                     (float) (zMin + originZ)).color(red, green, blue, alpha).endVertex();

@@ -4,9 +4,23 @@ import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.inventory.ContainerFilter;
-import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_Digital;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
+import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerGoggles_Digital;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.Level.entity.Entity;
+import net.minecraft.Level.entity.EquipmentSlot;
+import net.minecraft.Level.entity.LivingEntity;
+import net.minecraft.Level.entity.player.Inventory;
+import net.minecraft.Level.entity.player.Player;
+import net.minecraft.Level.item.ArmorItem;
+import net.minecraft.Level.item.ArmorMaterials;
+import net.minecraft.Level.item.ItemStack;
+import net.minecraft.Level.level.Level;
+import net.minecraftforge.items.CapabilityItemInteractionHandler;
+import net.minecraftforge.items.IItemInteractionHandler;
+import net.minecraftforge.network.NetworkHooks;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 
 import javax.annotation.Nullable;
@@ -20,13 +34,13 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
     public static int MAX_RADIUS = MiningGoggles.config.digitalGoggles.maxRadius;
 
     public ItemMiningGogglesDigital(Properties prop) {
-        super(ArmorMaterial.NETHERITE, EquipmentSlotType.HEAD, prop);
+        super(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, prop);
     }
 
     public static NonBlockingHashMap<BlockPos, Float[]> detectedBlocks = new NonBlockingHashMap<>();
 
     @Override
-    public NonBlockingHashMap<BlockPos, Float[]> findBlocks(PlayerEntity player,
+    public NonBlockingHashMap<BlockPos, Float[]> findBlocks(Player player,
                                                             ItemStack stack, boolean rescan) {
         if (!rescan) {
             return detectedBlocks;
@@ -63,8 +77,8 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
         return detectedBlocks;
     }
 
-    private static Float[] getColors(World world, HashMap<Integer, String[]> settings, BlockPos pos) {
-        List<String> names = RenderGoggleOverlay.getBlockNames(world.getBlockState(pos));
+    private static Float[] getColors(Level Level, HashMap<Integer, String[]> settings, BlockPos pos) {
+        List<String> names = RenderGoggleOverlay.getBlockNames(Level.getBlockState(pos));
         for (int index = 0; index < 16; index++) {
             if (settings.get(index) == null)
                 continue;
@@ -104,7 +118,7 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
     }
 
     @Override
-    public boolean canSeeBlock(PlayerEntity player, ItemStack stack, BlockPos pos, int wavelength) {
+    public boolean canSeeBlock(Player player, ItemStack stack, BlockPos pos, int wavelength) {
         String[] filters = getFilters(stack);
         for (String tag : RenderGoggleOverlay.getBlockNames(player.level.getBlockState(pos)))
             for (String f : filters)
@@ -136,7 +150,7 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
             HashMap<Integer, String[]> map = new HashMap();
             for (int index = 0; index < 16; index++) {
                 List<String> colorFilter = new ArrayList<>();
-                CompoundNBT nbt = helmet.getTagElement("color_" + index);
+                CompoundTag nbt = helmet.getTagElement("color_" + index);
                 if (nbt != null) {
                     int enabled = nbt.getInt("active");
                     if (enabled == 0) {
@@ -171,18 +185,18 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
 
     @Nullable
     @Override
-    public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot,
+    public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot,
                                   String type) {
         return "mininggoggles:textures/models/goggles_digital.png"; // TODO Dynamic based on lens / modules
     }
 
     @Override
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-        if (entity instanceof ServerPlayerEntity) {
-            PlayerEntity player = (PlayerEntity) entity;
+        if (entity instanceof Player) {
+            ServerPlayer player = (ServerPlayer) entity;
             if (player.isSecondaryUseActive()) {
                 INamedContainerProvider containerFilter = new ContainerProviderFilter(stack);
-                NetworkHooks.openGui((ServerPlayerEntity) player, containerFilter);
+                NetworkHooks.openGui((ServerPlayer) player, containerFilter);
             }
         }
         return super.onEntitySwing(stack, entity);
@@ -197,25 +211,25 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
         }
 
         @Override
-        public ITextComponent getDisplayName() {
+        public TextComponent getDisplayName() {
             return helmet.getDisplayName();
         }
 
 
         @Override
-        public ContainerFilter createMenu(int windowID, PlayerInventory inventory, PlayerEntity player) {
+        public ContainerFilter createMenu(int windowID, Inventory inventory, Player player) {
             return ContainerFilter.createContainerClientSide(windowID, inventory, null);
         }
     }
 
-    public static ItemStackHandlerGoggles_Digital getItemStackGoggles_Digital(
+    public static ItemStackInteractionHandlerGoggles_Digital getItemStackGoggles_Digital(
             ItemStack itemStack) {
-        IItemHandler goggles = itemStack.getCapability(
-                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
-        if (!(goggles instanceof ItemStackHandlerGoggles_Digital)) {
-            return new ItemStackHandlerGoggles_Digital();
+        IItemInteractionHandler goggles = itemStack.getCapability(
+                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY).orElse(null);
+        if (!(goggles instanceof ItemStackInteractionHandlerGoggles_Digital)) {
+            return new ItemStackInteractionHandlerGoggles_Digital();
         }
-        return (ItemStackHandlerGoggles_Digital) goggles;
+        return (ItemStackInteractionHandlerGoggles_Digital) goggles;
     }
 
     private static class ContainerProviderFilter implements INamedContainerProvider {
@@ -226,13 +240,13 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
         }
 
         @Override
-        public ITextComponent getDisplayName() {
+        public TextComponent getDisplayName() {
             return helmet.getDisplayName();
         }
 
         @Override
-        public ContainerFilter createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-            return ContainerFilter.createContainerServerSide(windowID, playerInventory, playerEntity.getMainHandItem());
+        public ContainerFilter createMenu(int windowID, Inventory Inventory, Player Player) {
+            return ContainerFilter.createContainerServerSide(windowID, Inventory, Player.getMainInteractionHandItem());
         }
     }
 

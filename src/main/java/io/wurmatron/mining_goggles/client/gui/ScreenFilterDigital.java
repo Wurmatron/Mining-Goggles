@@ -1,15 +1,20 @@
 package io.wurmatron.mining_goggles.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.inventory.ContainerFilter;
 import io.wurmatron.mining_goggles.items.ItemMiningGogglesDigital;
 import io.wurmatron.mining_goggles.network.PacketUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
 
-import static net.minecraftforge.fml.client.gui.GuiUtils.drawTexturedModalRect;
+import static net.minecraftforge.client.gui.GuiUtils.drawTexturedModalRect;
 
 public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
 
@@ -21,7 +26,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
     private int startingIndex = 0;
     private ItemStack stack;
 
-    public ScreenFilterDigital(ContainerFilter containerFilter, PlayerInventory inventory, ITextComponent title) {
+    public ScreenFilterDigital(ContainerFilter containerFilter, Inventory inventory, TextComponent title) {
         super(containerFilter, inventory, title);
         stack = inventory.getSelected();
     }
@@ -35,7 +40,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
                 GuiColorFilter entry = new GuiColorFilter(this.font, new TranslationTextComponent("Title"), index);
                 entry.init(Minecraft.getInstance(), width, height);
                 if (stack.hasTag()) {
-                    CompoundNBT colorNBT = stack.getTagElement("color_" + index);
+                    CompoundTag colorNBT = stack.getTagElement("color_" + index);
                     if (colorNBT != null) {
                         String filter = colorNBT.getString("filter");
                         boolean active = colorNBT.getInt("active") == 1;
@@ -43,12 +48,12 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
                         entry.text.setEditable(true);
                         entry.text.setTextColor(Color.WHITE.getRGB());
                     } else {
-                        colorNBT = new CompoundNBT();
+                        colorNBT = new CompoundTag();
                         colorNBT.putString("filter", "");
                         colorNBT.putInt("active", 0);
                     }
                 } else {
-                    stack.setTag(new CompoundNBT());
+                    stack.setTag(new CompoundTag());
                 }
                 this.filters[index] = entry;
                 this.children.add(entry.text);
@@ -58,7 +63,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
     }
 
     @Override
-    public void render(MatrixStack stack, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack stack, int mouseX, int mouseY, float delta) {
         this.minecraft.getTextureManager().bind(BACKGROUND_TEXTURE);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         int edgeSpacingX = (this.width - xSize) / 2;
@@ -79,7 +84,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
     }
 
     @Override
-    protected void renderBg(MatrixStack matrixStack, float v, int i, int i1) {
+    protected void renderBg(PoseStack PoseStack, float v, int i, int i1) {
     }
 
     @Override
@@ -126,9 +131,9 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
     @Override
     public void onClose() {
         super.onClose();
-        CompoundNBT stackNBT = stack.getTag();
+        CompoundTag stackNBT = stack.getTag();
         for (int index = 0; index < 16; index++) {
-            CompoundNBT nbt = new CompoundNBT();
+            CompoundTag nbt = new CompoundTag();
             nbt.putString("filter", filters[index].text.getValue());
             nbt.putInt("active", filters[index].enabled ? 1 : 0);
             stackNBT.put("color_" + index, nbt);

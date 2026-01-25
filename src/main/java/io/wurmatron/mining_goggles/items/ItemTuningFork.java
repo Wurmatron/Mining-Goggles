@@ -1,11 +1,23 @@
 package io.wurmatron.mining_goggles.items;
 
 import io.wurmatron.mining_goggles.inventory.ContainerTuningFork;
-import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerTuningFork;
+import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerTuningFork;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderTuningFork;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.Level.InteractionInteractionHand;
+import net.minecraft.Level.InterInteractionResultHolder;
+import net.minecraft.Level.entity.player.Inventory;
+import net.minecraft.Level.entity.player.Player;
+import net.minecraft.Level.item.Item;
+import net.minecraft.Level.item.ItemStack;
+import net.minecraft.Level.item.TooltipFlag;
+import net.minecraft.Level.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.CapabilityItemInteractionHandler;
+import net.minecraftforge.items.IItemInteractionHandler;
+import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,39 +31,41 @@ public class ItemTuningFork extends Item {
 
     @Nonnull
     @Override
-    public ActionResult<ItemStack> use(World world, PlayerEntity player,
-                                       @Nonnull Hand hand) {
-        ItemStack stack = player.getItemInHand(hand);
-        if (!world.isClientSide) {
+    public InterInteractionResultHolder<ItemStack> use(Level Level, Player player,
+                                                  @Nonnull InteractionInteractionHand InteractionHand) {
+        ItemStack stack = player.getItemInInteractionHand(InteractionHand);
+        if (!Level.isClientSide) {
             INamedContainerProvider containerProvider = new ContainerProvidedTuningFork(stack);
-            NetworkHooks.openGui((ServerPlayerEntity) player, containerProvider,
+            NetworkHooks.openGui((ServerPlayer) player, containerProvider,
                     (packetBuffer) -> {
                     });
         }
-        return ActionResult.pass(stack);
+        return InterInteractionResultHolder.pass(stack);
     }
 
+
+
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World world,
-                                List<ITextComponent> list, ITooltipFlag tip) {
-        ItemStackHandlerTuningFork stackHandler = getItemStackHandler(stack);
-        if (!stackHandler.getStackInSlot(0).isEmpty()) {
-            ItemStack adjustableCrystal = stackHandler.getStackInSlot(0);
+    public void appendHoverText(ItemStack stack, @Nullable Level Level,
+                                List<TextComponent> list, TooltipFlag tip) {
+        ItemStackInteractionHandlerTuningFork stackInteractionHandler = getItemStackInteractionHandler(stack);
+        if (!stackInteractionHandler.getStackInSlot(0).isEmpty()) {
+            ItemStack adjustableCrystal = stackInteractionHandler.getStackInSlot(0);
             int progress = 0;
             if (adjustableCrystal.hasTag() && adjustableCrystal.getTag().contains("progress")) {
                 progress = adjustableCrystal.getTag().getInt("progress");
             }
-            list.add(new StringTextComponent(
-                    ItemAttunmentCrystal.computeProgress(stackHandler.getStackInSlot(0)) + " "
+            list.add(new TextComponent(
+                    ItemAttunmentCrystal.computeProgress(stackInteractionHandler.getStackInSlot(0)) + " "
                             + "%"));
-            if (!stackHandler.getStackInSlot(0).getTag().getString("type").isEmpty()) {
-                list.add(new StringTextComponent(
-                        stackHandler.getStackInSlot(0).getTag().getString("type")));
+            if (!stackInteractionHandler.getStackInSlot(0).getTag().getString("type").isEmpty()) {
+                list.add(new TextComponent(
+                        stackInteractionHandler.getStackInSlot(0).getTag().getString("type")));
             }
         } else {
-            list.add(new StringTextComponent("Empty"));
+            list.add(new TextComponent("Empty"));
         }
-        super.appendHoverText(stack, world, list, tip);
+        super.appendHoverText(stack, Level, list, tip);
     }
 
     private static class ContainerProvidedTuningFork implements INamedContainerProvider {
@@ -63,33 +77,33 @@ public class ItemTuningFork extends Item {
         }
 
         @Override
-        public ITextComponent getDisplayName() {
+        public TextComponent getDisplayName() {
             return stackBag.getDisplayName();
         }
 
 
         @Override
-        public ContainerTuningFork createMenu(int windowID, PlayerInventory inventory,
-                                              PlayerEntity player) {
+        public ContainerTuningFork createMenu(int windowID, Inventory inventory,
+                                              Player player) {
             return ContainerTuningFork.createContainerServerSide(windowID, inventory,
-                    getItemStackHandler(stackBag), stackBag);
+                    getItemStackInteractionHandler(stackBag), stackBag);
         }
     }
 
     @Nonnull
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT oldCapNbt) {
+    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag oldCapNbt) {
         return new CapabilityProviderTuningFork();
     }
 
-    public static ItemStackHandlerTuningFork getItemStackHandler(
+    public static ItemStackInteractionHandlerTuningFork getItemStackInteractionHandler(
             ItemStack itemStack) {
-        IItemHandler TuningFork = itemStack.getCapability(
-                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
-        if (!(TuningFork instanceof ItemStackHandlerTuningFork)) {
-            return new ItemStackHandlerTuningFork();
+        IItemInteractionHandler TuningFork = itemStack.getCapability(
+                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY).orElse(null);
+        if (!(TuningFork instanceof ItemStackInteractionHandlerTuningFork)) {
+            return new ItemStackInteractionHandlerTuningFork();
         }
-        return (ItemStackHandlerTuningFork) TuningFork;
+        return (ItemStackInteractionHandlerTuningFork) TuningFork;
     }
 
     private final String BASE_NBT_TAG = "base";
@@ -97,11 +111,11 @@ public class ItemTuningFork extends Item {
 
     @Nullable
     @Override
-    public CompoundNBT getShareTag(ItemStack stack) {
-        CompoundNBT baseTag = stack.getTag();
-        ItemStackHandlerTuningFork itemStackHandler = getItemStackHandler(stack);
-        CompoundNBT capabilityTag = itemStackHandler.serializeNBT();
-        CompoundNBT combinedTag = new CompoundNBT();
+    public CompoundTag getShareTag(ItemStack stack) {
+        CompoundTag baseTag = stack.getTag();
+        ItemStackInteractionHandlerTuningFork itemStackInteractionHandler = getItemStackInteractionHandler(stack);
+        CompoundTag capabilityTag = itemStackInteractionHandler.serializeNBT();
+        CompoundTag combinedTag = new CompoundTag();
         if (baseTag != null) {
             combinedTag.put(BASE_NBT_TAG, baseTag);
         }
@@ -112,20 +126,20 @@ public class ItemTuningFork extends Item {
     }
 
     @Override
-    public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
+    public void readShareTag(ItemStack stack, @Nullable CompoundTag nbt) {
         if (nbt == null) {
             stack.setTag(null);
             return;
         }
         stack.setTag(nbt.getCompound(BASE_NBT_TAG));
-        ItemStackHandlerTuningFork itemStackHandlerFlowerBag = getItemStackHandler(
+        ItemStackInteractionHandlerTuningFork itemStackInteractionHandlerFlowerBag = getItemStackInteractionHandler(
                 stack);
-        itemStackHandlerFlowerBag.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
+        itemStackInteractionHandlerFlowerBag.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
     }
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        ItemStackHandlerTuningFork fork = getItemStackHandler(stack);
+        ItemStackInteractionHandlerTuningFork fork = getItemStackInteractionHandler(stack);
         if (!fork.getStackInSlot(0).isEmpty()) {
             return true;
         }
