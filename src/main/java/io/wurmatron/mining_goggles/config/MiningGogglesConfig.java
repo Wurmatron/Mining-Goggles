@@ -52,6 +52,8 @@ public class MiningGogglesConfig {
     public static void createDefaults() {
         MiningGogglesConfig defaults = new MiningGogglesConfig();
         File configLocation = new File(CONFIG_DIR + File.separator + "config.json");
+        if(!configLocation.getParentFile().exists())
+            configLocation.getParentFile().mkdirs();
         try {
             Files.write(configLocation.toPath(), MiningGoggles.GSON.toJson(defaults).getBytes(), StandardOpenOption.CREATE);
         } catch (Exception e) {
@@ -71,7 +73,6 @@ public class MiningGogglesConfig {
                 try {
                     Files.write(errorLocation.toPath(), Files.readAllBytes(configLocation.toPath()), StandardOpenOption.CREATE_NEW);
                 } catch (Exception f) {
-                    f.printStackTrace();
                     MiningGoggles.LOGGER.error("Failed to move error'd config!");
                 }
                 if(configLocation.delete())

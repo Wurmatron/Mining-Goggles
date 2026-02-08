@@ -11,10 +11,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.HashSet;
 import joptsimple.internal.Strings;
+import net.minecraft.client.Minecraft;
 
 public class OreConfigLoader {
 
-  public static final File CONFIG_DIR = new File("./config/Mining-Goggles");
+  public static final File CONFIG_DIR = new File(Minecraft.getInstance().gameDirectory.getAbsoluteFile() + File.separator + "config" + File.separator +  "Mining-Goggles");
 
   public static void save(OreWavelength ore) {
     HashSet<OreWavelength> oreConfig = new HashSet<>();
