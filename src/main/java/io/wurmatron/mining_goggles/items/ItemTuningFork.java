@@ -6,17 +6,8 @@ import io.wurmatron.mining_goggles.items.providers.CapabilityProviderTuningFork;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.Level.InteractionInteractionHand;
-import net.minecraft.Level.InterInteractionResultHolder;
-import net.minecraft.Level.entity.player.Inventory;
-import net.minecraft.Level.entity.player.Player;
-import net.minecraft.Level.item.Item;
-import net.minecraft.Level.item.ItemStack;
-import net.minecraft.Level.item.TooltipFlag;
-import net.minecraft.Level.level.Level;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.items.CapabilityItemInteractionHandler;
-import net.minecraftforge.items.IItemInteractionHandler;
 import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;

@@ -1,8 +1,8 @@
 package io.wurmatron.mining_goggles.api;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.Level.entity.player.Player;
-import net.minecraft.Level.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 
 import java.util.Random;

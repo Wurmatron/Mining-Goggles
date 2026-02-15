@@ -1,11 +1,10 @@
 package io.wurmatron.mining_goggles.items;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.Level.item.Item;
-import net.minecraft.Level.item.ItemStack;
-import net.minecraft.Level.item.TooltipFlag;
-import net.minecraft.Level.level.Level;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.List;

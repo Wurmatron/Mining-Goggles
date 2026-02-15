@@ -4,7 +4,7 @@ import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.items.MiningItems;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.Level.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;

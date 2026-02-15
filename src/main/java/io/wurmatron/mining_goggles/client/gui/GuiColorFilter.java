@@ -3,6 +3,8 @@ package io.wurmatron.mining_goggles.client.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -14,13 +16,13 @@ import static net.minecraftforge.client.gui.GuiUtils.drawTexturedModalRect;
 
 public class GuiColorFilter extends Screen {
 
-    public TextFieldWidget text;
+    public MultiLineLabel text;
     private int ID;
     public boolean enabled = true;
 
     protected GuiColorFilter(FontRenderContext font, TextComponent title, int ID) {
         super(title);
-        this.text = new TextFieldWidget(font, 0, 0, 162, 17, new TranslatableComponent("Nep"));
+        this.text = new MultiLineLabel.TextWithWidth(font, 0, 0, 162, 17, new TranslatableComponent("Nep"));
         this.text.setMaxLength(500);
         this.ID = ID;
     }

@@ -1,9 +1,8 @@
 package io.wurmatron.mining_goggles.items;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
-import net.minecraft.Level.item.Item;
-import net.minecraft.Level.item.Rarity;
-import net.minecraftforge.common.property.Properties;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.DeferredRegister;
@@ -23,7 +22,7 @@ public class MiningItems {
             new Item.Properties().stacksTo(4).tab(MiningGoggles.TAB_GOGGLES).durability(5000)
                     .setNoRepair().fireResistant());
     public static Item bag = new ItemCrystalBag(
-            new Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES));
+            new Item.Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES));
     public static Item gogglesUpgraded = new ItemMiningGogglesUpgraded(
             new Item.Properties().stacksTo(1).tab(MiningGoggles.TAB_GOGGLES));
     public static ItemConstructedCrystal constructedCrystal = new ItemConstructedCrystal(

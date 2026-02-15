@@ -12,27 +12,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.Level.Container;
-import net.minecraft.Level.InteractionInteractionHand;
-import net.minecraft.Level.InterInteractionResult;
-import net.minecraft.Level.entity.Entity;
-import net.minecraft.Level.entity.EquipmentSlot;
-import net.minecraft.Level.entity.player.Inventory;
-import net.minecraft.Level.entity.player.Player;
-import net.minecraft.Level.item.ArmorItem;
-import net.minecraft.Level.item.ArmorMaterial;
-import net.minecraft.Level.item.ArmorMaterials;
-import net.minecraft.Level.item.ItemStack;
-import net.minecraft.Level.item.context.UseOnContext;
-import net.minecraft.Level.level.Level;
-import net.minecraft.Level.level.LevelAccessor;
-import net.minecraft.Level.level.block.entity.BlockEntity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemInteractionHandler;
-import net.minecraftforge.items.IItemInteractionHandler;
-import net.minecraftforge.items.ItemInteractionHandlerHelper;
-import net.minecraftforge.items.ItemStackInteractionHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.network.NetworkHooks;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
@@ -56,8 +42,8 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
 
     @Nonnull
     @Override
-    public InterInteractionResult use(LevelAccessor Level, Player player,
-                                            @Nonnull InteractionInteractionHand InteractionHand) {
+    public InteractionResult use(LevelAccessor Level, Player player,
+                                      @Nonnull InteractionHand InteractionHand) {
         ItemStack stack = player.getItemInInteractionHand(InteractionHand);
         if (!Level.isClientSide) {
             INamedContainerProvider containerProvider = new ContainerProvidedGoggles_1(stack);
