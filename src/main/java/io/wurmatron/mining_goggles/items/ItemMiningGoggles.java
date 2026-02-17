@@ -12,13 +12,26 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.network.NetworkHooks;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
@@ -44,47 +57,47 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
     @Override
     public InteractionResult use(LevelAccessor Level, Player player,
                                       @Nonnull InteractionHand InteractionHand) {
-        ItemStack stack = player.getItemInInteractionHand(InteractionHand);
-        if (!Level.isClientSide) {
+        ItemStack stack = player.getItemInHand(InteractionHand);
+        if (!Level.isClientSide()) {
             INamedContainerProvider containerProvider = new ContainerProvidedGoggles_1(stack);
             NetworkHooks.openGui((ServerPlayer) player, containerProvider,
                     (packetBuffer) -> {
                     });
         }
-        return InterInteractionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Nonnull
     @Override
-    public InterInteractionResult onItemUseFirst(ItemStack stack, UseOnContext ctx) {
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext ctx) {
         Level Level = ctx.getLevel();
         if (Level.isClientSide()) {
-            return InterInteractionResult.PASS;
+            return InteractionResult.PASS;
         }
         BlockPos pos = ctx.getClickedPos();
         Direction side = ctx.getClickedFace();
-        ItemStack itemStack = ctx.getItemInInteractionHand();
+        ItemStack itemStack = ctx.getItemInHand();
         BlockEntity tile = Level.getBlockEntity(pos);
         if (tile == null) {
-            return InterInteractionResult.PASS;
+            return InteractionResult.PASS;
         }
         if (Level.isClientSide()) {
-            return InterInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        IItemInteractionHandler tileInventory;
-        LazyOptional<IItemInteractionHandler> capability = tile.getCapability(
-                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY, side);
+        IItemHandler tileInventory;
+        LazyOptional<IItemHandler> capability = tile.getCapability(
+                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
         if (capability.isPresent()) {
             tileInventory = capability.orElseThrow(AssertionError::new);
         } else if (tile instanceof Container) {
             tileInventory = new InvWrapper((Container) tile);
         } else {
-            return InterInteractionResult.FAIL;
+            return InteractionResult.FAIL;
         }
         ItemStackInteractionHandlerGoggles_1 itemStackInteractionHandler = getItemStackGoggles_1(itemStack);
-        for (int i = 0; i < itemStackInteractionHandler.getSlots(); i++) {
+        for (int i = 0; i < itemStackInteractionHandler.getNumberOfEmptySlots(); i++) {
             ItemStack flower = itemStackInteractionHandler.getStackInSlot(i);
-            ItemStack flowersWhichDidNotFit = ItemInteractionHandlerHelper.insertItemStacked(tileInventory,
+            ItemStack flowersWhichDidNotFit = ItemHandlerHelper.insertItemStacked(tileInventory,
                     flower, false);
             itemStackInteractionHandler.setStackInSlot(i, flowersWhichDidNotFit);
         }
@@ -93,7 +106,7 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
         int dirtyCounter = nbt.getInt("dirtyCounter");
         nbt.putInt("dirtyCounter", dirtyCounter + 1);
         itemStack.setTag(nbt);
-        return InterInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     private static class ContainerProvidedGoggles_1 implements INamedContainerProvider {
@@ -125,8 +138,8 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
 
     public static ItemStackInteractionHandlerGoggles_1 getItemStackGoggles_1(
             ItemStack itemStack) {
-        IItemInteractionHandler goggles = itemStack.getCapability(
-                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY).orElse(null);
+        IItemHandler goggles = itemStack.getCapability(
+                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
         if (!(goggles instanceof ItemStackInteractionHandlerGoggles_1)) {
             return new ItemStackInteractionHandlerGoggles_1();
         }
@@ -275,7 +288,7 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
 
     public static final int DAMAGE_CHANCE = MiningGoggles.config.primitiveGoggles.crystalDamageChance > 0 ? MiningGoggles.config.primitiveGoggles.maxRadius : 1;
 
-    private static void damageCrystal(Random rand, ItemStackInteractionHandler InteractionHandler, int index) {
+    private static void damageCrystal(Random rand, ItemStackHandler InteractionHandler, int index) {
         if (!InteractionHandler.getStackInSlot(index).isEmpty()) {
             if (rand.nextInt(DAMAGE_CHANCE) == 0) {
                 InteractionHandler.getStackInSlot(index)

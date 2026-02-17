@@ -1,7 +1,7 @@
 package io.wurmatron.mining_goggles.registry;
 
 import io.wurmatron.mining_goggles.inventory.*;
-import net.minecraft.Level.inventory.MenuType;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 

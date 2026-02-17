@@ -9,7 +9,9 @@ import io.wurmatron.mining_goggles.network.PacketUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
@@ -18,7 +20,7 @@ import static net.minecraftforge.client.gui.GuiUtils.drawTexturedModalRect;
 
 public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
 
-    public final static ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(MiningGoggles.MODID, "textures/gui/gogglesfilter.png");
+    public final static ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(MiningGoggles.MODID, "textures/gui/gogglesfilter.png");
     private static final int xSize = 217;
     private static final int ySize = 153;
 
@@ -37,7 +39,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
         if (filters == null || filters[0] == null) {
             int x = 0;
             for (int index = 0; index < 16; index++) {
-                GuiColorFilter entry = new GuiColorFilter(this.font, new TranslationTextComponent("Title"), index);
+                GuiColorFilter entry = new GuiColorFilter(this.font, new TranslatableComponent("Title"), index);
                 entry.init(Minecraft.getInstance(), width, height);
                 if (stack.hasTag()) {
                     CompoundTag colorNBT = stack.getTagElement("color_" + index);

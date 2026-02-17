@@ -6,8 +6,17 @@ import io.wurmatron.mining_goggles.items.providers.CapabilityProviderTuningFork;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
@@ -20,18 +29,20 @@ public class ItemTuningFork extends Item {
         super(prop);
     }
 
+
+
     @Nonnull
     @Override
-    public InterInteractionResultHolder<ItemStack> use(Level Level, Player player,
-                                                  @Nonnull InteractionInteractionHand InteractionHand) {
-        ItemStack stack = player.getItemInInteractionHand(InteractionHand);
+    public InteractionResultHolder<ItemStack> use(Level Level, Player player,
+                                                       @Nonnull InteractionHand InteractionHand) {
+        ItemStack stack = player.getItemInHand(InteractionHand);
         if (!Level.isClientSide) {
             INamedContainerProvider containerProvider = new ContainerProvidedTuningFork(stack);
             NetworkHooks.openGui((ServerPlayer) player, containerProvider,
                     (packetBuffer) -> {
                     });
         }
-        return InterInteractionResultHolder.pass(stack);
+        return InteractionResultHolder.pass(stack);
     }
 
 
@@ -59,7 +70,7 @@ public class ItemTuningFork extends Item {
         super.appendHoverText(stack, Level, list, tip);
     }
 
-    private static class ContainerProvidedTuningFork implements INamedContainerProvider {
+    private static class ContainerProvidedTuningFork implements NamedContainerProvider {
 
         private ItemStack stackBag;
 
@@ -89,8 +100,8 @@ public class ItemTuningFork extends Item {
 
     public static ItemStackInteractionHandlerTuningFork getItemStackInteractionHandler(
             ItemStack itemStack) {
-        IItemInteractionHandler TuningFork = itemStack.getCapability(
-                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY).orElse(null);
+        IItemHandler TuningFork = itemStack.getCapability(
+                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
         if (!(TuningFork instanceof ItemStackInteractionHandlerTuningFork)) {
             return new ItemStackInteractionHandlerTuningFork();
         }

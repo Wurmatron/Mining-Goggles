@@ -16,14 +16,15 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.Level.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
@@ -55,23 +56,24 @@ public class RenderGoggleOverlay {
     public static int damageTimer;
 
     @SubscribeEvent
-    public void onRenderLevel(RenderLevelLastEvent e) {
-        if (!activeRendering.isEmpty()) {
-            Minecraft.getInstance().gameRenderer.resetProjectionMatrix(e.getProjectionMatrix());
-            GL11.glPushMatrix();
-            enableBlend();
-            GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            disableTexture();
-            GlStateManager._disableCull();
-            enableDepthTest();
-            GlStateManager._clear(GL11.GL_DEPTH_BUFFER_BIT, Minecraft.ON_OSX);
-            for (BlockPos pos : activeRendering.keySet()) {
-                Float[] color = activeRendering.get(pos);
-                drawBoundingBoxAtBlockPos(e.getPoseStack(), BOX, color[0], color[1], color[2],
-                        color[3], pos);
+    public void onRenderLevel(RenderLevelStageEvent e) {
+        if (e.getStage() == RenderLevelStageEvent.Stage.AFTER_CUTOUT_MIPPED_BLOCKS_BLOCKS)
+            if (!activeRendering.isEmpty()) {
+                Minecraft.getInstance().gameRenderer.resetProjectionMatrix(e.getProjectionMatrix());
+                GL11.glPushMatrix();
+                enableBlend();
+                GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                disableTexture();
+                GlStateManager._disableCull();
+                enableDepthTest();
+                GlStateManager._clear(GL11.GL_DEPTH_BUFFER_BIT, Minecraft.ON_OSX);
+                for (BlockPos pos : activeRendering.keySet()) {
+                    Float[] color = activeRendering.get(pos);
+                    drawBoundingBoxAtBlockPos(e.getPoseStack(), BOX, color[0], color[1], color[2],
+                            color[3], pos);
+                }
+                GL11.glPopMatrix();
             }
-            GL11.glPopMatrix();
-        }
     }
 
     @SubscribeEvent

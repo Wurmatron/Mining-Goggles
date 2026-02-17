@@ -1,10 +1,15 @@
 package io.wurmatron.mining_goggles.items;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -45,9 +50,9 @@ public class ItemCrystal extends Item {
     }
 
     @Override
-    public InteractionResult<ItemStack> use(Level Level, Player player,
-                                       InteractionHand InteractionHand) {
-        CompoundTag nbt = player.getItemInInteractionHand(InteractionHand).getTag();
+    public InteractionResultHolder<ItemStack> use(Level Level, Player player,
+                                                  InteractionHand InteractionHand) {
+        CompoundTag nbt = player.getItemInHand(InteractionHand).getTag();
         Random RAND = Level.random;
         if (nbt == null) {
             nbt = new CompoundTag();
@@ -84,14 +89,14 @@ public class ItemCrystal extends Item {
                 nbt.putInt("min-wavelength", (base) + shift);
                 nbt.putInt("max-wavelength", (base + 50) + shift);
             }
-            player.getItemInInteractionHand(InteractionHand).setTag(nbt);
-            return InteractionResult.pass(player.getItemInInteractionHand(InteractionHand));
+            player.getItemInHand(InteractionHand).setTag(nbt);
+            return InteractionResult.PASS;
         }
         return super.use(Level, player, InteractionHand);
     }
 
     @Override
-    public void fillItemCategory(ItemGroup group,
+    public void fillItemCategory(CreativeModeTab group,
                                  NonNullList<ItemStack> items) {
         if (group == MiningGoggles.TAB_GOGGLES) {
             items.add(set(250, 350));

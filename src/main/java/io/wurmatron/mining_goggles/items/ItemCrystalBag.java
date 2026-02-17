@@ -4,10 +4,13 @@ import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesApi;
 import io.wurmatron.mining_goggles.inventory.ContainerCrystalBag;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderCrystalBag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -17,9 +20,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
@@ -38,7 +44,7 @@ public class ItemCrystalBag extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level Level, Player player,
                                                   @Nonnull InteractionHand InteractionHand) {
-        ItemStack stack = player.getItemInInteractionHand(InteractionHand);
+        ItemStack stack = player.getItemInHand(InteractionHand);
         if (!Level.isClientSide) {
             INamedContainerProvider containerProvider = new ContainerProvidedCrystalBag(stack);
             NetworkHooks.openGui((ServerPlayer) player, containerProvider,
@@ -50,14 +56,14 @@ public class ItemCrystalBag extends Item {
 
     @Nonnull
     @Override
-    public InteractionResult onItemUseFirst(ItemStack stack, ItemUseContext ctx) {
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext ctx) {
         Level Level = ctx.getLevel();
         if (Level.isClientSide()) {
             return InteractionResult.PASS;
         }
         BlockPos pos = ctx.getClickedPos();
         Direction side = ctx.getClickedFace();
-        ItemStack itemStack = ctx.getItemInInteractionHand();
+        ItemStack itemStack = ctx.getItemInHand();
         BlockEntity tile = Level.getBlockEntity(pos);
         if (tile == null) {
             return InteractionResult.PASS;
@@ -67,7 +73,7 @@ public class ItemCrystalBag extends Item {
         }
         IItemHandler tileInventory;
         LazyOptional<IItemHandler> capability = tile.getCapability(
-                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY, side);
+                CapabilityItemHandler.ITEM_InteractionHandLER_CAPABILITY, side);
         if (capability.isPresent()) {
             tileInventory = capability.orElseThrow(AssertionError::new);
         } else if (tile instanceof Container) {
@@ -117,10 +123,10 @@ public class ItemCrystalBag extends Item {
         return new CapabilityProviderCrystalBag();
     }
 
-    private static ItemStackInteractionHandlerCrystalBag getItemStackCrystalBag(
+    private static ItemStackHandlerCrystalBag getItemStackCrystalBag(
             ItemStack itemStack) {
         IItemHandler crystalBag = itemStack.getCapability(
-                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY).orElse(null);
+                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
         if (!(crystalBag instanceof ItemStackInteractionHandlerCrystalBag)) {
             return new ItemStackInteractionHandlerCrystalBag();
         }

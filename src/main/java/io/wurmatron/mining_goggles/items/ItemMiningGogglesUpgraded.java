@@ -10,9 +10,14 @@ import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.wrapper.InvWrapper;
@@ -33,21 +38,21 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
     public static int MAX_RADIUS = MiningGoggles.config.goggles.maxRadius > 0 ? MiningGoggles.config.primitiveGoggles.maxRadius : 1;
 
     public ItemMiningGogglesUpgraded(Properties prop) {
-        super(ArmorMaterial.NETHERITE, EquipmentSlot.HEAD, prop);
+        super(ArmorMaterials.NETHERITE, EquipmentSlot.HEAD, prop);
     }
 
     @Nonnull
     @Override
-    public InterInteractionResult<ItemStack> use(Level Level, Player player,
-                                            @Nonnull InteractionInteractionHand InteractionHand) {
-        ItemStack stack = player.getItemInInteractionHand(InteractionHand);
+    public InteractionResult<ItemStack> use(Level Level, Player player,
+                                                 @Nonnull InteractionHand InteractionHand) {
+        ItemStack stack = player.getItemInHand(InteractionHand);
         if (!Level.isClientSide) {
             INamedContainerProvider containerProvider = new ContainerProvidedGoggles_1(stack);
             NetworkHooks.openGui((Player) player, containerProvider,
                     (packetBuffer) -> {
                     });
         }
-        return InterInteractionResult.pass(stack);
+        return InteractionResult.pass(stack);
     }
 
     @Nonnull

@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class ScreenTuningFork extends ContainerScreen<ContainerTuningFork> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation("mininggoggles",
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("mininggoggles",
             "textures/gui/tuning_fork.png");
 
     public static final float PLAYER_LABEL_XPOS = 8;

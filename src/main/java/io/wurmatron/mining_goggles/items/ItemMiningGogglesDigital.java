@@ -9,10 +9,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.network.NetworkHooks;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 
@@ -217,8 +223,8 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
 
     public static ItemStackInteractionHandlerGoggles_Digital getItemStackGoggles_Digital(
             ItemStack itemStack) {
-        IItemInteractionHandler goggles = itemStack.getCapability(
-                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY).orElse(null);
+        IItemHandler goggles = itemStack.getCapability(
+                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
         if (!(goggles instanceof ItemStackInteractionHandlerGoggles_Digital)) {
             return new ItemStackInteractionHandlerGoggles_Digital();
         }
@@ -239,7 +245,7 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
 
         @Override
         public ContainerFilter createMenu(int windowID, Inventory Inventory, Player Player) {
-            return ContainerFilter.createContainerServerSide(windowID, Inventory, Player.getMainInteractionHandItem());
+            return ContainerFilter.createContainerServerSide(windowID, Inventory, Player.getItemInHand(InteractionHand.MAIN_HAND));
         }
     }
 

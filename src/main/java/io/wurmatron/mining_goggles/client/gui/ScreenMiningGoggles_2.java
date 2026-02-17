@@ -7,6 +7,7 @@ import io.wurmatron.mining_goggles.items.ItemCrystal;
 import io.wurmatron.mining_goggles.items.ItemMiningGogglesUpgraded;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -14,7 +15,7 @@ import java.awt.*;
 
 public class ScreenMiningGoggles_2 extends ContainerScreen<ContainerMiningGoggles_2> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation("mininggoggles",
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("mininggoggles",
             "textures/gui/goggles_2.png");
 
     public static final float PLAYER_LABEL_XPOS = 8;
@@ -66,10 +67,10 @@ public class ScreenMiningGoggles_2 extends ContainerScreen<ContainerMiningGoggle
         RenderSystem.pushMatrix();
         RenderSystem.scalef(.6f, .6f, .6f);
         // Range
-        font.draw(PoseStack, new TranslationTextComponent("stat.max_range.name").append(
+        font.draw(PoseStack, new TranslatableComponent("stat.max_range.name").append(
                         " " + ItemMiningGogglesUpgraded.getMaxRange(this.inventory.armor.get(3))), 107, 68,
                 Color.BLACK.getRGB());
-        font.draw(PoseStack, new TranslationTextComponent("stat.optimal_range.name").append(
+        font.draw(PoseStack, new TranslatableComponent("stat.optimal_range.name").append(
                 " " + (int) ((double) ItemMiningGogglesUpgraded.getMaxRange(this.inventory.armor.get(3))
                         * .3)), 107, 78, Color.BLACK.getRGB());
         RenderSystem.scalef(1f, 1f, 1f);
