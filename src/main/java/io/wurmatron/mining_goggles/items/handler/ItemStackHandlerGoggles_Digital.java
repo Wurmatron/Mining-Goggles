@@ -1,13 +1,14 @@
-package io.wurmatron.mining_goggles.items.InteractionHandler;
+package io.wurmatron.mining_goggles.items.handler;
 
-import net.minecraftforge.items.ItemStackInteractionHandler;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 
 
-public class ItemStackInteractionHandlerGoggles_Digital extends ItemStackInteractionHandler {
+public class ItemStackHandlerGoggles_Digital extends ItemStackHandler {
 
-    public ItemStackInteractionHandlerGoggles_Digital() {
+    public ItemStackHandlerGoggles_Digital() {
         super(0);
     }
 

@@ -1,7 +1,7 @@
 package io.wurmatron.mining_goggles.items;
 
 import io.wurmatron.mining_goggles.inventory.ContainerTuningFork;
-import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerTuningFork;
+import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerTuningFork;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderTuningFork;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
@@ -50,7 +50,7 @@ public class ItemTuningFork extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level Level,
                                 List<TextComponent> list, TooltipFlag tip) {
-        ItemStackInteractionHandlerTuningFork stackInteractionHandler = getItemStackInteractionHandler(stack);
+        ItemStackHandlerTuningFork stackInteractionHandler = getItemStackHandler(stack);
         if (!stackInteractionHandler.getStackInSlot(0).isEmpty()) {
             ItemStack adjustableCrystal = stackInteractionHandler.getStackInSlot(0);
             int progress = 0;
@@ -88,7 +88,7 @@ public class ItemTuningFork extends Item {
         public ContainerTuningFork createMenu(int windowID, Inventory inventory,
                                               Player player) {
             return ContainerTuningFork.createContainerServerSide(windowID, inventory,
-                    getItemStackInteractionHandler(stackBag), stackBag);
+                    getItemStackHandler(stackBag), stackBag);
         }
     }
 
@@ -98,14 +98,14 @@ public class ItemTuningFork extends Item {
         return new CapabilityProviderTuningFork();
     }
 
-    public static ItemStackInteractionHandlerTuningFork getItemStackInteractionHandler(
+    public static ItemStackHandlerTuningFork getItemStackHandler(
             ItemStack itemStack) {
         IItemHandler TuningFork = itemStack.getCapability(
                 CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
-        if (!(TuningFork instanceof ItemStackInteractionHandlerTuningFork)) {
-            return new ItemStackInteractionHandlerTuningFork();
+        if (!(TuningFork instanceof ItemStackHandlerTuningFork)) {
+            return new ItemStackHandlerTuningFork();
         }
-        return (ItemStackInteractionHandlerTuningFork) TuningFork;
+        return (ItemStackHandlerTuningFork) TuningFork;
     }
 
     private final String BASE_NBT_TAG = "base";
@@ -115,8 +115,8 @@ public class ItemTuningFork extends Item {
     @Override
     public CompoundTag getShareTag(ItemStack stack) {
         CompoundTag baseTag = stack.getTag();
-        ItemStackInteractionHandlerTuningFork itemStackInteractionHandler = getItemStackInteractionHandler(stack);
-        CompoundTag capabilityTag = itemStackInteractionHandler.serializeNBT();
+        ItemStackHandlerTuningFork itemStackHandler = getItemStackHandler(stack);
+        CompoundTag capabilityTag = itemStackHandler.serializeNBT();
         CompoundTag combinedTag = new CompoundTag();
         if (baseTag != null) {
             combinedTag.put(BASE_NBT_TAG, baseTag);
@@ -134,14 +134,14 @@ public class ItemTuningFork extends Item {
             return;
         }
         stack.setTag(nbt.getCompound(BASE_NBT_TAG));
-        ItemStackInteractionHandlerTuningFork itemStackInteractionHandlerFlowerBag = getItemStackInteractionHandler(
+        ItemStackHandlerTuningFork itemStackHandlerFlowerBag = getItemStackHandler(
                 stack);
-        itemStackInteractionHandlerFlowerBag.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
+        itemStackHandlerFlowerBag.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
     }
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        ItemStackInteractionHandlerTuningFork fork = getItemStackInteractionHandler(stack);
+        ItemStackHandlerTuningFork fork = getItemStackHandler(stack);
         if (!fork.getStackInSlot(0).isEmpty()) {
             return true;
         }

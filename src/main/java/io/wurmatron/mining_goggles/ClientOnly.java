@@ -22,6 +22,6 @@ public class ClientOnly {
     }
 
     public static void registerPropertyOverride() {
-        ItemProperties.register(MiningItems.bag, new ResourceLocation("fullness"), ItemCrystalBag::getFullnessPropertyOverride);
+        ItemProperties.register(MiningItems.bag, ResourceLocation.parse("fullness"), ItemCrystalBag::getFullnessPropertyOverride);
     }
 }

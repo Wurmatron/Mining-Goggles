@@ -25,8 +25,8 @@ public class ItemAttunmentCrystal extends ItemCrystal {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level Level, Player player, InteractionHand InteractionHand) {
-        return InteractionResult.PASS;
+    public InteractionResultHolder<ItemStack> use(Level Level, Player player, InteractionHand hand) {
+        return InteractionResultHolder.pass(player.getItemInHand(hand));
     }
 
     @Override

@@ -1,7 +1,7 @@
 package io.wurmatron.mining_goggles.inventory;
 
 import io.wurmatron.mining_goggles.MiningGoggles;
-import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerTuningFork;
+import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerTuningFork;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
@@ -9,12 +9,13 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 
 public class ContainerTuningFork extends Container {
 
-    private final ItemStackInteractionHandlerTuningFork itemStackInteractionHandler;
+    private final ItemStackHandlerTuningFork itemStackHandler;
     private final ItemStack itemStackBeingHeld;
 
 
@@ -32,10 +33,10 @@ public class ContainerTuningFork extends Container {
     public static final int PLAYER_INVENTORY_YPOS = 43;
 
     private ContainerTuningFork(int windowId, Inventory playerInv,
-                                ItemStackInteractionHandlerTuningFork itemStackInteractionHandlerFlowerBag,
+                                ItemStackHandlerTuningFork itemStackHandlerFlowerBag,
                                 ItemStack itemStackBeingHeld) {
         super(ContainerRegistry.containerTuningFork, windowId);
-        this.itemStackInteractionHandler = itemStackInteractionHandlerFlowerBag;
+        this.itemStackHandler = itemStackHandlerFlowerBag;
         this.itemStackBeingHeld = itemStackBeingHeld;
         int SLOT_X_SPACING = 18;
         int SLOT_Y_SPACING = 18;
@@ -58,13 +59,13 @@ public class ContainerTuningFork extends Container {
             }
         }
         // Crystal slots
-        addSlot(new SlotItemInteractionHandler(itemStackInteractionHandlerFlowerBag, 0, 80, 20));
+        addSlot(new SlotItemHandler(itemStackHandlerFlowerBag, 0, 80, 20));
     }
 
     @Override
     public boolean stillValid(@Nonnull Player player) {
-        ItemStack main = player.getMainInteractionHandItem();
-        ItemStack off = player.getOffInteractionHandItem();
+        ItemStack main = player.getMainHandItem();
+        ItemStack off = player.getOffhandItem();
         return (!main.isEmpty() && main == itemStackBeingHeld) ||
                 (!off.isEmpty() && off == itemStackBeingHeld);
     }
@@ -78,7 +79,7 @@ public class ContainerTuningFork extends Container {
         }
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack copyOfSourceStack = sourceStack.copy();
-        int BAG_SLOT_COUNT = itemStackInteractionHandler.getSlots();
+        int BAG_SLOT_COUNT = itemStackHandler.getSlots();
 
         if (sourceSlotIndex >= VANILLA_FIRST_SLOT_INDEX
                 && sourceSlotIndex < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
@@ -105,7 +106,7 @@ public class ContainerTuningFork extends Container {
     }
 
     public static ContainerTuningFork createContainerServerSide(int windowID,
-                                                                Inventory Inventory, ItemStackInteractionHandlerTuningFork forkContents,
+                                                                Inventory Inventory, ItemStackHandlerTuningFork forkContents,
                                                                 ItemStack bag) {
         return new ContainerTuningFork(windowID, Inventory, forkContents, bag);
     }
@@ -113,8 +114,8 @@ public class ContainerTuningFork extends Container {
     public static ContainerTuningFork createContainerClientSide(int windowID,
                                                                 Inventory Inventory, PacketBuffer extraData) {
         try {
-            ItemStackInteractionHandlerTuningFork itemStackInteractionHandler = new ItemStackInteractionHandlerTuningFork();
-            return new ContainerTuningFork(windowID, Inventory, itemStackInteractionHandler,
+            ItemStackHandlerTuningFork itemStackHandler = new ItemStackHandlerTuningFork();
+            return new ContainerTuningFork(windowID, Inventory, itemStackHandler,
                     ItemStack.EMPTY);
         } catch (IllegalArgumentException e) {
             MiningGoggles.LOGGER.warn(e);
@@ -125,7 +126,7 @@ public class ContainerTuningFork extends Container {
 
     @Override
     public void broadcastChanges() {
-        if (itemStackInteractionHandler.isDirty()) {
+        if (itemStackHandler.isDirty()) {
             CompoundTag nbt = itemStackBeingHeld.getOrCreateTag();
             int dirtyCounter = nbt.getInt("dirtyCounter");
             nbt.putInt("dirtyCounter", dirtyCounter + 1);
