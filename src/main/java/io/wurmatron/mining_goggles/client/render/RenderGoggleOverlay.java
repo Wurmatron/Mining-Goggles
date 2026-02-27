@@ -19,9 +19,11 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
@@ -38,7 +40,7 @@ import static com.mojang.blaze3d.systems.RenderSystem.*;
 public class RenderGoggleOverlay {
 
     public static NonBlockingHashMap<BlockPos, Float[]> activeRendering = new NonBlockingHashMap<>();
-    public static final BoundingBox BOX = new BoundingBox(0, 0, 0, 1, 1, 1);
+    public static final AABB BOX = new AABB(0, 0, 0, 1, 1, 1);
 
     // Configurable
     public static int MAX_GROWTH_PER_UPDATE = MiningGoggles.config.maxBlocksPerUpdate; // count
@@ -80,7 +82,7 @@ public class RenderGoggleOverlay {
     public void onClientTick(PlayerTickEvent e) {
         if (e.side.isClient()) {
             // Check for goggles
-            if (!(e.player.inventory.armor.get(3)
+            if (!(e.player.getInventory().armor.get(3)
                     .getItem() instanceof MiningGogglesCollector)) {
                 activeRendering.clear();
                 return;
@@ -100,11 +102,11 @@ public class RenderGoggleOverlay {
             }
 
         } else if (e.side.isServer()) {
-            if (e.player.inventory.armor.get(3).getItem() instanceof MiningGogglesCollector) {
-                MiningGogglesCollector collector = (MiningGogglesCollector) e.player.inventory.armor.get(
+            if (e.player.getInventory().armor.get(3).getItem() instanceof MiningGogglesCollector) {
+                MiningGogglesCollector collector = (MiningGogglesCollector) e.player.getInventory().armor.get(
                         3).getItem();
                 if (damageTimer == 0) {
-                    collector.damageCrystals(e.player.level.random, e.player.inventory.armor.get(3));
+                    collector.damageCrystals(e.player.level.random, e.player.getInventory().armor.get(3));
                     damageTimer = 20 * DAMAGE_INTERVAL;
                 } else {
                     damageTimer--;
@@ -114,7 +116,7 @@ public class RenderGoggleOverlay {
     }
 
     private static void updateActiveRendering(Player player) {
-        ItemStack stack = player.inventory.armor.get(3);
+        ItemStack stack = player.getInventory().armor.get(3);
         MiningGoggles.EXECUTORS.submit(() -> {
             NonBlockingHashMap<BlockPos, Float[]> detectedBlocks = collectDetectedBlocks(player,
                     stack, rescanTimer == 0);
@@ -157,23 +159,23 @@ public class RenderGoggleOverlay {
         if (state.is(Blocks.AIR))
             return false;
         List<String> names = getBlockNames(state);
-        MiningGogglesCollector collector = ((MiningGogglesCollector) player.inventory.armor.get(
+        MiningGogglesCollector collector = ((MiningGogglesCollector) player.getInventory().armor.get(
                 3).getItem());
-        if (!player.inventory.armor.get(3).getItem().equals(MiningItems.gogglesDigital)) {
+        if (!player.getInventory().armor.get(3).getItem().equals(MiningItems.gogglesDigital)) {
             for (String name : names) {
                 int wavelength = OreConfigLoader.get(name);
                 if (wavelength != -1 &&
-                        withinRange(player, player.inventory.armor.get(3), pos,
+                        withinRange(player, player.getInventory().armor.get(3), pos,
                                 name, wavelength)
-                        && collector.canSeeBlock(player, player.inventory.armor.get(3), pos,
+                        && collector.canSeeBlock(player, player.getInventory().armor.get(3), pos,
                         wavelength)) {
                     return true;
                 }
             }
         } else {
             for (String name : names) {
-                if (withinRange(player, player.inventory.armor.get(3), pos, name, 0)
-                        && collector.canSeeBlock(player, player.inventory.armor.get(3), pos, 0))
+                if (withinRange(player, player.getInventory().armor.get(3), pos, name, 0)
+                        && collector.canSeeBlock(player, player.getInventory().armor.get(3), pos, 0))
                     return true;
             }
         }
@@ -197,19 +199,19 @@ public class RenderGoggleOverlay {
     private static boolean withinRange(Player player, ItemStack stack, BlockPos pos,
                                        String ore, int wavelength) {
         int waveLength = OreConfigLoader.get(ore);
-        MiningGogglesCollector collector = ((MiningGogglesCollector) player.inventory.armor.get(
+        MiningGogglesCollector collector = ((MiningGogglesCollector) player.getInventory().armor.get(
                 3).getItem());
         double range = collector.maxRange(stack);
         if (!stack.getItem().equals(MiningItems.gogglesDigital)) {
             range = getBlockRadius(range, waveLength,
                     WavelengthCalculator.computeWavelength(
-                            collector.getWavelength(player.inventory.armor.get(3), 0))) + .9; // Add .9 to avoid flicking when near edge of block
+                            collector.getWavelength(player.getInventory().armor.get(3), 0))) + .9; // Add .9 to avoid flicking when near edge of block
             if (range == -1 || range == 0) {
-                range = collector.maxRange(player.inventory.armor.get(3));
+                range = collector.maxRange(player.getInventory().armor.get(3));
                 range = getBlockRadius(range, waveLength,
                         WavelengthCalculator.computeWavelength(
-                                ((MiningGogglesCollector) player.inventory.armor.get(3)
-                                        .getItem()).getWavelength(player.inventory.armor.get(3), 1)));
+                                ((MiningGogglesCollector) player.getInventory().armor.get(3)
+                                        .getItem()).getWavelength(player.getInventory().armor.get(3), 1)));
             }
         }
         if (isClose(new BlockPos(player.getX(), player.getY(), player.getZ()), pos, range, .99)) {
@@ -261,9 +263,9 @@ public class RenderGoggleOverlay {
 
     public void drawBoundingBoxAtBlockPos(PoseStack PoseStackIn, AABB aabbIn,
                                           float red, float green, float blue, float alpha, BlockPos pos) {
-        Vector3d cam = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        Vec3 cam = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         double camX = cam.x(), camY = cam.y(), camZ = cam.z();
-        drawShapeOutline(PoseStackIn, VoxelShapes.create(aabbIn), pos.getX() - camX,
+        drawShapeOutline(PoseStackIn, VoxelShape.create(aabbIn), pos.getX() - camX,
                 pos.getY() - camY, pos.getZ() - camZ, red, green, blue, alpha);
     }
 

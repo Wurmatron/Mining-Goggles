@@ -66,13 +66,13 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
 
     @Override
     public void render(PoseStack stack, int mouseX, int mouseY, float delta) {
-        this.minecraft.getTextureManager().bind(BACKGROUND_TEXTURE);
+        this.minecraft.getTextureManager().bindForSetup(BACKGROUND_TEXTURE);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         int edgeSpacingX = (this.width - xSize) / 2;
         int edgeSpacingY = (this.height - ySize) / 2;
         this.blit(stack, edgeSpacingX, edgeSpacingY, 0, 0, xSize, ySize);
         // Bar
-        drawTexturedModalRect(((width - 218) / 2) + 199,
+        drawTexturedModalRect(stack, ((width - 218) / 2) + 199,
                 (((height - 154) / 2) + 6) + (int) (((142f / 16) * startingIndex)), 219, 6, 12, 53, 1);
         // Boxes
         for (int index = startingIndex; index < startingIndex + 6; index++) {

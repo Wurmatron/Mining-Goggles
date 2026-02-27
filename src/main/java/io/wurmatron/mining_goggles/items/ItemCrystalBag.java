@@ -3,6 +3,7 @@ package io.wurmatron.mining_goggles.items;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesApi;
 import io.wurmatron.mining_goggles.inventory.ContainerCrystalBag;
+import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerCrystalBag;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderCrystalBag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -73,7 +74,7 @@ public class ItemCrystalBag extends Item {
         }
         IItemHandler tileInventory;
         LazyOptional<IItemHandler> capability = tile.getCapability(
-                CapabilityItemHandler.ITEM_InteractionHandLER_CAPABILITY, side);
+                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
         if (capability.isPresent()) {
             tileInventory = capability.orElseThrow(AssertionError::new);
         } else if (tile instanceof Container) {
@@ -81,7 +82,7 @@ public class ItemCrystalBag extends Item {
         } else {
             return InteractionResult.FAIL;
         }
-        ItemStackInteractionHandlerCrystalBag itemStackInteractionHandler = getItemStackCrystalBag(itemStack);
+        ItemStackHandlerCrystalBag itemStackInteractionHandler = getItemStackCrystalBag(itemStack);
         for (int i = 0; i < itemStackInteractionHandler.getSlots(); i++) {
             ItemStack flower = itemStackInteractionHandler.getStackInSlot(i);
             ItemStack flowersWhichDidNotFit = ItemStackHandler.insertItemStacked(tileInventory,
@@ -127,10 +128,10 @@ public class ItemCrystalBag extends Item {
             ItemStack itemStack) {
         IItemHandler crystalBag = itemStack.getCapability(
                 CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
-        if (!(crystalBag instanceof ItemStackInteractionHandlerCrystalBag)) {
-            return new ItemStackInteractionHandlerCrystalBag();
+        if (!(crystalBag instanceof ItemStackHandlerCrystalBag)) {
+            return new ItemStackHandlerCrystalBag();
         }
-        return (ItemStackInteractionHandlerCrystalBag) crystalBag;
+        return (ItemStackHandlerCrystalBag) crystalBag;
     }
 
     private final String BASE_NBT_TAG = "base";

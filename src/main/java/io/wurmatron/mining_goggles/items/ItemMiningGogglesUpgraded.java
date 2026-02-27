@@ -5,21 +5,33 @@ import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_2;
 import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerGoggles_2;
+import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_2;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_2;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.network.NetworkHooks;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
@@ -43,8 +55,8 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
 
     @Nonnull
     @Override
-    public InteractionResult<ItemStack> use(Level Level, Player player,
-                                                 @Nonnull InteractionHand InteractionHand) {
+    public InteractionResultHolder<ItemStack> use(Level Level, Player player,
+                                                  @Nonnull InteractionHand InteractionHand) {
         ItemStack stack = player.getItemInHand(InteractionHand);
         if (!Level.isClientSide) {
             INamedContainerProvider containerProvider = new ContainerProvidedGoggles_1(stack);
@@ -52,40 +64,40 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
                     (packetBuffer) -> {
                     });
         }
-        return InteractionResult.pass(stack);
+        return InteractionResultHolder.pass(stack);
     }
 
     @Nonnull
     @Override
-    public InterInteractionResult onItemUseFirst(ItemStack stack, UseOnContext ctx) {
-        net.minecraft.Level.level.Level Level = ctx.getLevel();
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext ctx) {
+        Level Level = ctx.getLevel();
         if (Level.isClientSide()) {
-            return InterInteractionResult.PASS;
+            return InteractionResult.PASS;
         }
         BlockPos pos = ctx.getClickedPos();
         Direction side = ctx.getClickedFace();
-        ItemStack itemStack = ctx.getItemInInteractionHand();
+        ItemStack itemStack = ctx.getItemInHand();
         BlockEntity tile = Level.getBlockEntity(pos);
         if (tile == null) {
-            return InterInteractionResult.PASS;
+            return InteractionResult.PASS;
         }
         if (Level.isClientSide()) {
-            return InterInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        IItemInteractionHandler tileInventory;
-        LazyOptional<IItemInteractionHandler> capability = tile.getCapability(
-                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY, side);
+        IItemHandler tileInventory;
+        LazyOptional<IItemHandler> capability = tile.getCapability(
+                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
         if (capability.isPresent()) {
             tileInventory = capability.orElseThrow(AssertionError::new);
         } else if (tile instanceof Container) {
             tileInventory = new InvWrapper((Container) tile);
         } else {
-            return InterInteractionResult.FAIL;
+            return InteractionResult.FAIL;
         }
-        ItemStackInteractionHandlerGoggles_2 itemStackInteractionHandler = getItemStackGoggles_2(itemStack);
+        ItemStackHandlerGoggles_2 itemStackInteractionHandler = getItemStackGoggles_2(itemStack);
         for (int i = 0; i < itemStackInteractionHandler.getSlots(); i++) {
             ItemStack flower = itemStackInteractionHandler.getStackInSlot(i);
-            ItemStack flowersWhichDidNotFit = ItemInteractionHandlerHelper.insertItemStacked(tileInventory,
+            ItemStack flowersWhichDidNotFit = ItemHandlerHelper.insertItemStacked(tileInventory,
                     flower, false);
             itemStackInteractionHandler.setStackInSlot(i, flowersWhichDidNotFit);
         }
@@ -94,7 +106,7 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
         int dirtyCounter = nbt.getInt("dirtyCounter");
         nbt.putInt("dirtyCounter", dirtyCounter + 1);
         itemStack.setTag(nbt);
-        return InterInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     private static class ContainerProvidedGoggles_1 implements INamedContainerProvider {
@@ -106,7 +118,7 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
         }
 
         @Override
-        public TextComponent getDisplayName() {
+        public Component getDisplayName() {
             return stackBag.getDisplayName();
         }
 
@@ -125,14 +137,14 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
         return new CapabilityProviderGoggles_2();
     }
 
-    public static ItemStackInteractionHandlerGoggles_2 getItemStackGoggles_2(
+    public static ItemStackHandlerGoggles_2 getItemStackGoggles_2(
             ItemStack itemStack) {
-        IItemInteractionHandler goggles = itemStack.getCapability(
-                CapabilityItemInteractionHandler.ITEM_InteractionHandLER_CAPABILITY).orElse(null);
-        if (!(goggles instanceof ItemStackInteractionHandlerGoggles_2)) {
-            return new ItemStackInteractionHandlerGoggles_2();
+        IItemHandler goggles = itemStack.getCapability(
+                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
+        if (!(goggles instanceof ItemStackHandlerGoggles_2)) {
+            return new ItemStackHandlerGoggles_2();
         }
-        return (ItemStackInteractionHandlerGoggles_2) goggles;
+        return (ItemStackHandlerGoggles_2) goggles;
     }
 
     private final String BASE_NBT_TAG = "base";
@@ -142,7 +154,7 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
     @Override
     public CompoundTag getShareTag(ItemStack stack) {
         CompoundTag baseTag = stack.getTag();
-        ItemStackInteractionHandlerGoggles_2 itemStackInteractionHandler = getItemStackGoggles_2(stack);
+        ItemStackHandlerGoggles_2 itemStackInteractionHandler = getItemStackGoggles_2(stack);
         CompoundTag capabilityTag = itemStackInteractionHandler.serializeNBT();
         CompoundTag combinedTag = new CompoundTag();
         if (baseTag != null) {
@@ -161,7 +173,7 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
             return;
         }
         stack.setTag(nbt.getCompound(BASE_NBT_TAG));
-        ItemStackInteractionHandlerGoggles_2 itemStackInteractionHandlerGoggles_2 = getItemStackGoggles_2(
+        ItemStackHandlerGoggles_2 itemStackInteractionHandlerGoggles_2 = getItemStackGoggles_2(
                 stack);
         itemStackInteractionHandlerGoggles_2.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
     }
@@ -271,15 +283,15 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
 
     @Override
     public void damageCrystals(Random random, ItemStack stack) {
-        ItemStackInteractionHandlerGoggles_2 InteractionHandler = getItemStackGoggles_2(stack);
-        for (int index = 0; index < InteractionHandler.getSlots(); index++) {
-            damageCrystal(random, InteractionHandler, index);
+        ItemStackHandlerGoggles_2 handler = getItemStackGoggles_2(stack);
+        for (int index = 0; index < handler.getSlots(); index++) {
+            damageCrystal(random, handler, index);
         }
     }
 
     public static final int DAMAGE_CHANCE = MiningGoggles.config.goggles.crystalDamageChance > 0 ? MiningGoggles.config.primitiveGoggles.maxRadius : 1;
 
-    private static void damageCrystal(Random rand, ItemStackInteractionHandler InteractionHandler, int index) {
+    private static void damageCrystal(Random rand, ItemStackHandler InteractionHandler, int index) {
         if (!InteractionHandler.getStackInSlot(index).isEmpty()) {
             if (rand.nextInt(DAMAGE_CHANCE) == 0) {
                 InteractionHandler.getStackInSlot(index)

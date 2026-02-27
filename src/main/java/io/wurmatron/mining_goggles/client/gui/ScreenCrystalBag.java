@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.wurmatron.mining_goggles.inventory.ContainerCrystalBag;
 import io.wurmatron.mining_goggles.items.MiningItems;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,7 +14,7 @@ import java.awt.*;
 
 public class ScreenCrystalBag extends AbstractContainerScreen<ContainerCrystalBag> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation("mininggoggles",
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("mininggoggles",
             "textures/gui/crystal_bag.png");
 
     public static final float BAG_LABEL_YPOS = -2;
@@ -21,7 +22,7 @@ public class ScreenCrystalBag extends AbstractContainerScreen<ContainerCrystalBa
     public static final float PLAYER_LABEL_DISTANCE_FROM_BOTTOM = 106;
 
     public ScreenCrystalBag(ContainerCrystalBag container, Inventory playerInv,
-                            TextComponent title) {
+                            Component title) {
         super(container, playerInv, title);
     }
 

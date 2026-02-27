@@ -5,6 +5,7 @@ import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.inventory.ContainerFilter;
 import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerGoggles_Digital;
+import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_Digital;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
@@ -221,14 +222,14 @@ public class ItemMiningGogglesDigital extends ArmorItem implements
         }
     }
 
-    public static ItemStackInteractionHandlerGoggles_Digital getItemStackGoggles_Digital(
+    public static ItemStackHandlerGoggles_Digital getItemStackGoggles_Digital(
             ItemStack itemStack) {
         IItemHandler goggles = itemStack.getCapability(
                 CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
-        if (!(goggles instanceof ItemStackInteractionHandlerGoggles_Digital)) {
-            return new ItemStackInteractionHandlerGoggles_Digital();
+        if (!(goggles instanceof ItemStackHandlerGoggles_Digital)) {
+            return new ItemStackHandlerGoggles_Digital();
         }
-        return (ItemStackInteractionHandlerGoggles_Digital) goggles;
+        return (ItemStackHandlerGoggles_Digital) goggles;
     }
 
     private static class ContainerProviderFilter implements INamedContainerProvider {

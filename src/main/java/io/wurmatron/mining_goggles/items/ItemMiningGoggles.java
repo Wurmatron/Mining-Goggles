@@ -5,6 +5,7 @@ import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_1;
 import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerGoggles_1;
+import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_1;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_1;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import net.minecraft.core.BlockPos;
@@ -94,7 +95,7 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
         } else {
             return InteractionResult.FAIL;
         }
-        ItemStackInteractionHandlerGoggles_1 itemStackInteractionHandler = getItemStackGoggles_1(itemStack);
+        ItemStackHandlerGoggles_1 itemStackInteractionHandler = getItemStackGoggles_1(itemStack);
         for (int i = 0; i < itemStackInteractionHandler.getNumberOfEmptySlots(); i++) {
             ItemStack flower = itemStackInteractionHandler.getStackInSlot(i);
             ItemStack flowersWhichDidNotFit = ItemHandlerHelper.insertItemStacked(tileInventory,
@@ -136,14 +137,14 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
         return new CapabilityProviderGoggles_1();
     }
 
-    public static ItemStackInteractionHandlerGoggles_1 getItemStackGoggles_1(
+    public static ItemStackHandlerGoggles_1 getItemStackGoggles_1(
             ItemStack itemStack) {
         IItemHandler goggles = itemStack.getCapability(
                 CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
-        if (!(goggles instanceof ItemStackInteractionHandlerGoggles_1)) {
-            return new ItemStackInteractionHandlerGoggles_1();
+        if (!(goggles instanceof ItemStackHandlerGoggles_1)) {
+            return new ItemStackHandlerGoggles_1();
         }
-        return (ItemStackInteractionHandlerGoggles_1) goggles;
+        return (ItemStackHandlerGoggles_1) goggles;
     }
 
     private final String BASE_NBT_TAG = "base";
@@ -153,7 +154,7 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
     @Override
     public CompoundTag getShareTag(ItemStack stack) {
         CompoundTag baseTag = stack.getTag();
-        ItemStackInteractionHandlerGoggles_1 itemStackInteractionHandler = getItemStackGoggles_1(stack);
+        ItemStackHandlerGoggles_1 itemStackInteractionHandler = getItemStackGoggles_1(stack);
         CompoundTag capabilityTag = itemStackInteractionHandler.serializeNBT();
         CompoundTag combinedTag = new CompoundTag();
         if (baseTag != null) {
@@ -172,7 +173,7 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
             return;
         }
         stack.setTag(nbt.getCompound(BASE_NBT_TAG));
-        ItemStackInteractionHandlerGoggles_1 itemStackInteractionHandlerGoggles_1 = getItemStackGoggles_1(
+        ItemStackHandlerGoggles_1 itemStackInteractionHandlerGoggles_1 = getItemStackGoggles_1(
                 stack);
         itemStackInteractionHandlerGoggles_1.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
     }
@@ -280,7 +281,7 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
 
     @Override
     public void damageCrystals(Random random, ItemStack stack) {
-        ItemStackInteractionHandlerGoggles_1 InteractionHandler = getItemStackGoggles_1(stack);
+        ItemStackHandlerGoggles_1 InteractionHandler = getItemStackGoggles_1(stack);
         for (int index = 0; index < InteractionHandler.getSlots(); index++) {
             damageCrystal(random, InteractionHandler, index);
         }
