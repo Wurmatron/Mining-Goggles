@@ -4,7 +4,6 @@ import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_2;
-import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerGoggles_2;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_2;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_2;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
@@ -12,10 +11,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Container;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
@@ -59,8 +56,8 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
                                                   @Nonnull InteractionHand InteractionHand) {
         ItemStack stack = player.getItemInHand(InteractionHand);
         if (!Level.isClientSide) {
-            INamedContainerProvider containerProvider = new ContainerProvidedGoggles_1(stack);
-            NetworkHooks.openGui((Player) player, containerProvider,
+            MenuProvider containerProvider = new ContainerProvidedGoggles_1(stack);
+            NetworkHooks.openGui((ServerPlayer) player, containerProvider,
                     (packetBuffer) -> {
                     });
         }
@@ -109,7 +106,7 @@ public class ItemMiningGogglesUpgraded extends ArmorItem implements
         return InteractionResult.SUCCESS;
     }
 
-    private static class ContainerProvidedGoggles_1 implements INamedContainerProvider {
+    private static class ContainerProvidedGoggles_1 implements MenuProvider {
 
         private ItemStack stackBag;
 

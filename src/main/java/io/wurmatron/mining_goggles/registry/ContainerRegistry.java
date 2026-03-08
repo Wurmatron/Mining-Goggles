@@ -5,6 +5,8 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import static net.minecraftforge.network.NetworkEvent.RegistrationChangeType.REGISTER;
+
 public class ContainerRegistry {
 
     //Containers
@@ -17,23 +19,23 @@ public class ContainerRegistry {
     @SubscribeEvent
     public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) {
         // Crystal Bag
-        containerTypeCrystalBag = IForgeContainerType.create(ContainerCrystalBag::createContainerClientSide);
+        containerTypeCrystalBag = MenuType.create(ContainerCrystalBag::createContainerClientSide);
         containerTypeCrystalBag.setRegistryName("container_crystalbag");
         event.getRegistry().register(containerTypeCrystalBag);
         // Goggles 1
-        containerTypeGoggles_1 = IForgeContainerType.create(ContainerMiningGoggles_1::createContainerClientSide);
+        containerTypeGoggles_1 = MenuType.create(ContainerMiningGoggles_1::createContainerClientSide);
         containerTypeGoggles_1.setRegistryName("container_goggles1");
         event.getRegistry().register(containerTypeGoggles_1);
         // Goggles 2 (Goggles Upgraded)
-        containerTypeGoggles_2 = IForgeContainerType.create(ContainerMiningGoggles_2::createContainerClientSide);
+        containerTypeGoggles_2 = MenuType.create(ContainerMiningGoggles_2::createContainerClientSide);
         containerTypeGoggles_2.setRegistryName("container_goggles2");
         event.getRegistry().register(containerTypeGoggles_2);
         // Tuning Fork
-        containerTuningFork = IForgeContainerType.create(ContainerTuningFork::createContainerClientSide);
+        containerTuningFork = MenuType.create(ContainerTuningFork::createContainerClientSide);
         containerTuningFork.setRegistryName("container_tuningfork");
         event.getRegistry().register(containerTuningFork);
         // Goggles (Digital)
-        containerTypeGoggles_Digital = IForgeContainerType.create(ContainerFilter::createContainerClientSide);
+        containerTypeGoggles_Digital = MenuType.create(ContainerFilter::createContainerClientSide);
         containerTypeGoggles_Digital.setRegistryName("container_filterdigital");
         event.getRegistry().register(containerTypeGoggles_Digital);
     }

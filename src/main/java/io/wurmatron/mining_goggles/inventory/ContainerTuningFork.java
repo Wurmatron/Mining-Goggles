@@ -1,5 +1,6 @@
 package io.wurmatron.mining_goggles.inventory;
 
+import io.netty.buffer.ByteBuf;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerTuningFork;
 import io.wurmatron.mining_goggles.registry.ContainerRegistry;
@@ -7,17 +8,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 
-public class ContainerTuningFork extends Container {
+public class ContainerTuningFork extends AbstractContainerMenu {
 
     private final ItemStackHandlerTuningFork itemStackHandler;
     private final ItemStack itemStackBeingHeld;
-
 
     private static final int HOTBAR_SLOT_COUNT = 9;
     private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
@@ -112,7 +113,7 @@ public class ContainerTuningFork extends Container {
     }
 
     public static ContainerTuningFork createContainerClientSide(int windowID,
-                                                                Inventory Inventory, PacketBuffer extraData) {
+                                                                Inventory Inventory, ByteBuf extraData) {
         try {
             ItemStackHandlerTuningFork itemStackHandler = new ItemStackHandlerTuningFork();
             return new ContainerTuningFork(windowID, Inventory, itemStackHandler,

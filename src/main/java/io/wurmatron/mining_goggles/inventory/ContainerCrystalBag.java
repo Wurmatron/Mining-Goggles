@@ -8,13 +8,14 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 
-public class ContainerCrystalBag extends Container {
+public class ContainerCrystalBag extends AbstractContainerMenu {
 
     private final ItemStackHandlerCrystalBag itemStackHandler;
     private final ItemStack itemStackBeingHeld;
@@ -119,10 +120,10 @@ public class ContainerCrystalBag extends Container {
     }
 
     public static ContainerCrystalBag createContainerClientSide(int windowID,
-                                                                Inventory Inventory, FriendlyByteBuf extraData) {
+                                                                Inventory inv, FriendlyByteBuf extraData) {
         try {
             ItemStackHandlerCrystalBag itemStackHandler = new ItemStackHandlerCrystalBag();
-            return new ContainerCrystalBag(windowID, Inventory, itemStackHandler,
+            return new ContainerCrystalBag(windowID, inv, itemStackHandler,
                     ItemStack.EMPTY);
         } catch (IllegalArgumentException e) {
             MiningGoggles.LOGGER.warn(e);

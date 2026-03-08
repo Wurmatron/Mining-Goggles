@@ -4,10 +4,12 @@ import io.wurmatron.mining_goggles.inventory.ContainerTuningFork;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerTuningFork;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderTuningFork;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -70,7 +72,7 @@ public class ItemTuningFork extends Item {
         super.appendHoverText(stack, Level, list, tip);
     }
 
-    private static class ContainerProvidedTuningFork implements NamedContainerProvider {
+    private static class ContainerProvidedTuningFork implements MenuProvider {
 
         private ItemStack stackBag;
 
@@ -79,7 +81,7 @@ public class ItemTuningFork extends Item {
         }
 
         @Override
-        public TextComponent getDisplayName() {
+        public Component getDisplayName() {
             return stackBag.getDisplayName();
         }
 

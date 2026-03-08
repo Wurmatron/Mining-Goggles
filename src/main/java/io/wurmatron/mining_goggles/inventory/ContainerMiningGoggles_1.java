@@ -7,13 +7,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 
-public class ContainerMiningGoggles_1 extends Container {
+public class ContainerMiningGoggles_1 extends AbstractContainerMenu {
 
     private final ItemStackHandlerGoggles_1 itemStackHandler;
     public final ItemStack itemStackBeingHeld;

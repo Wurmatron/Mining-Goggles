@@ -5,6 +5,7 @@ import io.wurmatron.mining_goggles.api.MiningGogglesApi;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -30,8 +31,7 @@ public class ItemAttunmentCrystal extends ItemCrystal {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level Level,
-                                List<TextComponent> text, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<TextComponent> text, TooltipFlag tip) {
         if (stack.getTag() != null && !stack.getTag().isEmpty()) {
             if (stack.getTag().getString("type").isEmpty()) {
                 text.add(new TextComponent("Unattuned"));
@@ -41,7 +41,7 @@ public class ItemAttunmentCrystal extends ItemCrystal {
                                 + stack.getTag().getString("type") + ChatFormatting.GRAY + "'"));
             }
         } else {
-            super.appendHoverText(stack, Level, text, flag);
+            super.appendHoverText(stack, world, text, tip);
         }
     }
 

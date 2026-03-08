@@ -9,12 +9,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Container;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +26,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.network.NetworkHooks;
 
@@ -47,12 +44,12 @@ public class ItemCrystalBag extends Item {
                                                   @Nonnull InteractionHand InteractionHand) {
         ItemStack stack = player.getItemInHand(InteractionHand);
         if (!Level.isClientSide) {
-            INamedContainerProvider containerProvider = new ContainerProvidedCrystalBag(stack);
+            MenuProvider containerProvider = new ContainerProvidedCrystalBag(stack);
             NetworkHooks.openGui((ServerPlayer) player, containerProvider,
                     (packetBuffer) -> {
                     });
         }
-        return InteractionResult.PASS;
+        return InteractionResultHolder.pass(stack);
     }
 
     @Nonnull
@@ -85,7 +82,7 @@ public class ItemCrystalBag extends Item {
         ItemStackHandlerCrystalBag itemStackInteractionHandler = getItemStackCrystalBag(itemStack);
         for (int i = 0; i < itemStackInteractionHandler.getSlots(); i++) {
             ItemStack flower = itemStackInteractionHandler.getStackInSlot(i);
-            ItemStack flowersWhichDidNotFit = ItemStackHandler.insertItemStacked(tileInventory,
+            ItemStack flowersWhichDidNotFit = itemStackInteractionHandler.insertItem(tileInventory,
                     flower, false);
             itemStackInteractionHandler.setStackInSlot(i, flowersWhichDidNotFit);
         }
@@ -97,7 +94,7 @@ public class ItemCrystalBag extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    private static class ContainerProvidedCrystalBag implements INamedContainerProvider {
+    private static class ContainerProvidedCrystalBag implements MenuProvider {
 
         private ItemStack stackBag;
 
@@ -106,7 +103,7 @@ public class ItemCrystalBag extends Item {
         }
 
         @Override
-        public TextComponent getDisplayName() {
+        public Component getDisplayName() {
             return stackBag.getDisplayName();
         }
 
@@ -141,7 +138,7 @@ public class ItemCrystalBag extends Item {
     @Override
     public CompoundTag getShareTag(ItemStack stack) {
         CompoundTag baseTag = stack.getTag();
-        ItemStackInteractionHandlerCrystalBag itemStackInteractionHandler = getItemStackCrystalBag(stack);
+        ItemStackHandlerCrystalBag itemStackInteractionHandler = getItemStackCrystalBag(stack);
         CompoundTag capabilityTag = itemStackInteractionHandler.serializeNBT();
         CompoundTag combinedTag = new CompoundTag();
         if (baseTag != null) {
@@ -160,14 +157,14 @@ public class ItemCrystalBag extends Item {
             return;
         }
         stack.setTag(nbt.getCompound(BASE_NBT_TAG));
-        ItemStackInteractionHandlerCrystalBag itemStackInteractionHandlerFlowerBag = getItemStackCrystalBag(
+        ItemStackHandlerCrystalBag itemStackInteractionHandlerFlowerBag = getItemStackCrystalBag(
                 stack);
         itemStackInteractionHandlerFlowerBag.deserializeNBT(nbt.getCompound(CAPABILITY_NBT_TAG));
     }
 
     public static float getFullnessPropertyOverride(ItemStack itemStack,
                                                     @Nullable Level Level, @Nullable LivingEntity livingEntity) {
-        ItemStackInteractionHandlerCrystalBag itemStackInteractionHandler = getItemStackCrystalBag(itemStack);
+        ItemStackHandlerCrystalBag itemStackInteractionHandler = getItemStackCrystalBag(itemStack);
         float fractionEmpty =
                 itemStackInteractionHandler.getNumberOfEmptySlots() / (float) itemStackInteractionHandler.getSlots();
         return 1.0F - fractionEmpty;
@@ -194,7 +191,7 @@ public class ItemCrystalBag extends Item {
 
     public static ItemStack create(ItemStack[] items) {
         ItemStack bag = new ItemStack(MiningItems.bag);
-        ItemStackInteractionHandlerCrystalBag InteractionHandler = getItemStackCrystalBag(bag);
+        ItemStackHandlerCrystalBag InteractionHandler = getItemStackCrystalBag(bag);
         for (int x = 0; x < InteractionHandler.getNumberOfEmptySlots(); x++) {
             if (items.length > x) {
                 InteractionHandler.insertItem(x, items[x], false);

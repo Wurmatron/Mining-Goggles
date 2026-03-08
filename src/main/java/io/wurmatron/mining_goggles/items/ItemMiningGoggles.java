@@ -4,18 +4,15 @@ import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.api.MiningGogglesCollector;
 import io.wurmatron.mining_goggles.client.render.RenderGoggleOverlay;
 import io.wurmatron.mining_goggles.inventory.ContainerMiningGoggles_1;
-import io.wurmatron.mining_goggles.items.InteractionHandler.ItemStackInteractionHandlerGoggles_1;
 import io.wurmatron.mining_goggles.items.handler.ItemStackHandlerGoggles_1;
 import io.wurmatron.mining_goggles.items.providers.CapabilityProviderGoggles_1;
 import io.wurmatron.mining_goggles.utils.WavelengthCalculator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Container;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,7 +22,6 @@ import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -56,16 +52,15 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
 
     @Nonnull
     @Override
-    public InteractionResult use(LevelAccessor Level, Player player,
-                                      @Nonnull InteractionHand InteractionHand) {
-        ItemStack stack = player.getItemInHand(InteractionHand);
-        if (!Level.isClientSide()) {
-            INamedContainerProvider containerProvider = new ContainerProvidedGoggles_1(stack);
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!world.isClientSide()) {
+            MenuProvider containerProvider = new ContainerProvidedGoggles_1(stack);
             NetworkHooks.openGui((ServerPlayer) player, containerProvider,
                     (packetBuffer) -> {
                     });
         }
-        return InteractionResult.PASS;
+        return InteractionResultHolder.pass(stack);
     }
 
     @Nonnull
@@ -110,7 +105,7 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
         return InteractionResult.SUCCESS;
     }
 
-    private static class ContainerProvidedGoggles_1 implements INamedContainerProvider {
+    private static class ContainerProvidedGoggles_1 implements MenuProvider {
 
         private ItemStack stackBag;
 
@@ -119,7 +114,7 @@ public class ItemMiningGoggles extends ArmorItem implements MiningGogglesCollect
         }
 
         @Override
-        public TextComponent getDisplayName() {
+        public Component getDisplayName() {
             return stackBag.getDisplayName();
         }
 
