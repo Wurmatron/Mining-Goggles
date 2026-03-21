@@ -3,12 +3,12 @@ package io.wurmatron.mining_goggles.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.wurmatron.mining_goggles.inventory.ContainerTuningFork;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-public class ScreenTuningFork extends ContainerScreen<ContainerTuningFork> {
+public class ScreenTuningFork extends AbstractContainerScreen<ContainerTuningFork> {
 
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("mininggoggles",
             "textures/gui/tuning_fork.png");
@@ -18,7 +18,7 @@ public class ScreenTuningFork extends ContainerScreen<ContainerTuningFork> {
 
     public ScreenTuningFork(ContainerTuningFork container,
                             Inventory playerInv,
-                            TextComponent title) {
+                            Component title) {
         super(container, playerInv, title);
         this.imageWidth = 176;
         this.imageHeight = 142;
@@ -39,8 +39,8 @@ public class ScreenTuningFork extends ContainerScreen<ContainerTuningFork> {
     @Override
     protected void renderBg(PoseStack PoseStack, float partialTicks, int mouseX,
                             int mouseY) {
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bind(TEXTURE);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        this.minecraft.getTextureManager().bindForSetup(TEXTURE);
         int edgeSpacingX = (this.width - this.getXSize()) / 2;
         int edgeSpacingY = (this.height - this.getXSize()) / 2;
         blit(PoseStack, edgeSpacingX, edgeSpacingY, 0, 0, getXSize(), getYSize());

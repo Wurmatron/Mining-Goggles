@@ -36,7 +36,7 @@ public class ContainerTuningFork extends AbstractContainerMenu {
     private ContainerTuningFork(int windowId, Inventory playerInv,
                                 ItemStackHandlerTuningFork itemStackHandlerFlowerBag,
                                 ItemStack itemStackBeingHeld) {
-        super(ContainerRegistry.containerTuningFork, windowId);
+        super(ContainerRegistry.containerTuningFork.get(), windowId);
         this.itemStackHandler = itemStackHandlerFlowerBag;
         this.itemStackBeingHeld = itemStackBeingHeld;
         int SLOT_X_SPACING = 18;

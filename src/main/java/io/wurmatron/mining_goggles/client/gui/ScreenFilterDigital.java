@@ -1,24 +1,28 @@
 package io.wurmatron.mining_goggles.client.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.inventory.ContainerFilter;
 import io.wurmatron.mining_goggles.items.ItemMiningGogglesDigital;
 import io.wurmatron.mining_goggles.network.PacketUtils;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
 import static net.minecraftforge.client.gui.GuiUtils.drawTexturedModalRect;
 
-public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
+public class ScreenFilterDigital extends AbstractContainerScreen<ContainerFilter> {
 
     public final static ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(MiningGoggles.MODID, "textures/gui/gogglesfilter.png");
     private static final int xSize = 217;
@@ -28,7 +32,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
     private int startingIndex = 0;
     private ItemStack stack;
 
-    public ScreenFilterDigital(ContainerFilter containerFilter, Inventory inventory, TextComponent title) {
+    public ScreenFilterDigital(ContainerFilter containerFilter, Inventory inventory, Component title) {
         super(containerFilter, inventory, title);
         stack = inventory.getSelected();
     }
@@ -67,7 +71,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
     @Override
     public void render(PoseStack stack, int mouseX, int mouseY, float delta) {
         this.minecraft.getTextureManager().bindForSetup(BACKGROUND_TEXTURE);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         int edgeSpacingX = (this.width - xSize) / 2;
         int edgeSpacingY = (this.height - ySize) / 2;
         this.blit(stack, edgeSpacingX, edgeSpacingY, 0, 0, xSize, ySize);
@@ -91,7 +95,7 @@ public class ScreenFilterDigital extends ContainerScreen<ContainerFilter> {
 
     @Override
     public boolean keyPressed(int p_231046_1_, int p_231046_2_, int p_231046_3_) {
-        InputMappings.Input mouseKey = InputMappings.getKey(p_231046_1_, p_231046_2_);
+        InputConstants.Key mouseKey = InputConstants.getKey(p_231046_1_, p_231046_2_);
         if (!(mouseKey.getValue() == 69))
             return super.keyPressed(p_231046_1_, p_231046_2_, p_231046_3_);
         return false;

@@ -34,7 +34,7 @@ public class ContainerMiningGoggles_1 extends AbstractContainerMenu {
     private ContainerMiningGoggles_1(int windowId, Inventory playerInv,
                                      ItemStackHandlerGoggles_1 itemStackHandlerGoggles_1,
                                      ItemStack itemStackBeingHeld) {
-        super(ContainerRegistry.containerTypeGoggles_1, windowId);
+        super(ContainerRegistry.containerTypeGoggles_1.get(), windowId);
         this.itemStackHandler = itemStackHandlerGoggles_1;
         this.itemStackBeingHeld = itemStackBeingHeld;
         int SLOT_X_SPACING = 18;

@@ -33,10 +33,10 @@ public class ContainerCrystalBag extends AbstractContainerMenu {
     public static final int BAG_INVENTORY_YPOS = 7;
     public static final int PLAYER_INVENTORY_YPOS = 69;
 
-    private ContainerCrystalBag(int windowId, Player playerInv,
+    public ContainerCrystalBag(int windowId, Player playerInv,
                                 ItemStackHandlerCrystalBag itemStackHandlerCrystalBag,
                                 ItemStack itemStackBeingHeld) {
-        super(ContainerRegistry.containerTypeCrystalBag, windowId);
+        super(ContainerRegistry.containerTypeCrystalBag.get(), windowId);
         this.itemStackHandler = itemStackHandlerCrystalBag;
         this.itemStackBeingHeld = itemStackBeingHeld;
         int SLOT_X_SPACING = 18;

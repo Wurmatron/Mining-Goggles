@@ -14,7 +14,7 @@ public class ContainerFilter extends AbstractContainerMenu {
     public ItemStack helmet;
 
     public ContainerFilter(int id, ItemStack helmet) {
-        super(ContainerRegistry.containerTypeGoggles_Digital, id);
+        super(ContainerRegistry.containerTypeGoggles_Digital.get(), id);
         this.helmet = helmet;
     }
 

@@ -86,12 +86,10 @@ public class MiningGoggles {
     }
 
     private void doClientStuff(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> {
-            () -> MenuScreens.register(ContainerRegistry.containerTypeCrystalBag, ScreenCrystalBag::new);
-            () -> MenuScreens.register(ContainerRegistry.containerTypeGoggles_1, ScreenMiningGoggles_1::new);
-            () -> MenuScreens.register(ContainerRegistry.containerTypeGoggles_2, ScreenMiningGoggles_2::new);
-            () -> MenuScreens.register(ContainerRegistry.containerTuningFork, ScreenTuningFork::new);
-            () -> MenuScreens.register(ContainerRegistry.containerTypeGoggles_Digital, ScreenFilterDigital::new);
-        });
+        event.enqueueWork(() -> MenuScreens.register(ContainerRegistry.containerTypeCrystalBag.get(), ScreenCrystalBag::new));
+        event.enqueueWork(() -> MenuScreens.register(ContainerRegistry.containerTypeGoggles_1.get(), ScreenMiningGoggles_1::new));
+        event.enqueueWork(() -> MenuScreens.register(ContainerRegistry.containerTypeGoggles_2.get(), ScreenMiningGoggles_2::new));
+        event.enqueueWork(() -> MenuScreens.register(ContainerRegistry.containerTuningFork.get(), ScreenTuningFork::new));
+        event.enqueueWork(() -> MenuScreens.register(ContainerRegistry.containerTypeGoggles_Digital.get(), ScreenFilterDigital::new));
     }
 }

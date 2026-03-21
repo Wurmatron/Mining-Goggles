@@ -45,7 +45,7 @@ public class ScreenCrystalBag extends AbstractContainerScreen<ContainerCrystalBa
         font.draw(PoseStack, bagLabel, BAG_LABEL_XPOS, BAG_LABEL_YPOS,
                 Color.darkGray.getRGB());
         float PLAYER_LABEL_YPOS = getYSize() - PLAYER_LABEL_DISTANCE_FROM_BOTTOM;
-        font.draw(PoseStack, this.inventory.getDisplayName(), PLAYER_LABEL_XPOS,
+        font.draw(PoseStack, this.playerInventoryTitle.getString(), PLAYER_LABEL_XPOS,
                 PLAYER_LABEL_YPOS, Color.darkGray.getRGB());
     }
 

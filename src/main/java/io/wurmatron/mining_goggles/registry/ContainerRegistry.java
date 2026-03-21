@@ -1,27 +1,30 @@
 package io.wurmatron.mining_goggles.registry;
 
+import io.wurmatron.mining_goggles.MiningGoggles;
 import io.wurmatron.mining_goggles.inventory.*;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 import static net.minecraftforge.network.NetworkEvent.RegistrationChangeType.REGISTER;
 
 public class ContainerRegistry {
 
+    public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, MiningGoggles.MODID);
+
     //Containers
-    public static MenuType<ContainerCrystalBag> containerTypeCrystalBag;
-    public static MenuType<ContainerMiningGoggles_1> containerTypeGoggles_1;
-    public static MenuType<ContainerMiningGoggles_2> containerTypeGoggles_2;
-    public static MenuType<ContainerTuningFork> containerTuningFork;
-    public static MenuType<ContainerFilter> containerTypeGoggles_Digital;
+    public static RegistryObject<MenuType<ContainerCrystalBag>> containerTypeCrystalBag = CONTAINERS.register("container_crystalbag", ()-> new MenuType<>(ContainerCrystalBag::new));
+    public static RegistryObject<MenuType<ContainerMiningGoggles_1>> containerTypeGoggles_1;
+    public static RegistryObject<MenuType<ContainerMiningGoggles_2>> containerTypeGoggles_2;
+    public static RegistryObject<MenuType<ContainerTuningFork>> containerTuningFork;
+    public static RegistryObject<MenuType<ContainerFilter>> containerTypeGoggles_Digital;
 
     @SubscribeEvent
     public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) {
-        // Crystal Bag
-        containerTypeCrystalBag = MenuType.create(ContainerCrystalBag::createContainerClientSide);
-        containerTypeCrystalBag.setRegistryName("container_crystalbag");
-        event.getRegistry().register(containerTypeCrystalBag);
+        event.getRegistry().register(containerTypeCrystalBag.get());
         // Goggles 1
         containerTypeGoggles_1 = MenuType.create(ContainerMiningGoggles_1::createContainerClientSide);
         containerTypeGoggles_1.setRegistryName("container_goggles1");
